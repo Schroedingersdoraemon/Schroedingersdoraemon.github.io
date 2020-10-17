@@ -4,6 +4,7 @@ title:  "dwmblocks使用心得"
 date:   2020-09-13 22:33:36 +0800
 categories: jekyll update
 ---
+
 本文系博主转载而来，已不明出处。
 
 我是 openSUSE 中文维基唯一的非官方维护者，openSUSE 简体中文翻译团队召集人，linuxsir SuSE 版块的版主，openSUSE 官方论坛 http://forums.opensuse.org 的唯一非官方版主，openSUSE 开放式编译服务中文软件源维护者。
