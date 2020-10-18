@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "dwmblocks使用心得"
+title:  "关于openSUSE"
 date:   2020-09-13 22:33:36 +0800
 categories: jekyll update
 ---
