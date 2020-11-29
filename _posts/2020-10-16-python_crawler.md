@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "北京理工大学python爬虫教程总结文档"
+title:  "python crawler tutorials and docs of Beijing Institute of Technology"
 date:   2020-03-13 22:24:36 +0800
 categories: jekyll update
 ---
