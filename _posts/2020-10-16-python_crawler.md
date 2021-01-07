@@ -65,7 +65,7 @@ def getHTMLtext(url):
 |requests.post()|submit POST resourses|
 |requests.put()|submit PUT(replace)|
 |requests.patch()|partially modified requests|
-|requests.delete()|delete
+|requests.delete()|delete|
 
 HTTP, Hyper Text Transfer Protocol  
 URL: `http://host[:port][path]
@@ -321,11 +321,11 @@ soup2 = BeautifulSoup(open('./demo.html'), 'html.parser')
 
 |Element|About|
 |:-:|:-:|
-|Tag|<>和</>标明开头结尾
-|Name|标签名字, `<p`>...`</p`>的名字是 p , 格式：`<tag>`.name
-|Attributes|字典形式， `<tag>`.attrs
-|NavigableString|非属性字符串,<>...</>中字符串， 格式：`<tag>`.string
-|Comment|注释
+|Tag|<>和</>标明开头结尾|
+|Name|标签名字, `<p`>...`</p`>的名字是 p , 格式：`<tag>`.name|
+|Attributes|字典形式， `<tag>`.attrs|
+|NavigableString|非属性字符串,<>...</>中字符串， 格式：`<tag>`.string|
+|Comment|注释|
 ```html
  <html>  
    <body>  
@@ -592,7 +592,7 @@ re: PY[^PY][0:10]
 |$|结尾|abc$表示abc且在结尾
 |()|分组标记，内部使用1|(abc)表示abc, (abc1def)表示abc, def|
 |\d|=[0-9]|
-|\w|=[A-Za-z0-9_]
+|\w|=[A-Za-z0-9_]|
 
 ```
 examples
@@ -603,6 +603,8 @@ PY{:#}N                     -       PN, PYN, PYYN, PYYN
 ```
 
 #### classic examples
+
+```
 |re||
 |:-:|:-:|
 |^[A-Za-z]+$|字母构成
