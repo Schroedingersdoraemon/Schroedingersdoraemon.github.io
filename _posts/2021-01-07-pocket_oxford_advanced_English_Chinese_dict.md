@@ -13,7 +13,9 @@ categories: jekyll update
 
 ### 二、下载词库文件
 
-[点此下载](http://123.57.208.243/Oxford_Advanced_9th.tar)牛津高阶英汉双语词典文件(或右键另存为)，疑问可联系网站管理员：dyalnturing@protonmail.com
+[点此下载](http://123.57.208.243/Oxford_Advanced_9th.tar)牛津高阶英汉双语词典文件(或右键另存为)
+
+文件404请联系网站管理员：dylanturing@protonmail.com
 
 ### 三、软件
 
