@@ -6,7 +6,9 @@ categories: jekyll update
 ---
 
 # 一、Week1:规则
+
 ## 1. Library: Requests
+
 ### (1). requests
     r = requests.get(url, params=None, **kwargs)
 
@@ -36,7 +38,7 @@ categories: jekyll update
 |requests.URLRuquired|URL缺失异常|
 |requests.TooManyRedirects|重定向|
 |requests.ConnectTimeout|连接远程服务器超时异常|
-|requests.Timeout|请求URL超时
+|requests.Timeout|请求URL超时|
 
 ```python
 #!/usr/bin/python
@@ -604,10 +606,9 @@ PY{:#}N                     -       PN, PYN, PYYN, PYYN
 
 #### classic examples
 
-```
 |re||
 |:-:|:-:|
-|^[A-Za-z]+$|字母构成
+|^[A-Za-z]+$|字母构成|
 |^[A-Za-z0-9]+$|字母和数字|
 |^-?\d+$|整数|
 |^[0-9]*[1-9][0-9]*$|正整数|
@@ -643,9 +644,9 @@ re库采用`raw string`类型表达正则表达式, 表示为`r'text'`
 #### 1) re.search(pattern, string, flags = 0)
 |flags|about|
 |:-:|:-:|
-|re.I  re.IGNORECASE|忽略大小写，[A-Z]可匹配小写字符
-|re.M  re.MULTILINE|^操作符能将给定字符串每行作为匹配开始
-|re.S  re.DOTALL|.匹配所有字符（默认不包括换行符）
+|re.I  re.IGNORECASE|忽略大小写，[A-Z]可匹配小写字符|
+|re.M  re.MULTILINE|^操作符能将给定字符串每行作为匹配开始|
+|re.S  re.DOTALL|.匹配所有字符（默认不包括换行符）|
 ```python
 import re
 match = re.search(r'[1-9]\d{5}', 'BIT 100081')
