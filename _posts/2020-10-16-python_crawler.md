@@ -27,10 +27,10 @@ categories: jekyll update
   r.encoding            #HTTP header中获取字段
   r.apparent_encoding   #从内容中分析出的响应内容编码方式（备选）
   r.content
-
 ```
 
 ### (2). universal framework
+
 |||
 |:-:|:-:|
 |requests.ConnectionError|网络连接错误|
@@ -59,6 +59,7 @@ def getHTMLtext(url):
 ```
 
 ### (3). 7 major methods of Requests
+
 |METHODS|INTRODUCTION|
 |:-:|:-:|
 |requests.request()||
