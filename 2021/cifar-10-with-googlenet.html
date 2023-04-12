@@ -1,0 +1,198 @@
+<!DOCTYPE html><html> <head><title>CIFAR-10 with GoogLeNet</title><meta charset=utf-8><link rel=stylesheet href=/theme/css/main.css></head> <body> <h1>CIFAR-10 with GoogLeNet</h1> 2021-05-16 11:32 <hr> <h1>1. train part</h1> <div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>PIL</span>
+<span class=kn>import</span> <span class=nn>time</span>
+<span class=kn>import</span> <span class=nn>torch</span>
+<span class=kn>import</span> <span class=nn>numpy</span> <span class=k>as</span> <span class=nn>np</span>
+<span class=kn>from</span> <span class=nn>torch</span> <span class=kn>import</span> <span class=n>nn</span>
+<span class=kn>from</span> <span class=nn>tqdm</span> <span class=kn>import</span> <span class=n>tqdm</span>
+<span class=kn>from</span> <span class=nn>torch</span> <span class=kn>import</span> <span class=n>optim</span>
+<span class=kn>from</span> <span class=nn>torchvision</span> <span class=kn>import</span> <span class=n>transforms</span>
+<span class=kn>from</span> <span class=nn>torch.nn</span> <span class=kn>import</span> <span class=n>functional</span> <span class=k>as</span> <span class=n>F</span>
+<span class=kn>from</span> <span class=nn>matplotlib</span> <span class=kn>import</span> <span class=n>pyplot</span> <span class=k>as</span> <span class=n>plt</span>
+<span class=kn>from</span> <span class=nn>torch.utils.data</span> <span class=kn>import</span> <span class=n>DataLoader</span>
+<span class=kn>from</span> <span class=nn>torchvision.datasets</span> <span class=kn>import</span> <span class=n>CIFAR10</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=err>!</span><span class=n>wget</span> <span class=n>https</span><span class=p>:</span><span class=o>//</span><span class=n>www</span><span class=o>.</span><span class=n>cs</span><span class=o>.</span><span class=n>toronto</span><span class=o>.</span><span class=n>edu</span><span class=o>/~</span><span class=n>kriz</span><span class=o>/</span><span class=n>cifar</span><span class=o>-</span><span class=mi>10</span><span class=o>-</span><span class=n>python</span><span class=o>.</span><span class=n>tar</span><span class=o>.</span><span class=n>gz</span>
+</code></pre></div> <p>--2021-05-16 11:43:20-- https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz</p> <p>Loaded CA certificate '/etc/ssl/certs/ca-certificates.crt'</p> <p>Resolving www.cs.toronto.edu (www.cs.toronto.edu)... 128.100.3.30</p> <p>Connecting to www.cs.toronto.edu (www.cs.toronto.edu)|128.100.3.30|:443... connected.</p> <p>HTTP request sent, awaiting response... 200 OK</p> <p>Length: 170498071 (163M) [application/x-gzip]</p> <p>Saving to: ‘cifar-10-python.tar.gz’</p> <p>cifar-10-python.tar 100%[===================&gt;] 162.60M 3.42MB/s in 50s </p> <p>2021-05-16 11:44:11 (3.27 MB/s) - ‘cifar-10-python.tar.gz’ saved [170498071/170498071]</p> <div class=highlight><pre><span></span><code><span class=n>transform</span> <span class=o>=</span> <span class=n>transforms</span><span class=o>.</span><span class=n>Compose</span><span class=p>([</span>
+    <span class=n>transforms</span><span class=o>.</span><span class=n>ToTensor</span><span class=p>(),</span>
+    <span class=n>transforms</span><span class=o>.</span><span class=n>Normalize</span><span class=p>(</span><span class=n>mean</span> <span class=o>=</span> <span class=p>(</span><span class=mf>0.5</span><span class=p>,</span> <span class=mf>0.5</span><span class=p>,</span> <span class=mf>0.5</span><span class=p>),</span>
+                         <span class=n>std</span> <span class=o>=</span> <span class=p>(</span><span class=mf>0.5</span><span class=p>,</span> <span class=mf>0.5</span><span class=p>,</span> <span class=mf>0.5</span><span class=p>))</span>
+<span class=p>])</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>train_set</span> <span class=o>=</span> <span class=n>CIFAR10</span><span class=p>(</span>
+    <span class=n>root</span> <span class=o>=</span> <span class=s1>&#39;./cifar-10&#39;</span><span class=p>,</span>
+    <span class=n>train</span> <span class=o>=</span> <span class=kc>True</span><span class=p>,</span>
+    <span class=c1># download = True,</span>
+    <span class=n>transform</span> <span class=o>=</span> <span class=n>transform</span>
+<span class=p>)</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>train_loader</span> <span class=o>=</span> <span class=n>DataLoader</span><span class=p>(</span>
+    <span class=n>train_set</span><span class=p>,</span>
+    <span class=n>batch_size</span> <span class=o>=</span> <span class=mi>100</span><span class=p>,</span>
+    <span class=n>shuffle</span> <span class=o>=</span> <span class=kc>True</span>
+<span class=p>)</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=k>class</span> <span class=nc>Inception_A</span><span class=p>(</span><span class=n>nn</span><span class=o>.</span><span class=n>Module</span><span class=p>):</span>
+    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>in_channels</span><span class=p>):</span>
+        <span class=nb>super</span><span class=p>(</span><span class=n>Inception_A</span><span class=p>,</span> <span class=bp>self</span><span class=p>)</span><span class=o>.</span><span class=fm>__init__</span><span class=p>()</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>branch3x3_1</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Conv2d</span><span class=p>(</span><span class=n>in_channels</span><span class=p>,</span> <span class=mi>16</span><span class=p>,</span> <span class=mi>1</span><span class=p>)</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>branch3x3_2</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Conv2d</span><span class=p>(</span><span class=mi>16</span><span class=p>,</span> <span class=mi>24</span><span class=p>,</span> <span class=mi>3</span><span class=p>,</span> <span class=n>padding</span> <span class=o>=</span> <span class=mi>1</span><span class=p>)</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>branch3x3_3</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Conv2d</span><span class=p>(</span><span class=mi>24</span><span class=p>,</span> <span class=mi>24</span><span class=p>,</span> <span class=mi>3</span><span class=p>,</span> <span class=n>padding</span> <span class=o>=</span> <span class=mi>1</span><span class=p>)</span>
+
+        <span class=bp>self</span><span class=o>.</span><span class=n>branch5x5_1</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Conv2d</span><span class=p>(</span><span class=n>in_channels</span><span class=p>,</span> <span class=mi>16</span><span class=p>,</span> <span class=mi>1</span><span class=p>)</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>branch5x5_2</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Conv2d</span><span class=p>(</span><span class=mi>16</span><span class=p>,</span> <span class=mi>24</span><span class=p>,</span> <span class=mi>5</span><span class=p>,</span> <span class=n>padding</span> <span class=o>=</span> <span class=mi>2</span><span class=p>)</span>
+
+        <span class=bp>self</span><span class=o>.</span><span class=n>branch1x1</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Conv2d</span><span class=p>(</span><span class=n>in_channels</span><span class=p>,</span> <span class=mi>16</span><span class=p>,</span> <span class=mi>1</span><span class=p>)</span>
+
+        <span class=bp>self</span><span class=o>.</span><span class=n>branch_pool</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Conv2d</span><span class=p>(</span><span class=n>in_channels</span><span class=p>,</span> <span class=mi>24</span><span class=p>,</span> <span class=mi>1</span><span class=p>)</span>
+
+    <span class=k>def</span> <span class=nf>forward</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>x</span><span class=p>):</span>
+        <span class=n>branch3x3</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>branch3x3_1</span><span class=p>(</span><span class=n>x</span><span class=p>)</span>
+        <span class=n>branch3x3</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>branch3x3_2</span><span class=p>(</span><span class=n>branch3x3</span><span class=p>)</span>
+        <span class=n>branch3x3</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>branch3x3_3</span><span class=p>(</span><span class=n>branch3x3</span><span class=p>)</span>
+
+        <span class=n>branch5x5</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>branch5x5_1</span><span class=p>(</span><span class=n>x</span><span class=p>)</span>
+        <span class=n>branch5x5</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>branch5x5_2</span><span class=p>(</span><span class=n>branch5x5</span><span class=p>)</span>
+
+        <span class=n>branch1x1</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>branch1x1</span><span class=p>(</span><span class=n>x</span><span class=p>)</span>
+
+        <span class=n>branch_pool</span> <span class=o>=</span> <span class=n>F</span><span class=o>.</span><span class=n>avg_pool2d</span><span class=p>(</span><span class=n>x</span><span class=p>,</span> <span class=mi>3</span><span class=p>,</span> <span class=mi>1</span><span class=p>,</span> <span class=mi>1</span><span class=p>)</span>
+        <span class=n>branch_pool</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>branch_pool</span><span class=p>(</span><span class=n>branch_pool</span><span class=p>)</span>
+
+        <span class=n>output</span> <span class=o>=</span> <span class=p>[</span><span class=n>branch1x1</span><span class=p>,</span> <span class=n>branch5x5</span><span class=p>,</span> <span class=n>branch3x3</span><span class=p>,</span> <span class=n>branch_pool</span><span class=p>]</span>
+
+        <span class=k>return</span> <span class=n>torch</span><span class=o>.</span><span class=n>cat</span><span class=p>(</span><span class=n>output</span><span class=p>,</span> <span class=n>dim</span> <span class=o>=</span> <span class=mi>1</span><span class=p>)</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=k>class</span> <span class=nc>GoogLeNet</span><span class=p>(</span><span class=n>nn</span><span class=o>.</span><span class=n>Module</span><span class=p>):</span>
+    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+        <span class=nb>super</span><span class=p>(</span><span class=n>GoogLeNet</span><span class=p>,</span> <span class=bp>self</span><span class=p>)</span><span class=o>.</span><span class=fm>__init__</span><span class=p>()</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>conv1</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Conv2d</span><span class=p>(</span><span class=mi>3</span><span class=p>,</span> <span class=mi>10</span><span class=p>,</span> <span class=mi>5</span><span class=p>)</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>incep1</span> <span class=o>=</span> <span class=n>Inception_A</span><span class=p>(</span><span class=n>in_channels</span><span class=o>=</span><span class=mi>10</span><span class=p>)</span>
+
+        <span class=bp>self</span><span class=o>.</span><span class=n>conv2</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Conv2d</span><span class=p>(</span><span class=mi>88</span><span class=p>,</span> <span class=mi>20</span><span class=p>,</span> <span class=mi>5</span><span class=p>)</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>incep2</span> <span class=o>=</span> <span class=n>Inception_A</span><span class=p>(</span><span class=n>in_channels</span><span class=o>=</span><span class=mi>20</span><span class=p>)</span>
+
+        <span class=bp>self</span><span class=o>.</span><span class=n>mp</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>MaxPool2d</span><span class=p>(</span><span class=mi>2</span><span class=p>)</span>
+        <span class=c1># 88*5*5 = 2200</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>fc</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Linear</span><span class=p>(</span><span class=mi>2200</span><span class=p>,</span> <span class=mi>10</span><span class=p>)</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>cls</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Softmax</span><span class=p>(</span><span class=n>dim</span> <span class=o>=</span> <span class=mi>1</span><span class=p>)</span>
+
+    <span class=k>def</span> <span class=nf>forward</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>x</span><span class=p>):</span>
+        <span class=n>x</span> <span class=o>=</span> <span class=n>F</span><span class=o>.</span><span class=n>relu</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>mp</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>conv1</span><span class=p>(</span><span class=n>x</span><span class=p>)))</span>
+        <span class=n>x</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>incep1</span><span class=p>(</span><span class=n>x</span><span class=p>)</span>
+        <span class=n>x</span> <span class=o>=</span> <span class=n>F</span><span class=o>.</span><span class=n>relu</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>mp</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>conv2</span><span class=p>(</span><span class=n>x</span><span class=p>)))</span>
+        <span class=n>x</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>incep2</span><span class=p>(</span><span class=n>x</span><span class=p>)</span>
+        <span class=n>x</span> <span class=o>=</span> <span class=n>x</span><span class=o>.</span><span class=n>view</span><span class=p>(</span><span class=n>x</span><span class=o>.</span><span class=n>size</span><span class=p>()[</span><span class=mi>0</span><span class=p>],</span> <span class=o>-</span><span class=mi>1</span><span class=p>)</span>
+        <span class=n>x</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>fc</span><span class=p>(</span><span class=n>x</span><span class=p>)</span>
+        <span class=n>x</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>cls</span><span class=p>(</span><span class=n>x</span><span class=p>)</span>
+        <span class=k>return</span> <span class=n>x</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>net</span> <span class=o>=</span> <span class=n>GoogLeNet</span><span class=p>()</span>
+<span class=n>torch</span><span class=o>.</span><span class=n>cuda</span><span class=o>.</span><span class=n>empty_cache</span><span class=p>()</span>
+<span class=n>device</span> <span class=o>=</span> <span class=p>(</span><span class=s1>&#39;cuda&#39;</span> <span class=k>if</span> <span class=n>torch</span><span class=o>.</span><span class=n>cuda</span><span class=o>.</span><span class=n>is_available</span><span class=p>()</span> <span class=k>else</span> <span class=s1>&#39;cpu&#39;</span><span class=p>)</span>
+<span class=k>if</span> <span class=ow>not</span> <span class=p>(</span><span class=n>device</span> <span class=o>==</span> <span class=s1>&#39;cpu&#39;</span><span class=p>):</span>
+    <span class=n>net</span><span class=o>.</span><span class=n>to</span><span class=p>(</span><span class=n>device</span><span class=p>)</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>criterion</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>nn</span><span class=o>.</span><span class=n>CrossEntropyLoss</span><span class=p>()</span>
+<span class=n>optimizer</span> <span class=o>=</span> <span class=n>optim</span><span class=o>.</span><span class=n>SGD</span><span class=p>(</span><span class=n>net</span><span class=o>.</span><span class=n>parameters</span><span class=p>(),</span> <span class=n>lr</span> <span class=o>=</span> <span class=mf>0.005</span><span class=p>,</span> <span class=n>momentum</span><span class=o>=</span> <span class=mf>0.2</span><span class=p>)</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>egimage</span><span class=p>,</span> <span class=n>eglabel</span> <span class=o>=</span> <span class=nb>iter</span><span class=p>(</span><span class=n>train_loader</span><span class=p>)</span><span class=o>.</span><span class=n>next</span><span class=p>()</span>
+
+<span class=nb>print</span><span class=p>(</span><span class=n>egimage</span><span class=o>.</span><span class=n>size</span><span class=p>())</span>
+<span class=nb>print</span><span class=p>(</span><span class=n>eglabel</span><span class=o>.</span><span class=n>size</span><span class=p>())</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=c1># print result</span>
+<span class=n>torch</span><span class=o>.</span><span class=n>Size</span><span class=p>([</span><span class=mi>100</span><span class=p>,</span> <span class=mi>3</span><span class=p>,</span> <span class=mi>32</span><span class=p>,</span> <span class=mi>32</span><span class=p>])</span>
+<span class=n>torch</span><span class=o>.</span><span class=n>Size</span><span class=p>([</span><span class=mi>100</span><span class=p>])</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>egindex</span> <span class=o>=</span> <span class=mi>4</span>
+
+<span class=n>plt</span><span class=o>.</span><span class=n>figure</span><span class=p>()</span>
+<span class=n>plt</span><span class=o>.</span><span class=n>imshow</span><span class=p>(</span><span class=n>egimage</span><span class=p>[</span><span class=n>egindex</span><span class=p>][</span><span class=mi>0</span><span class=p>])</span>
+<span class=n>plt</span><span class=o>.</span><span class=n>colorbar</span><span class=p>()</span>
+<span class=n>plt</span><span class=o>.</span><span class=n>grid</span><span class=p>()</span>
+<span class=n>plt</span><span class=o>.</span><span class=n>show</span><span class=p>()</span>
+
+<span class=nb>print</span><span class=p>(</span><span class=n>classes</span><span class=p>[</span><span class=n>eglabel</span><span class=p>[</span><span class=n>egindex</span><span class=p>]])</span>
+</code></pre></div> <p>cat</p> <p><img alt=cat src=/files/CIFAR10-with-GoogLeNet/output1.png></p> <div class=highlight><pre><span></span><code><span class=n>start_time</span> <span class=o>=</span> <span class=n>time</span><span class=o>.</span><span class=n>time</span><span class=p>()</span>
+<span class=n>epochs</span> <span class=o>=</span> <span class=mi>50</span>
+<span class=n>epoch_loss</span> <span class=o>=</span> <span class=p>[]</span>
+
+<span class=k>for</span> <span class=n>epoch</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>epochs</span><span class=p>):</span>
+    <span class=n>running_loss</span> <span class=o>=</span> <span class=mi>0</span>
+    <span class=k>for</span> <span class=n>i</span><span class=p>,</span> <span class=p>(</span><span class=n>inputs</span><span class=p>,</span> <span class=n>labels</span><span class=p>)</span> <span class=ow>in</span> <span class=nb>enumerate</span><span class=p>(</span><span class=n>train_loader</span><span class=p>):</span>
+        <span class=k>if</span> <span class=ow>not</span> <span class=p>(</span><span class=n>device</span> <span class=o>==</span> <span class=s1>&#39;cpu&#39;</span><span class=p>):</span>
+            <span class=n>inputs</span> <span class=o>=</span> <span class=n>inputs</span><span class=o>.</span><span class=n>to</span><span class=p>(</span><span class=n>device</span><span class=p>)</span>
+            <span class=n>labels</span> <span class=o>=</span> <span class=n>labels</span><span class=o>.</span><span class=n>to</span><span class=p>(</span><span class=n>device</span><span class=p>)</span>
+        <span class=n>y_hats</span> <span class=o>=</span> <span class=n>net</span><span class=p>(</span><span class=n>inputs</span><span class=p>)</span>
+
+        <span class=n>loss</span> <span class=o>=</span> <span class=n>criterion</span><span class=p>(</span><span class=n>y_hats</span><span class=p>,</span> <span class=n>labels</span><span class=p>)</span>
+        <span class=n>optimizer</span><span class=o>.</span><span class=n>zero_grad</span><span class=p>()</span>
+        <span class=n>loss</span><span class=o>.</span><span class=n>backward</span><span class=p>()</span>
+        <span class=n>optimizer</span><span class=o>.</span><span class=n>step</span><span class=p>()</span>
+
+        <span class=n>running_loss</span> <span class=o>+=</span> <span class=n>loss</span><span class=o>.</span><span class=n>item</span><span class=p>()</span>
+        <span class=n>avr_loss</span> <span class=o>=</span> <span class=n>running_loss</span> <span class=o>/</span> <span class=p>(</span><span class=n>i</span><span class=o>+</span><span class=mi>1</span><span class=p>)</span>
+
+    <span class=n>epoch_loss</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>avr_loss</span><span class=p>)</span>
+    <span class=k>if</span> <span class=n>epoch</span><span class=o>%</span><span class=mi>5</span> <span class=o>==</span> <span class=mi>0</span><span class=p>:</span>
+        <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;epoch </span><span class=si>%d</span><span class=s1>, loss: </span><span class=si>%.5f</span><span class=s1>&#39;</span><span class=o>%</span><span class=p>(</span><span class=n>epoch</span><span class=p>,</span> <span class=n>avr_loss</span><span class=p>))</span>
+
+<span class=n>end_time</span> <span class=o>=</span> <span class=n>time</span><span class=o>.</span><span class=n>time</span><span class=p>()</span>
+<span class=nb>print</span><span class=p>(</span><span class=s1>&#39;Training finished, time used </span><span class=si>%.3f</span><span class=s1> s&#39;</span><span class=o>%</span><span class=p>(</span><span class=n>end_time</span> <span class=o>-</span> <span class=n>start_time</span><span class=p>))</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>epoch</span> <span class=mi>0</span><span class=p>,</span> <span class=n>loss</span><span class=p>:</span> <span class=mf>1.81920</span>
+<span class=n>epoch</span> <span class=mi>5</span><span class=p>,</span> <span class=n>loss</span><span class=p>:</span> <span class=mf>1.81351</span>
+<span class=n>epoch</span> <span class=mi>10</span><span class=p>,</span> <span class=n>loss</span><span class=p>:</span> <span class=mf>1.80854</span>
+<span class=n>epoch</span> <span class=mi>15</span><span class=p>,</span> <span class=n>loss</span><span class=p>:</span> <span class=mf>1.80460</span>
+<span class=n>epoch</span> <span class=mi>20</span><span class=p>,</span> <span class=n>loss</span><span class=p>:</span> <span class=mf>1.80021</span>
+<span class=n>epoch</span> <span class=mi>25</span><span class=p>,</span> <span class=n>loss</span><span class=p>:</span> <span class=mf>1.79726</span>
+<span class=n>epoch</span> <span class=mi>30</span><span class=p>,</span> <span class=n>loss</span><span class=p>:</span> <span class=mf>1.79350</span>
+<span class=n>epoch</span> <span class=mi>35</span><span class=p>,</span> <span class=n>loss</span><span class=p>:</span> <span class=mf>1.78997</span>
+<span class=n>epoch</span> <span class=mi>40</span><span class=p>,</span> <span class=n>loss</span><span class=p>:</span> <span class=mf>1.78629</span>
+<span class=n>epoch</span> <span class=mi>45</span><span class=p>,</span> <span class=n>loss</span><span class=p>:</span> <span class=mf>1.78374</span>
+<span class=n>Training</span> <span class=n>finished</span><span class=p>,</span> <span class=n>time</span> <span class=n>used</span> <span class=mf>1777.526</span> <span class=n>s</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>plt</span><span class=o>.</span><span class=n>plot</span><span class=p>(</span><span class=n>epoch_loss</span><span class=p>)</span>
+</code></pre></div> <p>[<matplotlib.lines.line2d at 0x7fb5db595d30>]</p> <p><img alt=png src=/files/CIFAR10-with-GoogLeNet/output2.png></p> <div class=highlight><pre><span></span><code><span class=n>torch</span><span class=o>.</span><span class=n>save</span><span class=p>(</span><span class=n>net</span><span class=o>.</span><span class=n>state_dict</span><span class=p>(),</span> <span class=s1>&#39;./GoogLeNet_weights_0005_02.pkl&#39;</span><span class=p>)</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>ac</span> <span class=o>=</span> <span class=mi>0</span>
+<span class=n>total</span> <span class=o>=</span> <span class=mi>0</span> 
+<span class=k>with</span> <span class=n>torch</span><span class=o>.</span><span class=n>no_grad</span><span class=p>():</span>
+    <span class=k>for</span> <span class=n>i</span><span class=p>,</span> <span class=p>(</span><span class=n>inputs</span><span class=p>,</span> <span class=n>labels</span><span class=p>)</span> <span class=ow>in</span> <span class=nb>enumerate</span><span class=p>(</span><span class=n>test_loader</span><span class=p>):</span>
+        <span class=k>if</span> <span class=ow>not</span> <span class=p>(</span><span class=n>device</span> <span class=o>==</span><span class=s1>&#39;cpu&#39;</span><span class=p>):</span>
+            <span class=n>inputs</span> <span class=o>=</span> <span class=n>inputs</span><span class=o>.</span><span class=n>to</span><span class=p>(</span><span class=n>device</span><span class=p>)</span>
+            <span class=n>labels</span> <span class=o>=</span> <span class=n>labels</span><span class=o>.</span><span class=n>to</span><span class=p>(</span><span class=n>device</span><span class=p>)</span>
+        <span class=n>y_hats</span> <span class=o>=</span> <span class=n>net</span><span class=p>(</span><span class=n>inputs</span><span class=p>)</span>
+        <span class=n>y_pred</span> <span class=o>=</span> <span class=n>y_hats</span><span class=o>.</span><span class=n>argmax</span><span class=p>(</span><span class=n>dim</span> <span class=o>=</span> <span class=mi>1</span><span class=p>)</span>
+        <span class=n>ac</span> <span class=o>+=</span> <span class=p>(</span><span class=n>y_pred</span> <span class=o>==</span> <span class=n>labels</span><span class=p>)</span><span class=o>.</span><span class=n>sum</span><span class=p>()</span><span class=o>.</span><span class=n>item</span><span class=p>()</span>
+        <span class=n>total</span> <span class=o>+=</span> <span class=n>labels</span><span class=o>.</span><span class=n>size</span><span class=p>()[</span><span class=mi>0</span><span class=p>]</span>
+
+<span class=nb>print</span><span class=p>(</span><span class=s1>&#39;accuracy: &#39;</span><span class=p>,</span> <span class=n>ac</span><span class=o>/</span><span class=n>total</span><span class=p>)</span>
+</code></pre></div> <h1>2. test part</h1> <div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>torch</span>
+<span class=kn>from</span> <span class=nn>torchvision</span> <span class=kn>import</span> <span class=n>transforms</span>
+<span class=kn>from</span> <span class=nn>GoogLeNet_model</span> <span class=kn>import</span> <span class=n>GoogLeNet</span>
+<span class=kn>from</span> <span class=nn>torch.utils.data</span> <span class=kn>import</span> <span class=n>DataLoader</span>
+<span class=kn>from</span> <span class=nn>torchvision.datasets</span> <span class=kn>import</span> <span class=n>CIFAR10</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>transform</span> <span class=o>=</span> <span class=n>transforms</span><span class=o>.</span><span class=n>Compose</span><span class=p>([</span>
+    <span class=n>transforms</span><span class=o>.</span><span class=n>ToTensor</span><span class=p>(),</span>
+    <span class=n>transforms</span><span class=o>.</span><span class=n>Normalize</span><span class=p>(</span><span class=n>mean</span> <span class=o>=</span> <span class=p>(</span><span class=mf>0.5</span><span class=p>,</span> <span class=mf>0.5</span><span class=p>,</span> <span class=mf>0.5</span><span class=p>),</span>
+                        <span class=n>std</span> <span class=o>=</span> <span class=p>(</span><span class=mf>0.5</span><span class=p>,</span> <span class=mf>0.5</span><span class=p>,</span> <span class=mf>0.5</span><span class=p>))</span>
+<span class=p>])</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>test_set</span>  <span class=o>=</span> <span class=n>CIFAR10</span><span class=p>(</span>
+    <span class=n>root</span> <span class=o>=</span> <span class=s1>&#39;./cifar-10/&#39;</span><span class=p>,</span>
+    <span class=n>train</span> <span class=o>=</span> <span class=kc>False</span><span class=p>,</span>
+    <span class=n>transform</span> <span class=o>=</span> <span class=n>transform</span>
+<span class=p>)</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>test_loader</span> <span class=o>=</span> <span class=n>DataLoader</span><span class=p>(</span>
+    <span class=n>test_set</span><span class=p>,</span>
+    <span class=n>batch_size</span> <span class=o>=</span> <span class=mi>100</span><span class=p>,</span>
+    <span class=n>shuffle</span> <span class=o>=</span> <span class=kc>True</span><span class=p>,</span>
+<span class=p>)</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>net</span> <span class=o>=</span> <span class=n>GoogLeNet</span><span class=p>()</span>
+<span class=n>device</span> <span class=o>=</span> <span class=p>(</span><span class=s1>&#39;cuda&#39;</span> <span class=k>if</span> <span class=n>torch</span><span class=o>.</span><span class=n>cuda</span><span class=o>.</span><span class=n>is_available</span><span class=p>()</span> <span class=k>else</span> <span class=s1>&#39;cpu&#39;</span><span class=p>)</span>
+<span class=nb>print</span><span class=p>(</span><span class=s1>&#39;Using: &#39;</span><span class=p>,</span> <span class=n>device</span><span class=p>)</span>
+<span class=k>if</span> <span class=ow>not</span> <span class=p>(</span><span class=n>device</span> <span class=o>==</span> <span class=s1>&#39;cpu&#39;</span><span class=p>):</span>
+    <span class=n>net</span><span class=o>.</span><span class=n>to</span><span class=p>(</span><span class=n>device</span><span class=p>)</span>
+</code></pre></div> <p>Using: cuda</p> <div class=highlight><pre><span></span><code><span class=n>net</span><span class=o>.</span><span class=n>load_state_dict</span><span class=p>(</span><span class=n>torch</span><span class=o>.</span><span class=n>load</span><span class=p>(</span><span class=s1>&#39;./GoogLeNet_weights_0005_02.pkl&#39;</span><span class=p>))</span>
+</code></pre></div> <p><all keys matched successfully></p> <div class=highlight><pre><span></span><code><span class=n>ac</span> <span class=o>=</span> <span class=mi>0</span>
+<span class=n>total</span> <span class=o>=</span> <span class=mi>0</span> 
+<span class=k>with</span> <span class=n>torch</span><span class=o>.</span><span class=n>no_grad</span><span class=p>():</span>
+    <span class=k>for</span> <span class=n>i</span><span class=p>,</span> <span class=p>(</span><span class=n>inputs</span><span class=p>,</span> <span class=n>labels</span><span class=p>)</span> <span class=ow>in</span> <span class=nb>enumerate</span><span class=p>(</span><span class=n>test_loader</span><span class=p>):</span>
+        <span class=k>if</span> <span class=ow>not</span> <span class=p>(</span><span class=n>device</span> <span class=o>==</span><span class=s1>&#39;cpu&#39;</span><span class=p>):</span>
+            <span class=n>inputs</span> <span class=o>=</span> <span class=n>inputs</span><span class=o>.</span><span class=n>to</span><span class=p>(</span><span class=n>device</span><span class=p>)</span>
+            <span class=n>labels</span> <span class=o>=</span> <span class=n>labels</span><span class=o>.</span><span class=n>to</span><span class=p>(</span><span class=n>device</span><span class=p>)</span>
+        <span class=n>y_hats</span> <span class=o>=</span> <span class=n>net</span><span class=p>(</span><span class=n>inputs</span><span class=p>)</span>
+        <span class=n>y_pred</span> <span class=o>=</span> <span class=n>y_hats</span><span class=o>.</span><span class=n>argmax</span><span class=p>(</span><span class=n>dim</span> <span class=o>=</span> <span class=mi>1</span><span class=p>)</span>
+        <span class=n>ac</span> <span class=o>+=</span> <span class=p>(</span><span class=n>y_pred</span> <span class=o>==</span> <span class=n>labels</span><span class=p>)</span><span class=o>.</span><span class=n>sum</span><span class=p>()</span><span class=o>.</span><span class=n>item</span><span class=p>()</span>
+        <span class=n>total</span> <span class=o>+=</span> <span class=n>labels</span><span class=o>.</span><span class=n>size</span><span class=p>()[</span><span class=mi>0</span><span class=p>]</span>
+
+<span class=nb>print</span><span class=p>(</span><span class=s1>&#39;accuracy: &#39;</span><span class=p>,</span> <span class=n>ac</span><span class=o>/</span><span class=n>total</span><span class=p>)</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>accuracy</span><span class=p>:</span>  <span class=mf>0.6253</span>
+</code></pre></div> </body> </html>

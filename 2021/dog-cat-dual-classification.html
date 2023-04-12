@@ -1,0 +1,153 @@
+<!DOCTYPE html><html> <head><title>Dog Cat Dual Classification</title><meta charset=utf-8><link rel=stylesheet href=/theme/css/main.css></head> <body> <h1>Dog Cat Dual Classification</h1> 2021-04-25 10:18 <hr> <div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>cv2</span>
+<span class=kn>from</span> <span class=nn>matplotlib</span> <span class=kn>import</span> <span class=n>pyplot</span> <span class=k>as</span> <span class=n>plt</span>
+<span class=kn>import</span> <span class=nn>numpy</span> <span class=k>as</span> <span class=nn>np</span>
+<span class=kn>import</span> <span class=nn>torch</span>
+<span class=kn>import</span> <span class=nn>torch.nn</span> <span class=k>as</span> <span class=nn>nn</span>
+<span class=kn>import</span> <span class=nn>torch.nn.functional</span> <span class=k>as</span> <span class=nn>F</span>
+<span class=kn>from</span> <span class=nn>torch.utils.data</span> <span class=kn>import</span> <span class=n>DataLoader</span>
+<span class=kn>import</span> <span class=nn>torchvision</span>
+<span class=kn>from</span> <span class=nn>torchvision</span> <span class=kn>import</span> <span class=n>transforms</span>
+<span class=kn>from</span> <span class=nn>torchvision.datasets</span> <span class=kn>import</span> <span class=n>ImageFolder</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>transform</span> <span class=o>=</span> <span class=n>transforms</span><span class=o>.</span><span class=n>Compose</span><span class=p>([</span>
+    <span class=n>transforms</span><span class=o>.</span><span class=n>ToTensor</span><span class=p>(),</span>
+    <span class=n>transforms</span><span class=o>.</span><span class=n>Resize</span><span class=p>([</span><span class=mi>128</span><span class=p>,</span> <span class=mi>128</span><span class=p>]),</span>
+    <span class=n>transforms</span><span class=o>.</span><span class=n>Normalize</span><span class=p>((</span><span class=mf>0.5</span><span class=p>,</span> <span class=mf>0.5</span><span class=p>,</span> <span class=mf>0.5</span><span class=p>),</span> <span class=p>(</span><span class=mf>0.5</span><span class=p>,</span> <span class=mf>0.5</span><span class=p>,</span> <span class=mf>0.5</span><span class=p>)),</span>
+<span class=p>])</span>
+
+<span class=n>train_folder</span> <span class=o>=</span> <span class=n>ImageFolder</span><span class=p>(</span><span class=n>root</span><span class=o>=</span><span class=s1>&#39;./cat_dog/training_set&#39;</span><span class=p>,</span>
+                           <span class=n>transform</span> <span class=o>=</span> <span class=n>transform</span><span class=p>)</span>
+<span class=n>test_folder</span> <span class=o>=</span> <span class=n>ImageFolder</span><span class=p>(</span><span class=n>root</span><span class=o>=</span><span class=s1>&#39;./cat_dog/test_set&#39;</span><span class=p>,</span>
+                          <span class=n>transform</span> <span class=o>=</span> <span class=n>transform</span><span class=p>)</span>
+
+<span class=n>train_loader</span> <span class=o>=</span> <span class=n>DataLoader</span><span class=p>(</span><span class=n>train_folder</span><span class=p>,</span>
+                         <span class=n>batch_size</span> <span class=o>=</span> <span class=mi>100</span><span class=p>,</span>
+                         <span class=n>shuffle</span> <span class=o>=</span> <span class=kc>True</span><span class=p>)</span>
+<span class=n>test_loader</span> <span class=o>=</span> <span class=n>DataLoader</span><span class=p>(</span><span class=n>test_folder</span><span class=p>,</span>
+                         <span class=n>batch_size</span> <span class=o>=</span> <span class=mi>100</span><span class=p>,</span>
+                         <span class=n>shuffle</span> <span class=o>=</span> <span class=kc>True</span><span class=p>)</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=k>class</span> <span class=nc>Net</span><span class=p>(</span><span class=n>nn</span><span class=o>.</span><span class=n>Module</span><span class=p>):</span>
+    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+        <span class=nb>super</span><span class=p>(</span><span class=n>Net</span><span class=p>,</span> <span class=bp>self</span><span class=p>)</span><span class=o>.</span><span class=fm>__init__</span><span class=p>()</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>cal</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Sequential</span><span class=p>(</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>Conv2d</span><span class=p>(</span><span class=n>in_channels</span> <span class=o>=</span> <span class=mi>3</span><span class=p>,</span>
+                      <span class=n>out_channels</span> <span class=o>=</span> <span class=mi>8</span><span class=p>,</span>
+                      <span class=n>kernel_size</span> <span class=o>=</span> <span class=mi>3</span><span class=p>,</span>
+                      <span class=n>stride</span> <span class=o>=</span> <span class=mi>1</span><span class=p>,</span>
+                      <span class=n>padding</span> <span class=o>=</span> <span class=mi>1</span><span class=p>,</span>
+                      <span class=n>bias</span> <span class=o>=</span> <span class=kc>False</span><span class=p>),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>ReLU</span><span class=p>(),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>Conv2d</span><span class=p>(</span><span class=n>in_channels</span> <span class=o>=</span> <span class=mi>8</span><span class=p>,</span>
+                      <span class=n>out_channels</span> <span class=o>=</span> <span class=mi>8</span><span class=p>,</span>
+                      <span class=n>kernel_size</span> <span class=o>=</span> <span class=mi>3</span><span class=p>,</span>
+                      <span class=n>stride</span> <span class=o>=</span> <span class=mi>1</span><span class=p>,</span>
+                      <span class=n>padding</span> <span class=o>=</span> <span class=mi>1</span><span class=p>,</span>
+                      <span class=n>bias</span> <span class=o>=</span> <span class=kc>False</span><span class=p>),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>ReLU</span><span class=p>(),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>MaxPool2d</span><span class=p>((</span><span class=mi>2</span><span class=p>,</span> <span class=mi>2</span><span class=p>),</span> <span class=mi>2</span><span class=p>,</span> <span class=mi>0</span><span class=p>),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>ReLU</span><span class=p>(),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>Flatten</span><span class=p>(),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>Linear</span><span class=p>(</span><span class=mi>64</span><span class=o>*</span><span class=mi>64</span><span class=o>*</span><span class=mi>8</span><span class=p>,</span> <span class=mi>1000</span><span class=p>),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>ReLU</span><span class=p>(),</span>
+            <span class=c1>#nn.Linear(1000, 1000),</span>
+            <span class=c1>#nn.ReLU(),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>Linear</span><span class=p>(</span><span class=mi>1000</span><span class=p>,</span> <span class=mi>2</span><span class=p>),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>Softmax</span><span class=p>(</span><span class=n>dim</span> <span class=o>=</span> <span class=mi>1</span><span class=p>),</span>
+        <span class=p>)</span>
+
+    <span class=k>def</span> <span class=nf>forward</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>x</span><span class=p>):</span>
+        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>cal</span><span class=p>(</span><span class=n>x</span><span class=p>)</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>net</span> <span class=o>=</span> <span class=n>Net</span><span class=p>()</span><span class=o>.</span><span class=n>cuda</span><span class=p>()</span>
+<span class=n>torch</span><span class=o>.</span><span class=n>cuda</span><span class=o>.</span><span class=n>empty_cache</span><span class=p>()</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>device</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>device</span><span class=p>(</span><span class=s1>&#39;cuda&#39;</span> <span class=k>if</span> <span class=n>torch</span><span class=o>.</span><span class=n>cuda</span><span class=o>.</span><span class=n>is_available</span><span class=p>()</span> <span class=k>else</span> <span class=s1>&#39;cpu&#39;</span><span class=p>)</span>
+<span class=nb>print</span><span class=p>(</span><span class=s1>&#39;Using: &#39;</span><span class=p>,</span> <span class=n>device</span><span class=p>)</span>
+<span class=k>if</span> <span class=ow>not</span> <span class=p>(</span><span class=n>device</span> <span class=o>==</span> <span class=s1>&#39;cpu&#39;</span><span class=p>):</span>
+    <span class=n>net</span><span class=o>.</span><span class=n>to</span><span class=p>(</span><span class=n>device</span><span class=p>)</span>
+
+<span class=n>optimizer</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>optim</span><span class=o>.</span><span class=n>SGD</span><span class=p>(</span><span class=n>net</span><span class=o>.</span><span class=n>parameters</span><span class=p>(),</span> <span class=n>lr</span> <span class=o>=</span> <span class=mf>0.01</span><span class=p>)</span>
+<span class=n>loss_func</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>CrossEntropyLoss</span><span class=p>()</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>epochs</span> <span class=o>=</span> <span class=mi>50</span>
+<span class=n>epoch_loss</span> <span class=o>=</span> <span class=p>[]</span>
+
+<span class=k>for</span> <span class=n>epoch</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>epochs</span><span class=p>):</span>
+    <span class=n>running_loss</span> <span class=o>=</span> <span class=mf>0.0</span>
+    <span class=k>for</span> <span class=n>i</span><span class=p>,</span> <span class=p>(</span><span class=n>inputs</span><span class=p>,</span> <span class=n>labels</span><span class=p>)</span> <span class=ow>in</span> <span class=nb>enumerate</span><span class=p>(</span><span class=n>train_loader</span><span class=p>):</span>
+        <span class=c1># inputs [100, 3, 128, 128]</span>
+        <span class=c1># labels [100]</span>
+        <span class=k>if</span> <span class=ow>not</span> <span class=p>(</span><span class=n>device</span> <span class=o>==</span> <span class=s1>&#39;cpu&#39;</span><span class=p>):</span>
+            <span class=n>inputs</span><span class=p>,</span> <span class=n>labels</span> <span class=o>=</span> <span class=n>data</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span><span class=o>.</span><span class=n>to</span><span class=p>(</span><span class=n>device</span><span class=p>),</span><span class=n>data</span><span class=p>[</span><span class=mi>1</span><span class=p>]</span><span class=o>.</span><span class=n>to</span><span class=p>(</span><span class=n>device</span><span class=p>)</span>
+        <span class=k>else</span><span class=p>:</span>
+            <span class=n>inputs</span><span class=p>,</span> <span class=n>labels</span> <span class=o>=</span> <span class=n>data</span>
+
+        <span class=c1># y_hats [100, 2]</span>
+        <span class=n>y_hats</span> <span class=o>=</span> <span class=n>net</span><span class=p>(</span><span class=n>inputs</span><span class=p>)</span>
+
+        <span class=c1># labels [100, 1]</span>
+        <span class=c1># labels = labels.unsqueeze(1).type_as(y_hats)</span>
+
+        <span class=n>loss</span> <span class=o>=</span> <span class=n>loss_func</span><span class=p>(</span><span class=n>y_hats</span><span class=p>,</span> <span class=n>labels</span><span class=p>)</span>
+        <span class=n>optimizer</span><span class=o>.</span><span class=n>zero_grad</span><span class=p>()</span>
+        <span class=n>loss</span><span class=o>.</span><span class=n>backward</span><span class=p>()</span>
+        <span class=n>optimizer</span><span class=o>.</span><span class=n>step</span><span class=p>()</span>
+
+        <span class=n>running_loss</span> <span class=o>+=</span> <span class=n>loss</span><span class=o>.</span><span class=n>item</span><span class=p>()</span>
+
+    <span class=n>epoch_loss</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>running_loss</span> <span class=o>/</span> <span class=p>(</span><span class=n>i</span><span class=o>+</span><span class=mi>1</span><span class=p>))</span>
+    <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;epoch </span><span class=si>%d</span><span class=s1>, loss: </span><span class=si>%.3f</span><span class=s1>&#39;</span> <span class=o>%</span> <span class=p>(</span><span class=n>epoch</span><span class=p>,</span> <span class=n>running_loss</span><span class=o>/</span><span class=p>(</span><span class=n>i</span><span class=o>+</span><span class=mi>1</span><span class=p>)))</span>
+</code></pre></div> <div class=highlight><pre><span></span><code>epoch 0, loss: 0.670
+epoch 1, loss: 0.664
+epoch 2, loss: 0.659
+epoch 3, loss: 0.655
+epoch 4, loss: 0.647
+epoch 5, loss: 0.642
+epoch 6, loss: 0.638
+epoch 7, loss: 0.631
+epoch 8, loss: 0.624
+epoch 9, loss: 0.621
+epoch 10, loss: 0.611
+epoch 11, loss: 0.605
+epoch 12, loss: 0.600
+epoch 13, loss: 0.600
+epoch 14, loss: 0.595
+epoch 15, loss: 0.590
+epoch 16, loss: 0.590
+epoch 17, loss: 0.586
+epoch 18, loss: 0.581
+epoch 19, loss: 0.576
+epoch 20, loss: 0.574
+epoch 21, loss: 0.569
+epoch 22, loss: 0.566
+epoch 23, loss: 0.565
+epoch 24, loss: 0.595
+epoch 25, loss: 0.554
+epoch 26, loss: 0.556
+epoch 27, loss: 0.546
+epoch 28, loss: 0.553
+epoch 29, loss: 0.544
+epoch 30, loss: 0.540
+epoch 31, loss: 0.538
+epoch 32, loss: 0.546
+epoch 33, loss: 0.530
+epoch 34, loss: 0.523
+epoch 35, loss: 0.525
+epoch 36, loss: 0.523
+epoch 37, loss: 0.516
+epoch 38, loss: 0.518
+epoch 39, loss: 0.505
+epoch 40, loss: 0.514
+epoch 41, loss: 0.503
+epoch 42, loss: 0.509
+epoch 43, loss: 0.498
+epoch 44, loss: 0.507
+epoch 45, loss: 0.491
+epoch 46, loss: 0.501
+epoch 47, loss: 0.480
+epoch 48, loss: 0.494
+epoch 49, loss: 0.478
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>plt</span><span class=o>.</span><span class=n>plot</span><span class=p>(</span><span class=n>epoch_loss</span><span class=p>)</span>
+</code></pre></div> <p><img alt=png src=/files/Dog-Cat-Dual-Classification/output1.png></p> <div class=highlight><pre><span></span><code><span class=c1># save the model</span>
+<span class=n>model_path</span> <span class=o>=</span> <span class=s1>&#39;./caog_net.pkl&#39;</span>
+<span class=n>torch</span><span class=o>.</span><span class=n>save</span><span class=p>(</span><span class=n>net</span><span class=o>.</span><span class=n>state_dict</span><span class=p>(),</span> <span class=n>model_path</span><span class=p>)</span>
+
+<span class=c1># load the model</span>
+<span class=n>net</span><span class=o>.</span><span class=n>load_state_dict</span><span class=p>(</span><span class=n>torch</span><span class=o>.</span><span class=n>load</span><span class=p>(</span><span class=n>model_path</span><span class=p>))</span>
+</code></pre></div> </body> </html>

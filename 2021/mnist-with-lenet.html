@@ -1,0 +1,173 @@
+<!DOCTYPE html><html> <head><title>MNIST with LeNet</title><meta charset=utf-8><link rel=stylesheet href=/theme/css/main.css></head> <body> <h1>MNIST with LeNet</h1> 2021-05-02 00:03 <hr> <h1>1. train part</h1> <div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>time</span>
+<span class=kn>import</span> <span class=nn>torch</span>
+<span class=kn>import</span> <span class=nn>numpy</span> <span class=k>as</span> <span class=nn>np</span>
+<span class=kn>import</span> <span class=nn>torch.nn</span> <span class=k>as</span> <span class=nn>nn</span>
+<span class=kn>from</span> <span class=nn>matplotlib</span> <span class=kn>import</span> <span class=n>pyplot</span> <span class=k>as</span> <span class=n>plt</span>
+<span class=kn>import</span> <span class=nn>torch.nn.functional</span> <span class=k>as</span> <span class=nn>F</span>
+<span class=kn>from</span> <span class=nn>torch.utils.data</span> <span class=kn>import</span> <span class=n>DataLoader</span>
+<span class=kn>from</span> <span class=nn>torchvision</span> <span class=kn>import</span> <span class=n>transforms</span>
+<span class=kn>from</span> <span class=nn>torchvision.datasets</span> <span class=kn>import</span> <span class=n>MNIST</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>transform</span> <span class=o>=</span> <span class=n>transforms</span><span class=o>.</span><span class=n>Compose</span><span class=p>([</span>
+    <span class=n>transforms</span><span class=o>.</span><span class=n>ToTensor</span><span class=p>(),</span>
+    <span class=n>transforms</span><span class=o>.</span><span class=n>Normalize</span><span class=p>((</span><span class=mf>0.1307</span><span class=p>,</span> <span class=p>),</span> <span class=p>(</span><span class=mf>0.3081</span><span class=p>,))</span>
+<span class=p>])</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>train_set</span> <span class=o>=</span> <span class=n>MNIST</span><span class=p>(</span><span class=n>root</span> <span class=o>=</span> <span class=s1>&#39;./MNIST&#39;</span><span class=p>,</span>
+                  <span class=n>train</span> <span class=o>=</span> <span class=kc>True</span><span class=p>,</span>
+                  <span class=c1>#download = True,</span>
+                  <span class=n>transform</span> <span class=o>=</span> <span class=n>transform</span><span class=p>)</span>
+
+<span class=n>test_set</span> <span class=o>=</span> <span class=n>MNIST</span><span class=p>(</span><span class=n>root</span> <span class=o>=</span> <span class=s1>&#39;./MNIST&#39;</span><span class=p>,</span>
+                <span class=n>train</span> <span class=o>=</span> <span class=kc>False</span><span class=p>,</span>
+                <span class=n>transform</span> <span class=o>=</span> <span class=n>transform</span><span class=p>)</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>train_loader</span> <span class=o>=</span> <span class=n>DataLoader</span><span class=p>(</span>
+    <span class=n>train_set</span><span class=p>,</span>
+    <span class=n>batch_size</span> <span class=o>=</span> <span class=mi>100</span><span class=p>,</span>
+    <span class=n>shuffle</span> <span class=o>=</span> <span class=kc>True</span>
+<span class=p>)</span>
+
+<span class=n>test_loader</span> <span class=o>=</span> <span class=n>DataLoader</span><span class=p>(</span>
+    <span class=n>test_set</span><span class=p>,</span>
+    <span class=n>batch_size</span> <span class=o>=</span> <span class=mi>100</span><span class=p>,</span>
+    <span class=n>shuffle</span> <span class=o>=</span> <span class=kc>True</span>
+<span class=p>)</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=k>class</span> <span class=nc>LeNet</span><span class=p>(</span><span class=n>nn</span><span class=o>.</span><span class=n>Module</span><span class=p>):</span>
+    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+        <span class=nb>super</span><span class=p>(</span><span class=n>LeNet</span><span class=p>,</span> <span class=bp>self</span><span class=p>)</span><span class=o>.</span><span class=fm>__init__</span><span class=p>()</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>cal</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Sequential</span><span class=p>(</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>Conv2d</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=mi>6</span><span class=p>,</span> <span class=mi>5</span><span class=p>,</span> <span class=mi>1</span><span class=p>,</span> <span class=mi>2</span><span class=p>),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>ReLU</span><span class=p>(),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>MaxPool2d</span><span class=p>(</span><span class=mi>2</span><span class=p>,</span> <span class=mi>2</span><span class=p>),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>Conv2d</span><span class=p>(</span><span class=mi>6</span><span class=p>,</span> <span class=mi>16</span><span class=p>,</span> <span class=mi>5</span><span class=p>),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>ReLU</span><span class=p>(),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>MaxPool2d</span><span class=p>(</span><span class=mi>2</span><span class=p>,</span> <span class=mi>2</span><span class=p>),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>Flatten</span><span class=p>(),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>Linear</span><span class=p>(</span><span class=mi>5</span><span class=o>*</span><span class=mi>5</span><span class=o>*</span><span class=mi>16</span><span class=p>,</span> <span class=mi>120</span><span class=p>),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>Linear</span><span class=p>(</span><span class=mi>120</span><span class=p>,</span> <span class=mi>84</span><span class=p>),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>Linear</span><span class=p>(</span><span class=mi>84</span><span class=p>,</span> <span class=mi>10</span><span class=p>),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>Softmax</span><span class=p>(</span><span class=n>dim</span><span class=o>=</span><span class=mi>1</span><span class=p>)</span>
+        <span class=p>)</span>
+    <span class=k>def</span> <span class=nf>forward</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>x</span><span class=p>):</span>
+        <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>cal</span><span class=p>(</span><span class=n>x</span><span class=p>)</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>net</span> <span class=o>=</span> <span class=n>LeNet</span><span class=p>()</span>
+<span class=n>torch</span><span class=o>.</span><span class=n>cuda</span><span class=o>.</span><span class=n>empty_cache</span><span class=p>()</span>
+<span class=n>net</span><span class=o>.</span><span class=n>cuda</span><span class=p>()</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=c1># net structure</span>
+<span class=n>LeNet</span><span class=p>(</span>
+  <span class=p>(</span><span class=n>cal</span><span class=p>):</span> <span class=n>Sequential</span><span class=p>(</span>
+    <span class=p>(</span><span class=mi>0</span><span class=p>):</span> <span class=n>Conv2d</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=mi>6</span><span class=p>,</span> <span class=n>kernel_size</span><span class=o>=</span><span class=p>(</span><span class=mi>5</span><span class=p>,</span> <span class=mi>5</span><span class=p>),</span> <span class=n>stride</span><span class=o>=</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=mi>1</span><span class=p>),</span> <span class=n>padding</span><span class=o>=</span><span class=p>(</span><span class=mi>2</span><span class=p>,</span> <span class=mi>2</span><span class=p>))</span>
+    <span class=p>(</span><span class=mi>1</span><span class=p>):</span> <span class=n>ReLU</span><span class=p>()</span>
+    <span class=p>(</span><span class=mi>2</span><span class=p>):</span> <span class=n>MaxPool2d</span><span class=p>(</span><span class=n>kernel_size</span><span class=o>=</span><span class=mi>2</span><span class=p>,</span> <span class=n>stride</span><span class=o>=</span><span class=mi>2</span><span class=p>,</span> <span class=n>padding</span><span class=o>=</span><span class=mi>0</span><span class=p>,</span> <span class=n>dilation</span><span class=o>=</span><span class=mi>1</span><span class=p>,</span> <span class=n>ceil_mode</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span>
+    <span class=p>(</span><span class=mi>3</span><span class=p>):</span> <span class=n>Conv2d</span><span class=p>(</span><span class=mi>6</span><span class=p>,</span> <span class=mi>16</span><span class=p>,</span> <span class=n>kernel_size</span><span class=o>=</span><span class=p>(</span><span class=mi>5</span><span class=p>,</span> <span class=mi>5</span><span class=p>),</span> <span class=n>stride</span><span class=o>=</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=mi>1</span><span class=p>))</span>
+    <span class=p>(</span><span class=mi>4</span><span class=p>):</span> <span class=n>ReLU</span><span class=p>()</span>
+    <span class=p>(</span><span class=mi>5</span><span class=p>):</span> <span class=n>MaxPool2d</span><span class=p>(</span><span class=n>kernel_size</span><span class=o>=</span><span class=mi>2</span><span class=p>,</span> <span class=n>stride</span><span class=o>=</span><span class=mi>2</span><span class=p>,</span> <span class=n>padding</span><span class=o>=</span><span class=mi>0</span><span class=p>,</span> <span class=n>dilation</span><span class=o>=</span><span class=mi>1</span><span class=p>,</span> <span class=n>ceil_mode</span><span class=o>=</span><span class=kc>False</span><span class=p>)</span>
+    <span class=p>(</span><span class=mi>6</span><span class=p>):</span> <span class=n>Flatten</span><span class=p>(</span><span class=n>start_dim</span><span class=o>=</span><span class=mi>1</span><span class=p>,</span> <span class=n>end_dim</span><span class=o>=-</span><span class=mi>1</span><span class=p>)</span>
+    <span class=p>(</span><span class=mi>7</span><span class=p>):</span> <span class=n>Linear</span><span class=p>(</span><span class=n>in_features</span><span class=o>=</span><span class=mi>400</span><span class=p>,</span> <span class=n>out_features</span><span class=o>=</span><span class=mi>120</span><span class=p>,</span> <span class=n>bias</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+    <span class=p>(</span><span class=mi>8</span><span class=p>):</span> <span class=n>Linear</span><span class=p>(</span><span class=n>in_features</span><span class=o>=</span><span class=mi>120</span><span class=p>,</span> <span class=n>out_features</span><span class=o>=</span><span class=mi>84</span><span class=p>,</span> <span class=n>bias</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+    <span class=p>(</span><span class=mi>9</span><span class=p>):</span> <span class=n>Linear</span><span class=p>(</span><span class=n>in_features</span><span class=o>=</span><span class=mi>84</span><span class=p>,</span> <span class=n>out_features</span><span class=o>=</span><span class=mi>10</span><span class=p>,</span> <span class=n>bias</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+    <span class=p>(</span><span class=mi>10</span><span class=p>):</span> <span class=n>Softmax</span><span class=p>(</span><span class=n>dim</span><span class=o>=</span><span class=mi>1</span><span class=p>)</span>
+  <span class=p>)</span>
+<span class=p>)</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>device</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>device</span><span class=p>(</span><span class=s1>&#39;cuda&#39;</span> <span class=k>if</span> <span class=n>torch</span><span class=o>.</span><span class=n>cuda</span><span class=o>.</span><span class=n>is_available</span><span class=p>()</span> <span class=k>else</span> <span class=s1>&#39;cpu&#39;</span><span class=p>)</span>
+<span class=nb>print</span><span class=p>(</span><span class=s1>&#39;Using&#39;</span><span class=p>,</span> <span class=n>device</span><span class=p>)</span>
+<span class=k>if</span> <span class=ow>not</span> <span class=p>(</span><span class=n>device</span> <span class=o>==</span> <span class=s1>&#39;cpu&#39;</span><span class=p>):</span>
+    <span class=n>net</span><span class=o>.</span><span class=n>to</span><span class=p>(</span><span class=n>device</span><span class=p>)</span>
+
+<span class=n>optimizer</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>optim</span><span class=o>.</span><span class=n>SGD</span><span class=p>(</span><span class=n>net</span><span class=o>.</span><span class=n>parameters</span><span class=p>(),</span> <span class=n>lr</span> <span class=o>=</span> <span class=mf>0.01</span><span class=p>)</span>
+<span class=n>loss_func</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>CrossEntropyLoss</span><span class=p>()</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>egimage</span><span class=p>,</span> <span class=n>eglabel</span> <span class=o>=</span> <span class=nb>iter</span><span class=p>(</span><span class=n>train_loader</span><span class=p>)</span><span class=o>.</span><span class=n>next</span><span class=p>()</span>
+
+<span class=n>plt</span><span class=o>.</span><span class=n>figure</span><span class=p>()</span>
+<span class=n>plt</span><span class=o>.</span><span class=n>imshow</span><span class=p>(</span><span class=n>egimage</span><span class=p>[</span><span class=mi>0</span><span class=p>][</span><span class=mi>0</span><span class=p>])</span>
+<span class=n>plt</span><span class=o>.</span><span class=n>colorbar</span><span class=p>()</span>
+<span class=n>plt</span><span class=o>.</span><span class=n>grid</span><span class=p>(</span><span class=kc>True</span><span class=p>)</span>
+<span class=n>plt</span><span class=o>.</span><span class=n>show</span><span class=p>()</span>
+</code></pre></div> <p><img alt=png src=/files/MNIST-with-LeNet/output1.png></p> <div class=highlight><pre><span></span><code><span class=n>start_time</span> <span class=o>=</span> <span class=n>time</span><span class=o>.</span><span class=n>time</span><span class=p>()</span>
+
+<span class=n>epochs</span> <span class=o>=</span> <span class=mi>50</span>
+<span class=n>epoch_loss</span> <span class=o>=</span> <span class=p>[]</span>
+<span class=k>for</span> <span class=n>epoch</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>epochs</span><span class=p>):</span>
+    <span class=n>running_loss</span> <span class=o>=</span> <span class=mf>0.0</span>
+    <span class=k>for</span> <span class=n>i</span><span class=p>,</span> <span class=p>(</span><span class=n>inputs</span><span class=p>,</span> <span class=n>labels</span><span class=p>)</span> <span class=ow>in</span> <span class=nb>enumerate</span><span class=p>(</span><span class=n>train_loader</span><span class=p>):</span>
+        <span class=k>if</span> <span class=ow>not</span> <span class=p>(</span><span class=n>device</span> <span class=o>==</span> <span class=s1>&#39;cpu&#39;</span><span class=p>):</span>
+            <span class=n>inputs</span> <span class=o>=</span> <span class=n>inputs</span><span class=o>.</span><span class=n>to</span><span class=p>(</span><span class=n>device</span><span class=p>)</span>
+            <span class=n>labels</span> <span class=o>=</span> <span class=n>labels</span><span class=o>.</span><span class=n>to</span><span class=p>(</span><span class=n>device</span><span class=p>)</span>
+
+        <span class=n>y_hats</span> <span class=o>=</span> <span class=n>net</span><span class=p>(</span><span class=n>inputs</span><span class=p>)</span>
+
+        <span class=n>loss</span> <span class=o>=</span> <span class=n>loss_func</span><span class=p>(</span><span class=n>y_hats</span><span class=p>,</span> <span class=n>labels</span><span class=p>)</span>
+        <span class=n>optimizer</span><span class=o>.</span><span class=n>zero_grad</span><span class=p>()</span>
+        <span class=n>loss</span><span class=o>.</span><span class=n>backward</span><span class=p>()</span>
+        <span class=n>optimizer</span><span class=o>.</span><span class=n>step</span><span class=p>()</span>
+
+        <span class=n>running_loss</span> <span class=o>+=</span> <span class=n>loss</span><span class=o>.</span><span class=n>item</span><span class=p>()</span>
+        <span class=n>avr_loss</span> <span class=o>=</span> <span class=n>running_loss</span><span class=o>/</span><span class=p>(</span><span class=n>i</span><span class=o>+</span><span class=mi>1</span><span class=p>)</span>
+    <span class=n>epoch_loss</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>avr_loss</span><span class=p>)</span>
+    <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;epoch </span><span class=si>%d</span><span class=s1>, loss: </span><span class=si>%.3f</span><span class=s1>&#39;</span> <span class=o>%</span> <span class=p>(</span><span class=n>epoch</span><span class=p>,</span> <span class=n>avr_loss</span><span class=p>))</span>
+
+<span class=n>end_time</span> <span class=o>=</span> <span class=n>time</span><span class=o>.</span><span class=n>time</span><span class=p>()</span>
+<span class=nb>print</span><span class=p>(</span><span class=s1>&#39;Finished training, time used: </span><span class=si>%.3f</span><span class=s1>&#39;</span><span class=o>%</span><span class=p>(</span><span class=n>end_time</span> <span class=o>-</span> <span class=n>start_time</span><span class=p>))</span>
+</code></pre></div> <div class=highlight><pre><span></span><code>epoch 0, loss: 2.298
+epoch 5, loss: 1.603
+epoch 10, loss: 1.515
+epoch 15, loss: 1.500
+epoch 20, loss: 1.493
+epoch 25, loss: 1.489
+epoch 30, loss: 1.486
+epoch 35, loss: 1.484
+epoch 40, loss: 1.482
+epoch 45, loss: 1.481
+epoch 49, loss: 1.480
+Finished training, time used: 551.340
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>plt</span><span class=o>.</span><span class=n>plot</span><span class=p>(</span><span class=n>epoch_loss</span><span class=p>)</span>
+</code></pre></div> <p><img alt=png src=/files/MNIST-with-LeNet/output2.png></p> <div class=highlight><pre><span></span><code><span class=n>model_path</span> <span class=o>=</span> <span class=s1>&#39;./MNIST_model.pkl&#39;</span>
+<span class=n>torch</span><span class=o>.</span><span class=n>save</span><span class=p>(</span><span class=n>net</span><span class=o>.</span><span class=n>state_dict</span><span class=p>(),</span> <span class=n>model_path</span><span class=p>)</span>
+
+<span class=c1># net.load_state_dict(torch.load(model_path))</span>
+</code></pre></div> <h1>2. test part</h1> <div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>torch</span>
+<span class=kn>import</span> <span class=nn>numpy</span> <span class=k>as</span> <span class=nn>np</span>
+<span class=kn>from</span> <span class=nn>mnist_net</span> <span class=kn>import</span> <span class=n>LeNet</span>
+<span class=kn>from</span> <span class=nn>torchvision</span> <span class=kn>import</span> <span class=n>transforms</span>
+<span class=kn>from</span> <span class=nn>torch.utils.data</span> <span class=kn>import</span> <span class=n>DataLoader</span>
+<span class=kn>from</span> <span class=nn>torchvision.datasets</span> <span class=kn>import</span> <span class=n>MNIST</span>
+<span class=kn>from</span> <span class=nn>matplotlib</span> <span class=kn>import</span> <span class=n>pyplot</span> <span class=k>as</span> <span class=n>plt</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>transform</span> <span class=o>=</span> <span class=n>transforms</span><span class=o>.</span><span class=n>Compose</span><span class=p>([</span>
+    <span class=n>transforms</span><span class=o>.</span><span class=n>ToTensor</span><span class=p>(),</span>
+    <span class=n>transforms</span><span class=o>.</span><span class=n>Normalize</span><span class=p>((</span><span class=mf>0.1307</span><span class=p>,</span> <span class=p>),</span> <span class=p>(</span><span class=mf>0.3081</span><span class=p>,))</span>
+<span class=p>])</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>test_set</span> <span class=o>=</span> <span class=n>MNIST</span><span class=p>(</span><span class=n>root</span><span class=o>=</span><span class=s1>&#39;./MNIST&#39;</span><span class=p>,</span>
+                <span class=n>train</span><span class=o>=</span><span class=kc>False</span><span class=p>,</span>
+                <span class=n>transform</span><span class=o>=</span><span class=n>transform</span><span class=p>)</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>test_loader</span> <span class=o>=</span> <span class=n>DataLoader</span><span class=p>(</span>
+    <span class=n>test_set</span><span class=p>,</span>
+    <span class=n>batch_size</span> <span class=o>=</span> <span class=mi>100</span><span class=p>,</span>
+    <span class=n>shuffle</span> <span class=o>=</span> <span class=kc>True</span>
+<span class=p>)</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>device</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>device</span><span class=p>(</span><span class=s1>&#39;cuda&#39;</span> <span class=k>if</span> <span class=n>torch</span><span class=o>.</span><span class=n>cuda</span><span class=o>.</span><span class=n>is_available</span><span class=p>()</span> <span class=k>else</span> <span class=s1>&#39;cpu&#39;</span><span class=p>)</span>
+<span class=nb>print</span><span class=p>(</span><span class=s1>&#39;Using: &#39;</span><span class=p>,</span><span class=n>device</span><span class=p>)</span>
+
+<span class=n>net</span> <span class=o>=</span> <span class=n>LeNet</span><span class=p>()</span>
+<span class=c1># torch.cuda.empty_cache()</span>
+<span class=n>net</span><span class=o>.</span><span class=n>cuda</span><span class=p>()</span>
+
+<span class=n>net</span><span class=o>.</span><span class=n>load_state_dict</span><span class=p>(</span><span class=n>torch</span><span class=o>.</span><span class=n>load</span><span class=p>(</span><span class=s1>&#39;./MNIST_model.pkl&#39;</span><span class=p>))</span>
+<span class=k>if</span> <span class=ow>not</span> <span class=p>(</span><span class=n>device</span> <span class=o>==</span> <span class=s1>&#39;cpu&#39;</span><span class=p>):</span>
+    <span class=n>net</span><span class=o>.</span><span class=n>to</span><span class=p>(</span><span class=n>device</span><span class=p>)</span>
+</code></pre></div> <p>Using: cuda</p> <div class=highlight><pre><span></span><code><span class=n>total_ac</span> <span class=o>=</span> <span class=mi>0</span>
+<span class=k>for</span> <span class=n>i</span><span class=p>,</span> <span class=p>(</span><span class=n>inputs</span><span class=p>,</span> <span class=n>labels</span><span class=p>)</span> <span class=ow>in</span> <span class=nb>enumerate</span><span class=p>(</span><span class=n>test_loader</span><span class=p>):</span>
+    <span class=k>if</span> <span class=ow>not</span> <span class=p>(</span><span class=n>device</span> <span class=o>==</span> <span class=s1>&#39;cpu&#39;</span><span class=p>):</span>
+        <span class=n>inputs</span> <span class=o>=</span> <span class=n>inputs</span><span class=o>.</span><span class=n>to</span><span class=p>(</span><span class=n>device</span><span class=p>)</span>
+        <span class=n>labels</span> <span class=o>=</span> <span class=n>labels</span><span class=o>.</span><span class=n>to</span><span class=p>(</span><span class=n>device</span><span class=p>)</span>
+
+    <span class=n>y_hats</span> <span class=o>=</span> <span class=n>net</span><span class=p>(</span><span class=n>inputs</span><span class=p>)</span>
+    <span class=n>y_pred</span> <span class=o>=</span> <span class=n>y_hats</span><span class=o>.</span><span class=n>argmax</span><span class=p>(</span><span class=n>axis</span> <span class=o>=</span> <span class=mi>1</span><span class=p>)</span>
+
+    <span class=n>ac</span> <span class=o>=</span> <span class=p>(</span><span class=n>y_pred</span> <span class=o>==</span> <span class=n>labels</span><span class=p>)</span><span class=o>.</span><span class=n>sum</span><span class=p>()</span>
+    <span class=n>total_ac</span> <span class=o>+=</span> <span class=n>ac</span>
+
+    <span class=k>if</span> <span class=n>i</span><span class=o>==</span><span class=mi>9</span><span class=p>:</span>
+        <span class=k>break</span>
+
+<span class=nb>print</span><span class=p>(</span><span class=s1>&#39;Average accuracy of </span><span class=si>%d</span><span class=s1> tests: </span><span class=si>%.1f</span><span class=s1>&#39;</span><span class=o>%</span><span class=p>((</span><span class=n>i</span><span class=o>+</span><span class=mi>1</span><span class=p>),</span> <span class=n>total_ac</span><span class=o>/</span><span class=p>(</span><span class=n>i</span><span class=o>+</span><span class=mi>1</span><span class=p>)))</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=c1># output</span>
+<span class=n>Average</span> <span class=n>accuracy</span> <span class=n>of</span> <span class=mi>10</span> <span class=n>tests</span><span class=p>:</span> <span class=mf>98.3</span>
+</code></pre></div> </body> </html>

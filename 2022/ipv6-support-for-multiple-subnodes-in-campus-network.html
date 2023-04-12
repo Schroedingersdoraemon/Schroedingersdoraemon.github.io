@@ -1,0 +1,5 @@
+<!DOCTYPE html><html> <head><title>IPv6 support for multiple subnodes in campus network</title><meta charset=utf-8><link rel=stylesheet href=/theme/css/main.css></head> <body> <h1>IPv6 support for multiple subnodes in campus network</h1> 2022-07-29 18:41 <hr> <h1>1. WAN</h1> <p>IPv6 connection type: Native DHCP v6</p> <p>Acquire IPv6 WAN type: Stateless: RA</p> <p>DNSv6 WAN Settings:</p> <ul> <li>240c::6666</li> <li>2400:3200::1</li> <li>2001:4860:4860::8888</li> </ul> <p>IPv6 LAN Settings:</p> <ul> <li>fc00:101:101::1</li> </ul> <p>IPv6 LAN Prefix Length: 64</p> <p>LAN DHCPv6 Server: Stateless</p> <h1>2. scripts</h1> <p>Customization -&gt; Scripts -&gt; After Firewall rules</p> <div class=highlight><pre><span></span><code>ip6tables<span class=w> </span>-F
+ip6tables<span class=w> </span>-P<span class=w> </span>INPUT<span class=w> </span>ACCEPT
+ip6tables<span class=w> </span>-P<span class=w> </span>FORWARD<span class=w> </span>ACCEPT
+ip6tables<span class=w> </span>-P<span class=w> </span>OUTPUT<span class=w> </span>ACCEPT
+</code></pre></div> </body> </html>

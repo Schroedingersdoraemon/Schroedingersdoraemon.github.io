@@ -1,0 +1,33 @@
+<!DOCTYPE html><html> <head><title>"How do you perfectly run QQ and WeChat using wine?"</title><meta charset=utf-8><link rel=stylesheet href=/theme/css/main.css></head> <body> <h1>"How do you perfectly run QQ and WeChat using wine?"</h1> 2020-04-29 19:23 <hr> <p>Dec 24, 2022: The official native client is released.</p> <p>Aug 12, 2021: using electron-qq and electron-wechat now :)</p> <p>Nov 29, 2020: 多年之后的更新： deepin.com.qq.office挺好用的，懒得折腾了。</p> <h1>1、 安装</h1> <p>安装 wine，下载 QQ 和微信的安装程序。</p> <p>使用 wine 打开安装程序：</p> <div class=highlight><pre><span></span><code>wine<span class=w> </span>PCQQ2020.exe
+</code></pre></div> <h1>2、 字体修复</h1> <p>可以直接将 wine 需要的字体替换为系统已知字体</p> <h2>2.1 系统中文支持</h2> <div class=highlight><pre><span></span><code>locale<span class=w> </span>-a
+</code></pre></div> <p>如果没有以 zh_CN 开头的输出，那么请编辑 <code>/etc/locale-gen</code>，取消 zh_CN.UTF-8 前的注释</p> <p>随后运行</p> <div class=highlight><pre><span></span><code>sudo<span class=w> </span>locale-gen
+</code></pre></div> <h2>2.2 创建注册表规则文件</h2> <p>创建一个新文件，命名为 <code>fonts.reg</code>，其内容如下</p> <div class=highlight><pre><span></span><code><span class=n>REGEDIT4</span>
+
+<span class=p>[</span><span class=n>HKEY_LOCAL_MACHINE</span><span class=p>\</span><span class=n>Software</span><span class=p>\</span><span class=n>Microsoft</span><span class=p>\</span><span class=n>WindowsNT</span><span class=p>\</span><span class=n>CurrentVersion</span><span class=p>\</span><span class=n>FontLink</span><span class=p>\</span><span class=n>SystemLink</span><span class=p>]</span>
+<span class=s2>&quot;待替换字体1&quot;</span><span class=p>=</span><span class=s2>&quot;现有字体&quot;</span>
+<span class=s2>&quot;待替换字体2&quot;</span><span class=p>=</span><span class=s2>&quot;现有字体&quot;</span>
+<span class=p>...</span>
+</code></pre></div> <p>值得注意的是：现有字体应该为 <code>/usr/share/fonts/</code> 文件夹下的字体<strong>文件名</strong>，可用 <code>fc-list</code> 指令查询</p> <p>这里提供一份个人替换文件做为参考：<a href=/files/wine-QQ-WeChat-perfectly/chn_font.reg>chn_font.reg</a></p> <h2>2.3 导入文件到注册表</h2> <p>以下两种方法任选其一即可</p> <h3>2.3.1</h3> <div class=highlight><pre><span></span><code>wine<span class=w> </span>regedit
+</code></pre></div> <p>点击左上角Registry，Import Registry File，选择我们创建的文件即可。</p> <h3>2.3.2</h3> <div class=highlight><pre><span></span><code>wine<span class=w> </span>regedit<span class=w> </span>fonts.reg
+</code></pre></div> <p>我替换的现有字体为 <em>nerd fonts source code pro</em>，Arch 用户可在 archlinuxcn 源中下载 nerd-fonts-source-code-pro。 其他用户可在 nerd fonts 的 <a target=blank href=https://github.com/ryanoasis/nerd-fonts>GitHub主页</a> 自行下载安装</p> <p>您也可以更换为其它中文字体</p> <p>此时打开安装包，如果字体依旧为方框，可以设定以中文环境运行wine：</p> <div class=highlight><pre><span></span><code>env<span class=w> </span><span class=nv>LANG</span><span class=o>=</span>zh_CN.UTF-8<span class=w> </span>wine<span class=w> </span>PCQQ2020.exe
+</code></pre></div> <p>此时，久违的中文字体应该就可以出现啦！</p> <h2>2.4 possible problem</h2> <p>至于安装微信后提示的WeChatWin.dll文件缺失问题，可以如此解决：</p> <ul> <li> <p>安装32位的libldap库，可以在自己发行版的包管理器中查找一下libldap，安装即可。</p> </li> <li> <p>如果WeChat文件夹无有WeChatWin.dll文件，请下载此文件。</p> </li> </ul> <p>将文件放在~/.wine/drive_c/Tencent/WeChat/文件夹下（你的微信的安装路径），此时微信也可以正常打开了</p> <p>如果微信的信息框无法显示输入文字，请安装winetricks，随后执行</p> <div class=highlight><pre><span></span><code>winetricks<span class=w> </span>riched20
+</code></pre></div> <h1>3、 使用方法</h1> <p>安装完成之后，每次打开都要输入诸如此类的指令：</p> <div class=highlight><pre><span></span><code>env<span class=w> </span><span class=nv>LANG</span><span class=o>=</span>zh_CN.UTF-8<span class=w> </span>wine<span class=w> </span>~/.wine/drive_c/Tencent/WeChat/WeChat.exe
+</code></pre></div> <p>虽说可以将指令存为一个脚本文件然后执行，但是也是不方便，那么有没有更好的方法呢？</p> <p>我的解决方法是使用 <a href=https://tools.suckless.org/dmenu/ target=_blank>dmenu</a>。</p> <p>dmenu 是一个 X 下的快速、轻量级的软件启动器，它从 stdin 读取任意文本，并创建一个菜单，每一行都有一个菜单项。 然后，用户可以通过方向键或键入名称的一部分来选择一个项目，该行就会被输出到 stdout。 dmenu_run 是 dmenu 附带的 wrapper，可将其用作应用程序启动器。</p> <p>既然dmenu可以创建菜单，那么可以根据此特性写一个脚本：</p> <div class=highlight><pre><span></span><code><span class=ch>#!bin/sh</span>
+<span class=nv>choices</span><span class=o>=</span><span class=s2>&quot;QQ\nWeChat&quot;</span>
+<span class=nv>chosen</span><span class=o>=</span><span class=k>$(</span><span class=nb>echo</span><span class=w> </span>-e<span class=w> </span><span class=nv>$choices</span><span class=w> </span><span class=p>|</span><span class=w> </span>dmenu<span class=w> </span>-p<span class=w> </span><span class=s2>&quot;打开程序：&quot;</span><span class=k>)</span>
+<span class=k>case</span><span class=w> </span><span class=nv>$chosen</span><span class=w> </span><span class=k>in</span>
+<span class=w>    </span>QQ<span class=o>)</span>
+<span class=w>        </span>env<span class=w> </span><span class=nv>LANG</span><span class=o>=</span>zh_CN.UTF-8<span class=w> </span>wine<span class=w> </span><span class=s2>&quot;~/.wine/drive_c/.../QQ.exe&quot;</span><span class=w> </span><span class=p>;;</span>
+<span class=w>    </span>WeChat<span class=o>)</span>
+<span class=w>        </span>env<span class=w> </span><span class=nv>LANG</span><span class=o>=</span>zh_CN.UTF-8<span class=w> </span>wine<span class=w> </span><span class=s2>&quot;~/.wine/drive_c/.../WeChat.exe&quot;</span><span class=w> </span><span class=p>;;</span>
+<span class=k>esac</span>
+</code></pre></div> <p>将这个脚本绑定到某个快捷键，就能完成QQ和微信的启动啦。</p> <p>如果你使用的是 albert 或 ulauncher 之类，可以在 <code>~/.local/share/applications/</code> 下新建 QQ.desktop 和 WeChat.desktop 文件</p> <p>例如QQ.desktop</p> <div class=highlight><pre><span></span><code><span class=k>[Desktop Entry]</span>
+<span class=na>Categories</span><span class=o>=</span><span class=s>Network</span><span class=c1>;InstantMessaging;</span>
+<span class=na>Exec</span><span class=o>=</span><span class=s>env LANG=zh_CN.UTF-8 wine &quot;~/.wine/drive_c/.../QQ.exe所在位置&quot;</span>
+<span class=na>Icon</span><span class=o>=</span><span class=s>QQ</span>
+<span class=na>Name</span><span class=o>=</span><span class=s>WineQQ</span>
+<span class=na>NoDisplay</span><span class=o>=</span><span class=s>false</span>
+<span class=na>StartupNotify</span><span class=o>=</span><span class=s>true</span>
+<span class=na>Terminal</span><span class=o>=</span><span class=s>0</span>
+<span class=na>Type</span><span class=o>=</span><span class=s>Application</span>
+</code></pre></div> </body> </html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html><html> <head><title>Data Classfication</title><meta charset=utf-8><link rel=stylesheet href=/theme/css/main.css></head> <body> <h1>Data Classfication</h1> 2021-04-18 13:16 <hr> <div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>torch</span>
+<span class=kn>import</span> <span class=nn>torch.nn</span> <span class=k>as</span> <span class=nn>nn</span>
+<span class=kn>from</span> <span class=nn>matplotlib</span> <span class=kn>import</span> <span class=n>pyplot</span> <span class=k>as</span> <span class=n>plt</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>data</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>ones</span><span class=p>(</span><span class=mi>100</span><span class=p>,</span> <span class=mi>2</span><span class=p>)</span>
+<span class=n>x0</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>normal</span><span class=p>(</span><span class=n>data</span><span class=o>*</span><span class=mi>2</span><span class=p>,</span> <span class=mi>1</span><span class=p>)</span>
+<span class=n>x1</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>normal</span><span class=p>(</span><span class=n>data</span><span class=o>*-</span><span class=mi>2</span><span class=p>,</span> <span class=mi>1</span><span class=p>)</span>
+
+<span class=n>x</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>cat</span><span class=p>([</span><span class=n>x0</span><span class=p>,</span> <span class=n>x1</span><span class=p>],</span> <span class=mi>0</span><span class=p>)</span><span class=c1>#.type(torch.FloatTensor)</span>
+<span class=n>y0</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>zeros</span><span class=p>(</span><span class=mi>100</span><span class=p>)</span>
+<span class=n>y1</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>ones</span><span class=p>(</span><span class=mi>100</span><span class=p>)</span>
+<span class=n>y</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>cat</span><span class=p>([</span><span class=n>y0</span><span class=p>,</span> <span class=n>y1</span><span class=p>],</span> <span class=mi>0</span><span class=p>)</span><span class=o>.</span><span class=n>type</span><span class=p>(</span><span class=n>torch</span><span class=o>.</span><span class=n>LongTensor</span><span class=p>)</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=k>class</span> <span class=nc>Net</span><span class=p>(</span><span class=n>nn</span><span class=o>.</span><span class=n>Module</span><span class=p>):</span>
+    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+        <span class=nb>super</span><span class=p>(</span><span class=n>Net</span><span class=p>,</span> <span class=bp>self</span><span class=p>)</span><span class=o>.</span><span class=fm>__init__</span><span class=p>()</span>
+        <span class=bp>self</span><span class=o>.</span><span class=n>classify</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Sequential</span><span class=p>(</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>Linear</span><span class=p>(</span><span class=mi>2</span><span class=p>,</span> <span class=mi>15</span><span class=p>),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>ReLU</span><span class=p>(),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>Linear</span><span class=p>(</span><span class=mi>15</span><span class=p>,</span> <span class=mi>2</span><span class=p>),</span>
+            <span class=n>nn</span><span class=o>.</span><span class=n>Softmax</span><span class=p>(</span><span class=n>dim</span><span class=o>=</span><span class=mi>1</span><span class=p>)</span>
+        <span class=p>)</span>
+
+    <span class=k>def</span> <span class=nf>forward</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>x</span><span class=p>):</span>
+        <span class=n>classification</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>classify</span><span class=p>(</span><span class=n>x</span><span class=p>)</span>
+        <span class=k>return</span> <span class=n>classification</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>net</span> <span class=o>=</span> <span class=n>Net</span><span class=p>()</span>
+<span class=n>optimizer</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>optim</span><span class=o>.</span><span class=n>SGD</span><span class=p>(</span><span class=n>net</span><span class=o>.</span><span class=n>parameters</span><span class=p>(),</span> <span class=n>lr</span><span class=o>=</span><span class=mf>0.3</span><span class=p>)</span>
+<span class=n>loss_func</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>CrossEntropyLoss</span><span class=p>()</span>
+</code></pre></div> <div class=highlight><pre><span></span><code><span class=k>for</span> <span class=n>epoch</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>100</span><span class=p>):</span>
+    <span class=n>y_hat</span> <span class=o>=</span> <span class=n>net</span><span class=p>(</span><span class=n>x</span><span class=p>)</span>
+    <span class=n>loss</span> <span class=o>=</span> <span class=n>loss_func</span><span class=p>(</span><span class=n>y_hat</span><span class=p>,</span> <span class=n>y</span><span class=p>)</span>
+    <span class=n>optimizer</span><span class=o>.</span><span class=n>zero_grad</span><span class=p>()</span>
+    <span class=n>loss</span><span class=o>.</span><span class=n>backward</span><span class=p>()</span>
+    <span class=n>optimizer</span><span class=o>.</span><span class=n>step</span><span class=p>()</span>
+
+<span class=n>classification</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>max</span><span class=p>(</span><span class=n>y_hat</span><span class=p>,</span> <span class=mi>1</span><span class=p>)[</span><span class=mi>1</span><span class=p>]</span>
+<span class=n>class_y</span> <span class=o>=</span> <span class=n>classification</span><span class=o>.</span><span class=n>data</span><span class=o>.</span><span class=n>numpy</span><span class=p>()</span>
+<span class=n>target_y</span> <span class=o>=</span> <span class=n>y</span><span class=o>.</span><span class=n>data</span><span class=o>.</span><span class=n>numpy</span><span class=p>()</span>
+
+<span class=n>plt</span><span class=o>.</span><span class=n>scatter</span><span class=p>(</span><span class=n>x</span><span class=o>.</span><span class=n>data</span><span class=o>.</span><span class=n>numpy</span><span class=p>()[:,</span><span class=mi>0</span><span class=p>],</span>
+            <span class=n>x</span><span class=o>.</span><span class=n>data</span><span class=o>.</span><span class=n>numpy</span><span class=p>()[:,</span><span class=mi>1</span><span class=p>],</span>
+           <span class=n>c</span> <span class=o>=</span> <span class=n>class_y</span><span class=p>,</span>
+           <span class=n>s</span> <span class=o>=</span> <span class=mi>100</span><span class=p>,</span>
+           <span class=n>cmap</span> <span class=o>=</span> <span class=s1>&#39;RdYlGn&#39;</span><span class=p>,</span>
+           <span class=p>)</span>
+<span class=n>accuracy</span> <span class=o>=</span> <span class=nb>sum</span><span class=p>(</span><span class=n>class_y</span> <span class=o>==</span> <span class=n>target_y</span><span class=p>)</span><span class=o>/</span><span class=mi>200</span>
+<span class=c1># plt.title(&#39;accuracy = %s&#39;%accuracy)</span>
+<span class=n>plt</span><span class=o>.</span><span class=n>text</span><span class=p>(</span><span class=mf>1.5</span><span class=p>,</span>
+        <span class=o>-</span><span class=mi>4</span><span class=p>,</span>
+        <span class=sa>f</span><span class=s1>&#39;accuracy = </span><span class=si>{</span><span class=n>accuracy</span><span class=si>}</span><span class=s1>&#39;</span><span class=p>,</span>
+        <span class=n>fontdict</span> <span class=o>=</span> <span class=p>{</span><span class=s1>&#39;size&#39;</span><span class=p>:</span><span class=s1>&#39;20&#39;</span><span class=p>,</span>
+                    <span class=s1>&#39;color&#39;</span><span class=p>:</span><span class=s1>&#39;blue&#39;</span><span class=p>}</span>
+        <span class=p>)</span>
+<span class=n>plt</span><span class=o>.</span><span class=n>show</span><span class=p>()</span>
+</code></pre></div> </body> </html>
