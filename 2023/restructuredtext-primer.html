@@ -58,10 +58,71 @@ F    F    F
     <span class=kn>import</span> <span class=nn>sys</span>
     <span class=nb>print</span><span class=p>(</span><span class=n>sys</span><span class=o>.</span><span class=n>executable</span><span class=p>)</span>
 </pre></div> </div> <div class=section id=images> <h3><a class=toc-backref href=#toc-entry-16>1.8. images</a></h3> <img alt src=/files/MNIST-with-LeNet/output1.png> <div class=highlight><pre><span></span><span class=p>..</span> <span class=ow>image</span><span class=p>::</span> /path/to/image.png
-</pre></div> <p>1.9. citation</p> <p>Lorem ipsum <a class=citation-reference href=#ref id=citation-reference-1>[Ref]</a> dolor sit amet.</p> <table class="docutils citation" frame=void id=ref rules=none> <colgroup><col class=label><col></colgroup> <tbody valign=top> <tr><td class=label><a class=fn-backref href=#citation-reference-1>[Ref]</a></td><td>Book or article reference, URL or whatever.</td></tr> </tbody> </table> </div> </div> <div class=section id=advanced> <h2><a class=toc-backref href=#toc-entry-17>2. advanced</a></h2> <div class=section id=math> <h3><a class=toc-backref href=#toc-entry-18>2.1. math</a></h3> <p>According to Leonhard Euler, we have Euler's formula which states that for any real number x:</p> <blockquote> <div class=formula> <i>e</i><sup><i>ix</i></sup> = <i>cos</i><i>x</i> + <i>i</i><i>sin</i><i>x</i> </div> </blockquote> <div class=highlight><pre><span></span><span class=p>..</span> <span class=ow>math</span><span class=p>::</span>
+</pre></div> <p>1.9. citation</p> <p>Lorem ipsum <a class=citation-reference href=#ref id=citation-reference-1>[Ref]</a> dolor sit amet.</p> <table class="docutils citation" frame=void id=ref rules=none> <colgroup><col class=label><col></colgroup> <tbody valign=top> <tr><td class=label><a class=fn-backref href=#citation-reference-1>[Ref]</a></td><td>Book or article reference, URL or whatever.</td></tr> </tbody> </table> </div> </div> <div class=section id=advanced> <h2><a class=toc-backref href=#toc-entry-17>2. advanced</a></h2> <div class=section id=math> <h3><a class=toc-backref href=#toc-entry-18>2.1. math</a></h3> <p>According to Leonhard Euler, we have Euler's formula which states that for any real number x:</p> <blockquote> <div class=math> \begin{equation*} e^ix = cos x + i sin x \end{equation*} </div> </blockquote> <div class=highlight><pre><span></span><span class=p>..</span> <span class=ow>math</span><span class=p>::</span>
 
     e^ix = cos x + i sin x
-</pre></div> <p>Another famous formula inlined here is <span class=formula><i>a</i><sup>2</sup> + <i>b</i><sup>2</sup> = <i>c</i><sup>2</sup></span>.</p> <div class=highlight><pre><span></span><span class=na>:math:</span><span class=nv>`a^2 + b^2 = c^2`</span>
-</pre></div> </div> <div class=section id=emacs-rst-mode> <h3><a class=toc-backref href=#toc-entry-19>2.2. emacs rst-mode</a></h3> <p>Since emacs v24.3 reST support is integrated.</p> <div class=section id=section-adornment> <h4><a class=toc-backref href=#toc-entry-20>2.2.1 section adornment</a></h4> <dl class=docutils> <dt><em>C-c C-a C-a</em></dt> <dd>rst-adjust</dd> </dl> <div class=highlight><pre><span></span>My Section Title
+</pre></div> <p>Mean Squared Error Loss, or MSE Loss:</p> <div class=math> \begin{equation*} J_{MSE} = \frac{1}{N}\sum_{i=1}^N(y_i - \hat{y}_i)^2 \end{equation*} </div> <p>Here inlined a famous formula: <span class=math>\(a^2 + b^2 = c^2\)</span>.</p> <div class=highlight><pre><span></span><span class=na>:math:</span><span class=nv>`a^2 + b^2 = c^2`</span>
+</pre></div> <p>For another instance, sigmoid function is defined as <span class=math>\(f(x) = \frac{1}{1+e^{-x}}\)</span></p> </div> <div class=section id=emacs-rst-mode> <h3><a class=toc-backref href=#toc-entry-19>2.2. emacs rst-mode</a></h3> <p>Since emacs v24.3 reST support is integrated.</p> <div class=section id=section-adornment> <h4><a class=toc-backref href=#toc-entry-20>2.2.1 section adornment</a></h4> <dl class=docutils> <dt><em>C-c C-a C-a</em></dt> <dd>rst-adjust</dd> </dl> <div class=highlight><pre><span></span>My Section Title
 === C-c C-a C-a
-</pre></div> </div> <div class=section id=move-around-sections> <h4><a class=toc-backref href=#toc-entry-21>2.2.2 move around sections</a></h4> <dl class=docutils> <dt><em>C-M-a</em></dt> <dd>rst-backward-section</dd> <dt><em>C-M-e</em></dt> <dd>rst-forward-section</dd> </dl> </div> <div class=section id=plain-lines-to-lists> <h4><a class=toc-backref href=#toc-entry-22>2.2.3 plain lines to lists</a></h4> <p><strong>C-c C-l</strong></p> <dl class=docutils> <dt><em>C-c C-l C-e</em></dt> <dd>rst-enumerate-region</dd> <dt><em>C-c C-l C-b</em></dt> <dd>rst-bullet-list-region</dd> <dt>C-c C-l TAB</dt> <dd>rst-insert-list</dd> </dl> </div> <div class=section id=table-of-contents> <h4><a class=toc-backref href=#toc-entry-23>2.2.4 table of contents</a></h4> <p>Present table of contents in a temporary buffer. <strong>C-c C-t</strong></p> <dl class=docutils> <dt>C-c C-t C-t</dt> <dd>rst-toc</dd> </dl> <p>insert table-of-contents</p> <dl class=docutils> <dt>C-c C-t C-i</dt> <dd>rst-toc-insert</dd> </dl> </div> </div> </div> </body> </html>
+</pre></div> </div> <div class=section id=move-around-sections> <h4><a class=toc-backref href=#toc-entry-21>2.2.2 move around sections</a></h4> <dl class=docutils> <dt><em>C-M-a</em></dt> <dd>rst-backward-section</dd> <dt><em>C-M-e</em></dt> <dd>rst-forward-section</dd> </dl> </div> <div class=section id=plain-lines-to-lists> <h4><a class=toc-backref href=#toc-entry-22>2.2.3 plain lines to lists</a></h4> <p><strong>C-c C-l</strong></p> <dl class=docutils> <dt><em>C-c C-l C-e</em></dt> <dd>rst-enumerate-region</dd> <dt><em>C-c C-l C-b</em></dt> <dd>rst-bullet-list-region</dd> <dt>C-c C-l TAB</dt> <dd>rst-insert-list</dd> </dl> </div> <div class=section id=table-of-contents> <h4><a class=toc-backref href=#toc-entry-23>2.2.4 table of contents</a></h4> <p>Present table of contents in a temporary buffer. <strong>C-c C-t</strong></p> <dl class=docutils> <dt>C-c C-t C-t</dt> <dd>rst-toc</dd> </dl> <p>insert table-of-contents</p> <dl class=docutils> <dt>C-c C-t C-i</dt> <dd>rst-toc-insert</dd> </dl> </div> </div> </div> <script type=text/javascript>if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script> </body> </html>
