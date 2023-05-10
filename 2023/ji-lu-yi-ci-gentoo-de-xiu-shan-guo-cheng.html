@@ -18,6 +18,6 @@ cp<span class=w> </span>/mnt/gentoo/usr/share/portage/config/repos.conf<span cla
 </pre></div> </div> <div class=section id=section-2> <h3><a class=toc-backref href=#toc-entry-8>2.2. 子卷快照</a></h3> <p>Btrfs 的子卷并不是块设备，而是独立可挂载的 POSIX filetree</p> <div class=highlight><pre><span></span><span class=c1># btrfs subvolume snapshot &lt;subvolume&gt; { &lt;subdir&gt;/&lt;name&gt; | &lt;subdir&gt; }</span>
 <span class=c1># btrfs sub snap -r ... # -r 意味着该快照只读</span>
 </pre></div> <p>首先在 / 下创建专用于备份的文件夹，我称其为 <em>snapshoot</em> 哈哈哈</p> <div class=highlight><pre><span></span><span class=c1># btrfs subvolume create /snapshoot</span>
-</pre></div> <p>我将 home 文件夹设为了子卷，所以需要快照两次，因为其不是递归的</p> <div class=highlight><pre><span></span><span class=c1># btrfs subvolume snapshot -r /     /snapshoot/$(date +&quot;%Y-%m-%d&quot;)-readonly-root</span>
+</pre></div> <p>我将 home 文件夹设为了子卷，所以需要快照两次，因为 btrfs 的快照 <strong>不是递归的</strong> ， 子卷存在的地方会被映射为同名的空文件夹</p> <div class=highlight><pre><span></span><span class=c1># btrfs subvolume snapshot -r /     /snapshoot/$(date +&quot;%Y-%m-%d&quot;)-readonly-root</span>
 <span class=c1># btrfs subvolume snapshot -r /home /snapshoot/$(date +&quot;%Y-%m-%d&quot;)-readonly-home</span>
 </pre></div> </div> </div> </body> </html>
