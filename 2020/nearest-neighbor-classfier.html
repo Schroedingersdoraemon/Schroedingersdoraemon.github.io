@@ -1,20 +1,22 @@
-<!DOCTYPE html><html> <head><title>Nearest Neighbor Classfier</title><meta charset=utf-8><meta name=viewport content="width=device-width" initial-scale=1><link rel=stylesheet href=/theme/css/main.css></head> <body> <h1>Nearest Neighbor Classfier</h1> 2020-09-26 16:23 <hr> <p>首先需要<a href=http://www.cs.toronto.edu/~kriz/cifar.html>下载cifar-10数据集</a></p> <p>然后将训练集的 6 个batch合并到一个数组中去，程序如下：</p> <div class=highlight><pre><span></span><code><span class=c1># cifar-10数据集的保存格式， 需要pickle解码</span>
+<!doctype html><title>
+Nearest Neighbor Classfier
+    </title><meta charset=utf-8><meta content=width=device-width initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><body><h1>Nearest Neighbor Classfier</h1> 2020-09-26 16:23 <hr><p>首先需要<a href=http://www.cs.toronto.edu/~kriz/cifar.html>下载cifar-10数据集</a><p>然后将训练集的 6 个batch合并到一个数组中去，程序如下：<div class=highlight><pre><span></span><code><span class=c1># cifar-10数据集的保存格式， 需要pickle解码</span>
 <span class=kn>import</span> <span class=nn>pickle</span>
 <span class=kn>import</span> <span class=nn>numpy</span> <span class=k>as</span> <span class=nn>np</span>
 
 <span class=k>def</span> <span class=nf>unpickle</span><span class=p>(</span><span class=n>file</span><span class=p>):</span>
-    <span class=k>with</span> <span class=nb>open</span><span class=p>(</span><span class=n>file</span><span class=p>,</span> <span class=s1>&#39;rb&#39;</span><span class=p>)</span> <span class=k>as</span> <span class=n>fo</span><span class=p>:</span>
-        <span class=nb>dict</span> <span class=o>=</span> <span class=n>pickle</span><span class=o>.</span><span class=n>load</span><span class=p>(</span><span class=n>fo</span><span class=p>,</span> <span class=n>encoding</span><span class=o>=</span><span class=s1>&#39;latin-1&#39;</span><span class=p>)</span>
+    <span class=k>with</span> <span class=nb>open</span><span class=p>(</span><span class=n>file</span><span class=p>,</span> <span class=s1>'rb'</span><span class=p>)</span> <span class=k>as</span> <span class=n>fo</span><span class=p>:</span>
+        <span class=nb>dict</span> <span class=o>=</span> <span class=n>pickle</span><span class=o>.</span><span class=n>load</span><span class=p>(</span><span class=n>fo</span><span class=p>,</span> <span class=n>encoding</span><span class=o>=</span><span class=s1>'latin-1'</span><span class=p>)</span>
         <span class=k>return</span> <span class=nb>dict</span>
 
 <span class=k>def</span> <span class=nf>train_data</span><span class=p>():</span>
     <span class=n>x</span> <span class=o>=</span> <span class=p>[]</span>
     <span class=n>y</span> <span class=o>=</span> <span class=p>[]</span>
     <span class=k>for</span> <span class=n>i</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=mi>6</span><span class=p>):</span>
-        <span class=n>batch_file</span> <span class=o>=</span> <span class=s1>&#39;cifar-10-batches-py/data_batch_</span><span class=si>%d</span><span class=s1>&#39;</span><span class=o>%</span><span class=p>(</span><span class=n>i</span><span class=p>)</span>
+        <span class=n>batch_file</span> <span class=o>=</span> <span class=s1>'cifar-10-batches-py/data_batch_</span><span class=si>%d</span><span class=s1>'</span><span class=o>%</span><span class=p>(</span><span class=n>i</span><span class=p>)</span>
         <span class=n>batch_dict</span> <span class=o>=</span> <span class=n>unpickle</span><span class=p>(</span><span class=n>batch_file</span><span class=p>)</span>
-        <span class=n>train_batch</span> <span class=o>=</span> <span class=n>batch_dict</span><span class=p>[</span><span class=s1>&#39;data&#39;</span><span class=p>]</span>
-        <span class=n>train_label</span> <span class=o>=</span> <span class=n>batch_dict</span><span class=p>[</span><span class=s1>&#39;labels&#39;</span><span class=p>]</span>
+        <span class=n>train_batch</span> <span class=o>=</span> <span class=n>batch_dict</span><span class=p>[</span><span class=s1>'data'</span><span class=p>]</span>
+        <span class=n>train_label</span> <span class=o>=</span> <span class=n>batch_dict</span><span class=p>[</span><span class=s1>'labels'</span><span class=p>]</span>
         <span class=n>x</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>train_batch</span><span class=p>)</span>
         <span class=n>y</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>train_label</span><span class=p>)</span>
         <span class=n>data</span> <span class=o>=</span> <span class=n>np</span><span class=o>.</span><span class=n>concatenate</span><span class=p>(</span><span class=n>x</span><span class=p>)</span>
@@ -23,20 +25,20 @@
     <span class=k>return</span> <span class=n>data</span><span class=p>,</span> <span class=n>label</span>
 
 <span class=k>def</span> <span class=nf>test_data</span><span class=p>():</span>
-    <span class=n>batch_file</span> <span class=o>=</span> <span class=s1>&#39;cifar-10-batches-py/test_batch&#39;</span>
+    <span class=n>batch_file</span> <span class=o>=</span> <span class=s1>'cifar-10-batches-py/test_batch'</span>
     <span class=n>batch_dict</span> <span class=o>=</span> <span class=n>unpickle</span><span class=p>(</span><span class=n>batch_file</span><span class=p>)</span>
-    <span class=n>data</span> <span class=o>=</span> <span class=n>batch_dict</span><span class=p>[</span><span class=s1>&#39;data&#39;</span><span class=p>]</span>
-    <span class=n>test_label</span> <span class=o>=</span> <span class=n>batch_dict</span><span class=p>[</span><span class=s1>&#39;labels&#39;</span><span class=p>]</span>
+    <span class=n>data</span> <span class=o>=</span> <span class=n>batch_dict</span><span class=p>[</span><span class=s1>'data'</span><span class=p>]</span>
+    <span class=n>test_label</span> <span class=o>=</span> <span class=n>batch_dict</span><span class=p>[</span><span class=s1>'labels'</span><span class=p>]</span>
     <span class=n>label</span> <span class=o>=</span> <span class=n>np</span><span class=o>.</span><span class=n>array</span><span class=p>(</span><span class=n>test_label</span><span class=p>)</span>
 
     <span class=k>return</span> <span class=n>data</span><span class=p>,</span> <span class=n>label</span>
-</code></pre></div> <p>将此程序命名为cifar_data_loader，放到同目录下</p> <p>如此这般，便可以通过如下片段使用：</p> <div class=highlight><pre><span></span><code><span class=c1># 导入上述程序</span>
+</code></pre></div><p>将此程序命名为cifar_data_loader，放到同目录下<p>如此这般，便可以通过如下片段使用：<div class=highlight><pre><span></span><code><span class=c1># 导入上述程序</span>
 <span class=kn>import</span> <span class=nn>cifar_data_loader</span>
-<span class=sd>&#39;&#39;&#39; 调用cifar_data_loader的train_data函数，将训练数据存为train_data,将训练标签存为train_label&#39;&#39;&#39;</span>
+<span class=sd>''' 调用cifar_data_loader的train_data函数，将训练数据存为train_data,将训练标签存为train_label'''</span>
 <span class=n>train_data</span><span class=p>,</span> <span class=n>train_label</span> <span class=o>=</span> <span class=n>cifar_data_loader</span><span class=o>.</span><span class=n>train_data</span><span class=p>()</span>
-<span class=sd>&#39;&#39;&#39; 调用cifar_data_loader的test_data函数，将训练数据存为test_data,将训练标签存为test_label&#39;&#39;&#39;</span>
+<span class=sd>''' 调用cifar_data_loader的test_data函数，将训练数据存为test_data,将训练标签存为test_label'''</span>
 <span class=n>test_data</span><span class=p>,</span> <span class=n>test_label</span> <span class=o>=</span> <span class=n>cifar_data_loader</span><span class=o>.</span><span class=n>test_data</span><span class=p>()</span>
-</code></pre></div> <p>算法部分如下：</p> <div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>pickle</span>
+</code></pre></div><p>算法部分如下：<div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>pickle</span>
 <span class=kn>import</span> <span class=nn>numpy</span> <span class=k>as</span> <span class=nn>np</span>
 <span class=kn>import</span> <span class=nn>cifar_data_loader</span>
 
@@ -65,7 +67,7 @@
 <span class=n>Yte_predict</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>predict</span><span class=p>(</span><span class=n>test_data</span><span class=p>)</span>
 <span class=n>accuracy</span> <span class=o>=</span> <span class=n>np</span><span class=o>.</span><span class=n>mean</span><span class=p>(</span><span class=n>Yte_predict</span> <span class=o>==</span> <span class=n>test_label</span><span class=p>)</span>
 
-<span class=nb>print</span><span class=p>(</span><span class=s1>&#39;accuracy: </span><span class=si>%f</span><span class=s1>&#39;</span> <span class=o>%</span> <span class=n>accuracy</span><span class=p>)</span>
-</code></pre></div> <p>花费36分钟，得到结果如下：</p> <div class=highlight><pre><span></span><code>&gt;<span class=w> </span>python<span class=w> </span>NearestNeighbor.py
+<span class=nb>print</span><span class=p>(</span><span class=s1>'accuracy: </span><span class=si>%f</span><span class=s1>'</span> <span class=o>%</span> <span class=n>accuracy</span><span class=p>)</span>
+</code></pre></div><p>花费36分钟，得到结果如下：<div class=highlight><pre><span></span><code>><span class=w> </span>python<span class=w> </span>NearestNeighbor.py
 <span class=c1># accuracy: 0.249200</span>
-</code></pre></div> </body> </html>
+</code></pre></div>
