@@ -1,4 +1,6 @@
-<!DOCTYPE html><html> <head><title>reStructuredText primer</title><meta charset=utf-8><meta name=viewport content="width=device-width" initial-scale=1><link rel=stylesheet href=/theme/css/main.css></head> <body> <h1>reStructuredText primer</h1> 2023-04-10 17:46 <hr> <div class="contents topic" id=topic-1> <p class=topic-title>目录</p> <ul class=simple> <li><a class="reference internal" href=#abstract id=toc-entry-1>0. abstract</a></li> <li><a class="reference internal" href=#basics id=toc-entry-2>1. basics</a><ul> <li><a class="reference internal" href=#headings id=toc-entry-3>1.1. headings</a></li> <li><a class="reference internal" href=#inline-markup id=toc-entry-4>1.2. inline markup</a></li> <li><a class="reference internal" href=#lists id=toc-entry-5>1.3. lists</a><ul> <li><a class="reference internal" href=#bullet-list id=toc-entry-6>1.3.1. bullet list</a></li> <li><a class="reference internal" href=#number-list id=toc-entry-7>1.3.2. number list</a></li> <li><a class="reference internal" href=#definition-list id=toc-entry-8>1.3.3. definition list</a></li> </ul> </li> <li><a class="reference internal" href=#fields-lists id=toc-entry-9>1.3.4. fields lists</a></li> <li><a class="reference internal" href=#line-blocks id=toc-entry-10>1.4. line blocks</a></li> <li><a class="reference internal" href=#tables id=toc-entry-11>1.5. tables</a><ul> <li><a class="reference internal" href=#grid-table id=toc-entry-12>1.5.1. grid table</a></li> <li><a class="reference internal" href=#simple-table id=toc-entry-13>1.5.2. simple table</a></li> </ul> </li> <li><a class="reference internal" href=#hyper-link id=toc-entry-14>1.6. hyper link</a></li> <li><a class="reference internal" href=#code-blocks id=toc-entry-15>1.7. code blocks</a></li> <li><a class="reference internal" href=#images id=toc-entry-16>1.8. images</a></li> <li><a class="reference internal" href=#citation id=toc-entry-17>1.9. citation</a></li> <li><a class="reference internal" href=#table-of-contents id=toc-entry-18>1.10. table of contents</a></li> </ul> </li> <li><a class="reference internal" href=#advanced id=toc-entry-19>2. advanced</a><ul> <li><a class="reference internal" href=#math id=toc-entry-20>2.1. math</a></li> <li><a class="reference internal" href=#emacs-rst-mode id=toc-entry-21>2.2. emacs rst-mode</a><ul> <li><a class="reference internal" href=#section-adornment id=toc-entry-22>2.2.1 section adornment</a></li> <li><a class="reference internal" href=#move-around-sections id=toc-entry-23>2.2.2 move around sections</a></li> <li><a class="reference internal" href=#plain-lines-to-lists id=toc-entry-24>2.2.3 plain lines to lists</a></li> <li><a class="reference internal" href=#table-of-contents-1 id=toc-entry-25>2.2.4 table of contents</a></li> </ul> </li> </ul> </li> </ul> </div> <div class=section id=abstract> <h2><a class=toc-backref href=#toc-entry-1>0. abstract</a></h2> <p>reStructuredText, or reST, is designed to be a simple yet unobtrusive markup language.</p> </div> <div class=section id=basics> <h2><a class=toc-backref href=#toc-entry-2>1. basics</a></h2> <div class=section id=headings> <h3><a class=toc-backref href=#toc-entry-3>1.1. headings</a></h3> <div class=highlight><pre><span></span><span class=gh>Title</span>
+<!doctype html><title>
+reStructuredText primer
+    </title><meta charset=utf-8><meta content=width=device-width initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><body><h1>reStructuredText primer</h1> 2023-04-10 17:46 <hr><div class="contents topic" id=topic-1><p class=topic-title><a class="reference internal" href=#top>目录</a><ul class=simple><li><a class="reference internal" href=#abstract id=toc-entry-1>0. abstract</a><li><a class="reference internal" href=#basics id=toc-entry-2>1. basics</a><ul><li><a class="reference internal" href=#headings id=toc-entry-3>1.1. headings</a><li><a class="reference internal" href=#inline-markup id=toc-entry-4>1.2. inline markup</a><li><a class="reference internal" href=#lists id=toc-entry-5>1.3. lists</a><ul><li><a class="reference internal" href=#bullet-list id=toc-entry-6>1.3.1. bullet list</a><li><a class="reference internal" href=#number-list id=toc-entry-7>1.3.2. number list</a><li><a class="reference internal" href=#definition-list id=toc-entry-8>1.3.3. definition list</a></ul><li><a class="reference internal" href=#fields-lists id=toc-entry-9>1.3.4. fields lists</a><li><a class="reference internal" href=#line-blocks id=toc-entry-10>1.4. line blocks</a><li><a class="reference internal" href=#tables id=toc-entry-11>1.5. tables</a><ul><li><a class="reference internal" href=#grid-table id=toc-entry-12>1.5.1. grid table</a><li><a class="reference internal" href=#simple-table id=toc-entry-13>1.5.2. simple table</a></ul><li><a class="reference internal" href=#hyper-link id=toc-entry-14>1.6. hyper link</a><li><a class="reference internal" href=#code-blocks id=toc-entry-15>1.7. code blocks</a><li><a class="reference internal" href=#images id=toc-entry-16>1.8. images</a><li><a class="reference internal" href=#citation id=toc-entry-17>1.9. citation</a><li><a class="reference internal" href=#table-of-contents id=toc-entry-18>1.10. table of contents</a></ul><li><a class="reference internal" href=#advanced id=toc-entry-19>2. advanced</a><ul><li><a class="reference internal" href=#math id=toc-entry-20>2.1. math</a><li><a class="reference internal" href=#emacs-rst-mode id=toc-entry-21>2.2. emacs rst-mode</a><ul><li><a class="reference internal" href=#section-adornment id=toc-entry-22>2.2.1 section adornment</a><li><a class="reference internal" href=#move-around-sections id=toc-entry-23>2.2.2 move around sections</a><li><a class="reference internal" href=#plain-lines-to-lists id=toc-entry-24>2.2.3 plain lines to lists</a><li><a class="reference internal" href=#table-of-contents-1 id=toc-entry-25>2.2.4 table of contents</a></ul></ul></ul></div><div class=section id=abstract><h2><a class=toc-backref href=#toc-entry-1>0. abstract</a></h2><p>reStructuredText, or reST, is designed to be a simple yet unobtrusive markup language.</div><div class=section id=basics><h2><a class=toc-backref href=#toc-entry-2>1. basics</a></h2><div class=section id=headings><h3><a class=toc-backref href=#toc-entry-3>1.1. headings</a></h3><div class=highlight><pre><span></span><span class=gh>Title</span>
 <span class=gh>=====</span>
 
 <span class=gh>Section</span>
@@ -6,34 +8,34 @@
 
 <span class=gh>Subsection</span>
 <span class=gh>~~~~~~~~~~</span>
-</pre></div> </div> <div class=section id=inline-markup> <h3><a class=toc-backref href=#toc-entry-4>1.2. inline markup</a></h3> <p><em>italic</em> *text* for emphasis</p> <p><strong>boldface</strong> **text** for strong emphasis</p> <p><tt class="docutils literal">backquote</tt> ``text`` for code samples</p> </div> <div class=section id=lists> <h3><a class=toc-backref href=#toc-entry-5>1.3. lists</a></h3> <div class=section id=bullet-list> <h4><a class=toc-backref href=#toc-entry-6>1.3.1. bullet list</a></h4> <ul class=simple> <li>available signs: + - *<ul> <li>nested lists must be seperated</li> <li>by an empty line</li> </ul> </li> <li>and here the parent list continues</li> </ul> <div class=highlight><pre><span></span><span class=m>-</span> available signs: + - *
+</pre></div></div><div class=section id=inline-markup><h3><a class=toc-backref href=#toc-entry-4>1.2. inline markup</a></h3><p><em>italic</em> *text* for emphasis<p><strong>boldface</strong> **text** for strong emphasis<p><tt class="docutils literal">backquote</tt> ``text`` for code samples</div><div class=section id=lists><h3><a class=toc-backref href=#toc-entry-5>1.3. lists</a></h3><div class=section id=bullet-list><h4><a class=toc-backref href=#toc-entry-6>1.3.1. bullet list</a></h4><ul class=simple><li>available signs: + - *<ul><li>nested lists must be seperated<li>by an empty line</ul><li>and here the parent list continues</ul><div class=highlight><pre><span></span><span class=m>-</span> available signs: + - *
 
   <span class=m>-</span> nested lists must be seperated
   <span class=m>-</span> by an empty line
 
 <span class=m>-</span> and here the parent list continues
-</pre></div> </div> <div class=section id=number-list> <h4><a class=toc-backref href=#toc-entry-7>1.3.2. number list</a></h4> <ol class="arabic simple"> <li>auto numbering is feasible</li> <li>using prefix sign '#'</li> </ol> <div class=highlight><pre><span></span><span class=m>#.</span> auto numbering is feasible
-<span class=m>#.</span> using prefix sign &#39;#&#39;
-</pre></div> </div> <div class=section id=definition-list> <h4><a class=toc-backref href=#toc-entry-8>1.3.3. definition list</a></h4> <dl class=docutils> <dt>term(up to a line)</dt> <dd>Definition must be indented and multiple paragraphs are possible</dd> <dt>detergent</dt> <dd>a chemical liquid or powder for cleaning</dd> </dl> <div class=highlight><pre><span></span>term
+</pre></div></div><div class=section id=number-list><h4><a class=toc-backref href=#toc-entry-7>1.3.2. number list</a></h4><ol class="arabic simple"><li>auto numbering is feasible<li>using prefix sign '#'</ol><div class=highlight><pre><span></span><span class=m>#.</span> auto numbering is feasible
+<span class=m>#.</span> using prefix sign '#'
+</pre></div></div><div class=section id=definition-list><h4><a class=toc-backref href=#toc-entry-8>1.3.3. definition list</a></h4><dl class=docutils><dt>term(up to a line)<dd>Definition must be indented and multiple paragraphs are possible<dt>detergent<dd>a chemical liquid or powder for cleaning</dl><div class=highlight><pre><span></span>term
     Definition must be indented
     and multiple paragraphs are possible
 
 detergent
     a chemical liquid or powder for cleaning
-</pre></div> </div> </div> <div class=section id=fields-lists> <h3><a class=toc-backref href=#toc-entry-9>1.3.4. fields lists</a></h3> <table class="docutils field-list" frame=void rules=none> <col class=field-name> <col class=field-body> <tbody valign=top> <tr class=field><th class=field-name>fieldname:</th><td class=field-body>Field Content</td> </tr> </tbody> </table> <div class=highlight><pre><span></span><span class=nc>:fieldname:</span> Field Content
+</pre></div></div></div><div class=section id=fields-lists><h3><a class=toc-backref href=#toc-entry-9>1.3.4. fields lists</a></h3><table class="docutils field-list" frame=void rules=none><col class=field-name><col class=field-body><tbody valign=top><tr class=field><th class=field-name>fieldname:<td class=field-body>Field Content</table><div class=highlight><pre><span></span><span class=nc>:fieldname:</span> Field Content
 
 def my_function(my_arg, my_other_arg):
-    &quot;&quot;&quot;A function just for me.
+    """A function just for me.
 
     <span class=nc>:param my_arg:</span> The first of my arguments.
     <span class=nc>:param my_other_arg:</span> The second of my arguments.
 
     <span class=nc>:returns:</span> A message (just for me, of course).
-    &quot;&quot;&quot;
-</pre></div> </div> <div class=section id=line-blocks> <h3><a class=toc-backref href=#toc-entry-10>1.4. line blocks</a></h3> <p>prefix every line with | to preserve line breaks</p> <div class=line-block> <div class=line>These lines are</div> <div class=line>broken exactly like in</div> <div class=line>the source file</div> </div> <div class=highlight><pre><span></span><span class=o>|</span> These lines are
+    """
+</pre></div></div><div class=section id=line-blocks><h3><a class=toc-backref href=#toc-entry-10>1.4. line blocks</a></h3><p>prefix every line with | to preserve line breaks<div class=line-block><div class=line>These lines are</div><div class=line>broken exactly like in</div><div class=line>the source file</div></div><div class=highlight><pre><span></span><span class=o>|</span> These lines are
 <span class=o>|</span> broken exactly like in
 <span class=o>|</span> the source file
-</pre></div> </div> <div class=section id=tables> <h3><a class=toc-backref href=#toc-entry-11>1.5. tables</a></h3> <div class=section id=grid-table> <h4><a class=toc-backref href=#toc-entry-12>1.5.1. grid table</a></h4> <p>For grid tables, grid cells must be painted manually.</p> <table border=1 class=docutils> <colgroup> <col width=43%> <col width=21%> <col width=18%> <col width=18%> </colgroup> <thead valign=bottom> <tr><th class=head>Header row, column 1 (header rows optional)</th> <th class=head>Header 2</th> <th class=head>Header 3</th> <th class=head>Header 4</th> </tr> </thead> <tbody valign=top> <tr><td>body row 1, column 1</td> <td>column 2</td> <td>column 3</td> <td>column 4</td> </tr> <tr><td>body row 2</td> <td>...</td> <td>...</td> <td>&nbsp;</td> </tr> </tbody> </table> <div class=highlight><pre><span></span>+------------------------+------------+----------+----------+
+</pre></div></div><div class=section id=tables><h3><a class=toc-backref href=#toc-entry-11>1.5. tables</a></h3><div class=section id=grid-table><h4><a class=toc-backref href=#toc-entry-12>1.5.1. grid table</a></h4><p>For grid tables, grid cells must be painted manually.<table border=1 class=docutils><colgroup><col width=43%><col width=21%><col width=18%><col width=18%></colgroup><thead valign=bottom><tr><th class=head>Header row, column 1 (header rows optional)<th class=head>Header 2<th class=head>Header 3<th class=head>Header 4<tbody valign=top><tr><td>body row 1, column 1<td>column 2<td>column 3<td>column 4<tr><td>body row 2<td>...<td>...<td> </table><div class=highlight><pre><span></span>+------------------------+------------+----------+----------+
 <span class=o>|</span> Header row, column 1   | Header 2   | Header 3 | Header 4 |
 <span class=o>|</span> (header rows optional) |            |          |          |
 +========================+============+==========+==========+
@@ -41,7 +43,7 @@ def my_function(my_arg, my_other_arg):
 +------------------------+------------+----------+----------+
 <span class=o>|</span> body row 2             | ...        | ...      |          |
 +------------------------+------------+----------+----------+
-</pre></div> </div> <div class=section id=simple-table> <h4><a class=toc-backref href=#toc-entry-13>1.5.2. simple table</a></h4> <table border=1 class=docutils> <colgroup> <col width=23%> <col width=23%> <col width=54%> </colgroup> <thead valign=bottom> <tr><th class=head>A</th> <th class=head>B</th> <th class=head>A and B</th> </tr> </thead> <tbody valign=top> <tr><td>T</td> <td>F</td> <td>F</td> </tr> <tr><td>F</td> <td>T</td> <td>F</td> </tr> <tr><td>T</td> <td>T</td> <td>T</td> </tr> <tr><td>F</td> <td>F</td> <td>F</td> </tr> </tbody> </table> <div class=highlight><pre><span></span>===  ===  =======
+</pre></div></div><div class=section id=simple-table><h4><a class=toc-backref href=#toc-entry-13>1.5.2. simple table</a></h4><table border=1 class=docutils><colgroup><col width=23%><col width=23%><col width=54%></colgroup><thead valign=bottom><tr><th class=head>A<th class=head>B<th class=head>A and B<tbody valign=top><tr><td>T<td>F<td>F<tr><td>F<td>T<td>F<tr><td>T<td>T<td>T<tr><td>F<td>F<td>F</table><div class=highlight><pre><span></span>===  ===  =======
 A    B    A and B
 ===  ===  =======
 T    F    F
@@ -49,82 +51,21 @@ F    T    F
 T    T    T
 F    F    F
 ===  ===  =======
-</pre></div> </div> </div> <div class=section id=hyper-link> <h3><a class=toc-backref href=#toc-entry-14>1.6. hyper link</a></h3> <p><a class="reference external" href=https://example.com>Link Text</a></p> <div class=highlight><pre><span></span><span class=s>`Link Text </span><span class=si>&lt;https://example.com&gt;</span><span class=s>`_</span>
-</pre></div> <p><a class="reference external" href=https://example.com>Another Link Text</a></p> <div class=highlight><pre><span></span><span class=s>`Another Link Text`_</span>
+</pre></div></div></div><div class=section id=hyper-link><h3><a class=toc-backref href=#toc-entry-14>1.6. hyper link</a></h3><p><a class="reference external" href=https://example.com>Link Text</a><div class=highlight><pre><span></span><span class=s>`Link Text </span><span class=si>&LThttps://example.com></span><span class=s>`_</span>
+</pre></div><p><a class="reference external" href=https://example.com>Another Link Text</a><div class=highlight><pre><span></span><span class=s>`Another Link Text`_</span>
 
 <span class=p>..</span> <span class=nt>_Another Link Text:</span> https://example.com
-</pre></div> </div> <div class=section id=code-blocks> <h3><a class=toc-backref href=#toc-entry-15>1.7. code blocks</a></h3> <div class=highlight><pre><span></span><span class=p>..</span> <span class=ow>code-block</span><span class=p>::</span> <span class=k>python</span>
+</pre></div></div><div class=section id=code-blocks><h3><a class=toc-backref href=#toc-entry-15>1.7. code blocks</a></h3><div class=highlight><pre><span></span><span class=p>..</span> <span class=ow>code-block</span><span class=p>::</span> <span class=k>python</span>
 
     <span class=kn>import</span> <span class=nn>sys</span>
     <span class=nb>print</span><span class=p>(</span><span class=n>sys</span><span class=o>.</span><span class=n>executable</span><span class=p>)</span>
-</pre></div> </div> <div class=section id=images> <h3><a class=toc-backref href=#toc-entry-16>1.8. images</a></h3> <img alt="Alternative Text" src=/files/MNIST-with-LeNet/output1.png> <div class=highlight><pre><span></span><span class=p>..</span> <span class=ow>image</span><span class=p>::</span> /path/to/image.png
+</pre></div></div><div class=section id=images><h3><a class=toc-backref href=#toc-entry-16>1.8. images</a></h3><img alt="Alternative Text" src=/files/MNIST-with-LeNet/output1.png><div class=highlight><pre><span></span><span class=p>..</span> <span class=ow>image</span><span class=p>::</span> /path/to/image.png
        <span class=nc>:alt:</span> Alternative Text is useful to those who probably lose image
-</pre></div> </div> <div class=section id=citation> <h3><a class=toc-backref href=#toc-entry-17>1.9. citation</a></h3> <p>Lorem ipsum <a class=citation-reference href=#ref id=citation-reference-1>[Ref]</a> dolor sit amet.</p> <table class="docutils citation" frame=void id=ref rules=none> <colgroup><col class=label><col></colgroup> <tbody valign=top> <tr><td class=label><a class=fn-backref href=#citation-reference-1>[Ref]</a></td><td>Book or article reference, URL or whatever.</td></tr> </tbody> </table> </div> <div class=section id=table-of-contents> <h3><a class=toc-backref href=#toc-entry-18>1.10. table of contents</a></h3> <p>The following code automatically expands to table of contents.</p> <div class=highlight><pre><span></span><span class=p>..</span> <span class=ow>contents</span><span class=p>::</span>
-</pre></div> </div> </div> <div class=section id=advanced> <h2><a class=toc-backref href=#toc-entry-19>2. advanced</a></h2> <div class=section id=math> <h3><a class=toc-backref href=#toc-entry-20>2.1. math</a></h3> <p>According to Leonhard Euler, we have Euler's formula which states that for any real number x:</p> <blockquote> <div class=math> \begin{equation*} e^ix = cos x + i sin x \end{equation*} </div> </blockquote> <div class=highlight><pre><span></span><span class=p>..</span> <span class=ow>math</span><span class=p>::</span>
+</pre></div></div><div class=section id=citation><h3><a class=toc-backref href=#toc-entry-17>1.9. citation</a></h3><p>Lorem ipsum <a class=citation-reference href=#ref id=citation-reference-1>[Ref]</a> dolor sit amet.<table class="docutils citation" frame=void id=ref rules=none><colgroup><col class=label><col></colgroup><tbody valign=top><tr><td class=label><a class=fn-backref href=#citation-reference-1>[Ref]</a><td>Book or article reference, URL or whatever.</table></div><div class=section id=table-of-contents><h3><a class=toc-backref href=#toc-entry-18>1.10. table of contents</a></h3><p>The following code automatically expands to table of contents.<div class=highlight><pre><span></span><span class=p>..</span> <span class=ow>contents</span><span class=p>::</span>
+</pre></div></div></div><div class=section id=advanced><h2><a class=toc-backref href=#toc-entry-19>2. advanced</a></h2><div class=section id=math><h3><a class=toc-backref href=#toc-entry-20>2.1. math</a></h3><p>According to Leonhard Euler, we have Euler's formula which states that for any real number x:<blockquote><div class=math>\begin{equation*} e^ix = cos x + i sin x \end{equation*}</div></blockquote><div class=highlight><pre><span></span><span class=p>..</span> <span class=ow>math</span><span class=p>::</span>
 
     e^ix = cos x + i sin x
-</pre></div> <p>Mean Squared Error Loss, or MSE Loss:</p> <div class=math> \begin{equation*} J_{MSE} = \frac{1}{N}\sum_{i=1}^N(y_i - \hat{y}_i)^2 \end{equation*} </div> <p>Here inlined a famous formula: <span class=math>\(a^2 + b^2 = c^2\)</span>.</p> <div class=highlight><pre><span></span><span class=na>:math:</span><span class=nv>`a^2 + b^2 = c^2`</span>
-</pre></div> <p>For another instance, sigmoid function is defined as <span class=math>\(f(x) = \frac{1}{1+e^{-x}}\)</span></p> </div> <div class=section id=emacs-rst-mode> <h3><a class=toc-backref href=#toc-entry-21>2.2. emacs rst-mode</a></h3> <p>Since emacs v24.3 reST support is integrated.</p> <div class=section id=section-adornment> <h4><a class=toc-backref href=#toc-entry-22>2.2.1 section adornment</a></h4> <dl class=docutils> <dt><em>C-c C-a C-a</em></dt> <dd>rst-adjust</dd> </dl> <div class=highlight><pre><span></span>My Section Title
+</pre></div><p>Mean Squared Error Loss, or MSE Loss:<div class=math>\begin{equation*} J_{MSE} = \frac{1}{N}\sum_{i=1}^N(y_i - \hat{y}_i)^2 \end{equation*}</div><p>Here inlined a famous formula: <span class=math>\(a^2 + b^2 = c^2\)</span>.<div class=highlight><pre><span></span><span class=na>:math:</span><span class=nv>`a^2 + b^2 = c^2`</span>
+</pre></div><p>For another instance, sigmoid function is defined as <span class=math>\(f(x) = \frac{1}{1+e^{-x}}\)</span></div><div class=section id=emacs-rst-mode><h3><a class=toc-backref href=#toc-entry-21>2.2. emacs rst-mode</a></h3><p>Since emacs v24.3 reST support is integrated.<div class=section id=section-adornment><h4><a class=toc-backref href=#toc-entry-22>2.2.1 section adornment</a></h4><dl class=docutils><dt><em>C-c C-a C-a</em><dd>rst-adjust</dl><div class=highlight><pre><span></span>My Section Title
 === C-c C-a C-a
-</pre></div> </div> <div class=section id=move-around-sections> <h4><a class=toc-backref href=#toc-entry-23>2.2.2 move around sections</a></h4> <dl class=docutils> <dt><em>C-M-a</em></dt> <dd>rst-backward-section</dd> <dt><em>C-M-e</em></dt> <dd>rst-forward-section</dd> </dl> </div> <div class=section id=plain-lines-to-lists> <h4><a class=toc-backref href=#toc-entry-24>2.2.3 plain lines to lists</a></h4> <p><strong>C-c C-l</strong></p> <dl class=docutils> <dt><em>C-c C-l C-e</em></dt> <dd>rst-enumerate-region</dd> <dt><em>C-c C-l C-b</em></dt> <dd>rst-bullet-list-region</dd> <dt>C-c C-l TAB</dt> <dd>rst-insert-list</dd> </dl> </div> <div class=section id=table-of-contents-1> <h4><a class=toc-backref href=#toc-entry-25>2.2.4 table of contents</a></h4> <p>Present table of contents in a temporary buffer. <strong>C-c C-t</strong></p> <dl class=docutils> <dt>C-c C-t C-t</dt> <dd>rst-toc</dd> </dl> <p>insert table-of-contents</p> <dl class=docutils> <dt>C-c C-t C-i</dt> <dd>rst-toc-insert</dd> </dl> </div> </div> </div> <script type=text/javascript>if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-    var align = "center",
-        indent = "0em",
-        linebreak = "false";
-
-    if (false) {
-        align = (screen.width < 768) ? "left" : align;
-        indent = (screen.width < 768) ? "0em" : indent;
-        linebreak = (screen.width < 768) ? 'true' : linebreak;
-    }
-
-    var mathjaxscript = document.createElement('script');
-    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
-    mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
-
-    var configscript = document.createElement('script');
-    configscript.type = 'text/x-mathjax-config';
-    configscript[(window.opera ? "innerHTML" : "text")] =
-        "MathJax.Hub.Config({" +
-        "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
-        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
-        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
-        "    displayAlign: '"+ align +"'," +
-        "    displayIndent: '"+ indent +"'," +
-        "    showMathMenu: true," +
-        "    messageStyle: 'normal'," +
-        "    tex2jax: { " +
-        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
-        "        displayMath: [ ['$$','$$'] ]," +
-        "        processEscapes: true," +
-        "        preview: 'TeX'," +
-        "    }, " +
-        "    'HTML-CSS': { " +
-        "        availableFonts: ['STIX', 'TeX']," +
-        "        preferredFont: 'STIX'," +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
-        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
-        "    }, " +
-        "}); " +
-        "if ('default' !== 'default') {" +
-            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-        "}";
-
-    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
-    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
-}
-</script> </body> </html>
+</pre></div></div><div class=section id=move-around-sections><h4><a class=toc-backref href=#toc-entry-23>2.2.2 move around sections</a></h4><dl class=docutils><dt><em>C-M-a</em><dd>rst-backward-section<dt><em>C-M-e</em><dd>rst-forward-section</dl></div><div class=section id=plain-lines-to-lists><h4><a class=toc-backref href=#toc-entry-24>2.2.3 plain lines to lists</a></h4><p><strong>C-c C-l</strong><dl class=docutils><dt><em>C-c C-l C-e</em><dd>rst-enumerate-region<dt><em>C-c C-l C-b</em><dd>rst-bullet-list-region<dt>C-c C-l TAB<dd>rst-insert-list</dl></div><div class=section id=table-of-contents-1><h4><a class=toc-backref href=#toc-entry-25>2.2.4 table of contents</a></h4><p>Present table of contents in a temporary buffer. <strong>C-c C-t</strong><dl class=docutils><dt>C-c C-t C-t<dd>rst-toc</dl><p>insert table-of-contents<dl class=docutils><dt>C-c C-t C-i<dd>rst-toc-insert</dl></div></div></div><script>if(!document.getElementById(`mathjaxscript_pelican_#%@#\$@#`)){let j=`});`,b=768,g=`VARIANT['bold'].fonts.unshift('MathJax_default-bold');`,h=`VARIANT['italic'].fonts.unshift('MathJax_default-italic');`,i=`VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');`,l=0,k=`head`,c=`script`,f=`VARIANT['normal'].fonts.unshift('MathJax_default');`,e=`    }, `,d=`',`,a=`0em`;var align=`center`,indent=a,linebreak=`false`;if(!1){align=screen.width<b?`left`:align;indent=screen.width<b?a:indent;linebreak=screen.width<b?`true`:linebreak};var mathjaxscript=document.createElement(c);mathjaxscript.id=`mathjaxscript_pelican_#%@#\$@#`;mathjaxscript.type=`text/javascript`;mathjaxscript.src=`https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML`;var configscript=document.createElement(c);configscript.type=`text/x-mathjax-config`;configscript[window.opera?`innerHTML`:`text`]=`MathJax.Hub.Config({`+ `    config: ['MMLorHTML.js'],`+ `    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } },`+ `    jax: ['input/TeX','input/MathML','output/HTML-CSS'],`+ `    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js'],`+ `    displayAlign: '`+ align+ d+ `    displayIndent: '`+ indent+ d+ `    showMathMenu: true,`+ `    messageStyle: 'normal',`+ `    tex2jax: { `+ `        inlineMath: [ ['\\\\\\\\(','\\\\\\\\)'] ], `+ `        displayMath: [ ['\$\$','\$\$'] ],`+ `        processEscapes: true,`+ `        preview: 'TeX',`+ e+ `    'HTML-CSS': { `+ `        availableFonts: ['STIX', 'TeX'],`+ `        preferredFont: 'STIX',`+ `        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} },`+ `        linebreaks: { automatic: `+ linebreak+ `, width: '90% container' },`+ e+ `}); `+ `if ('default' !== 'default') {`+ `MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {`+ `var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;`+ f+ g+ h+ i+ j+ `MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {`+ `var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;`+ f+ g+ h+ i+ j+ `}`;(document.body||document.getElementsByTagName(k)[l]).appendChild(configscript);(document.body||document.getElementsByTagName(k)[l]).appendChild(mathjaxscript)}</script>

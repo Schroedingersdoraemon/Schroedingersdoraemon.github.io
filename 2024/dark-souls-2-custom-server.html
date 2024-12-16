@@ -1,0 +1,43 @@
+<!doctype html><title>
+Dark Souls 2 Custom Server
+    </title><meta charset=utf-8><meta content=width=device-width initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><body><h1>Dark Souls 2 Custom Server</h1> 2024-12-14 00:16 <hr><div class="contents topic" id=topic-1><p class=topic-title><a class="reference internal" href=#top>目录</a><ul class=simple><li><a class="reference internal" href=#intro id=toc-entry-1>0. intro</a><li><a class="reference internal" href=#my-download-mcdonald id=toc-entry-2>1. My Download != McDonald</a><li><a class="reference internal" href=#steamcmd id=toc-entry-3>2. steamcmd</a><li><a class="reference internal" href=#server-config id=toc-entry-4>3. server config</a><li><a class="reference internal" href=#further-config id=toc-entry-5>4. further config</a><li><a class="reference internal" href=#play id=toc-entry-6>4. Play!</a></ul></div><div class=section id=intro><h2><a class=toc-backref href=#toc-entry-1>0. intro</a></h2><p>bearer of the curse...<p>受制于网络问题，我和另一位游魂的联机不是很流畅<div class=highlight><pre><span></span>客户端 <==> 服务器：画符出现的速度
+客户端 <==> 客户端：与好友的p2p联机延迟
+</pre></div><p>于是自建了服务器。最近服务器快到期了，所以记录一下自建 服务器的流程。<p>首先来到 <a class="reference external" href=https://github.com/TLeonardUK/ds3os>github.com/TLeonardUK/ds3os 这个项目</a><p>这个项目是黑魂2（原罪学者）和黑魂3游戏服务器的开源实现，可在线mod而不被ban<p>另外只支持正版，因为需要校验steam</div><div class=section id=my-download-mcdonald><h2><a class=toc-backref href=#toc-entry-2>1. My Download != McDonald</a></h2><p>来到 <a class="reference external" href=https://github.com/TLeonardUK/ds3os/releases>github releases</a> 复制 linux.zip 下载链接<p><strong>如果只希望连接到他人服务器，只下载 windows.zip 即可</strong><p>ssh 到服务器上，使用 <em>wget</em> 或者其他工具下载<div class=highlight><pre><span></span>wget<span class=w> </span>https://github.com/TLeonardUK/ds3os/releases/download/v0.42.0.0-main/linux.zip
+</pre></div><p>创建文件夹存放相关数据，这里命名为 <strong>ds2.server</strong><div class=highlight><pre><span></span>mkdir<span class=w> </span>ds2.server
+</pre></div><p>将下载的压缩包解压到 ds2.server 文件夹<div class=highlight><pre><span></span>unzip<span class=w> </span>linux.zip<span class=w> </span>-d<span class=w> </span>ds2.server
+</pre></div><p>进入到 ds2.server 文件夹<div class=highlight><pre><span></span><span class=nb>cd</span><span class=w> </span>ds2.server
+</pre></div><p>里面的Server目录下有<div class=highlight><pre><span></span>（暂不）可执行文件 Server
+WebUI/
+libsteam_api.so
+</pre></div></div><div class=section id=steamcmd><h2><a class=toc-backref href=#toc-entry-3>2. steamcmd</a></h2><p>来到 <a class="reference external" href=https://developer.valvesoftware.com/wiki/SteamCMD>valve 开发者wiki的steamcmd页面</a><p>下载 steamcmd，如果是 ubuntu 就执行下面，其他发行版就看对应的方法<div class=highlight><pre><span></span>sudo<span class=w> </span>add-apt-repository<span class=w> </span>multiverse<span class=p>;</span><span class=w> </span>sudo<span class=w> </span>dpkg<span class=w> </span>--add-architecture<span class=w> </span>i386<span class=p>;</span><span class=w> </span>sudo<span class=w> </span>apt<span class=w> </span>update
+sudo<span class=w> </span>apt<span class=w> </span>install<span class=w> </span>steamcmd
+</pre></div><p>运行 <em>steamcmd</em> 进入到 steam 命令行环境中<p>设置游戏服务器路径为 ds2.server<div class=highlight><pre><span></span>force_install_dir<span class=w> </span>~/ds2.server
+</pre></div><p>随后登录 steam，匿名登录即可<div class=highlight><pre><span></span>login<span class=w> </span>anonymous
+</pre></div><p>输入quit退出steam环境</div><div class=section id=server-config><h2><a class=toc-backref href=#toc-entry-4>3. server config</a></h2><p>进入到 ds2.server 下的 Server 目录，为 Server 文件增加可执行属性<div class=highlight><pre><span></span><span class=nb>cd</span><span class=w> </span>ds2.server/Server
+chmod<span class=w> </span>+x<span class=w> </span>./Server
+</pre></div><p>./Server 运行 Server 文件，会提示下面的报错<div class=highlight><pre><span></span>./Server: error while loading shared libraries: libsteam_api.so:
+cannot open shared object file: no such file or directory
+</pre></div><p>不难注意到，Server 目录下除了可执行文件 Server，还有这个缺少的 libsteam_api.so<p>所以我们可以通过<div class=highlight><pre><span></span><span class=nb>export</span><span class=w> </span><span class=nv>LD_LIBRARY_PATH</span><span class=o>=</span><span class=nv>$LD_LIBRARY_PATH</span>:<span class=nv>$HOME</span>/ds2.server/Server
+<span class=c1># 后面会有更自动化的方法，这个命令只对当前会话有效</span>
+</pre></div><p>然后 ./Server 运行，又会发现另一个错误<div class=highlight><pre><span></span>steamclient.so: cannot open shared obect file: No such file or directory
+dlopen failed trying to load:
+/home/steam/.steam/sdk64/steamclient.so: cannot open shared object file
+</pre></div><p>这里 steamclient.so 的位置在另一个地方，所以软链接过来<div class=highlight><pre><span></span>ln<span class=w> </span>-s<span class=w> </span>~/.local/share/Steam/steamcmd/linux64/steamclient.so<span class=w> </span>~/.steam/sdk64/
+<span class=c1># 非ubuntu系统 *可能* 并不在 前面这个位置，可以自己找一下</span>
+</pre></div><p>然后编辑一下服务器的配置文件 Saved/default/config.json<p>需要编辑的地方<div class=highlight><pre><span></span>Header：进服务器时的标题
+Body：标题下面的文字
+ServerName：选择服务器时显示的名字
+ServerDescription：服务器描述
+ServerHostname：服务器公网ip
+Password：服务器密码（可选）
+GameType：默认黑魂3，如果魂2则改为 DarkSouls2
+</pre></div></div><div class=section id=further-config><h2><a class=toc-backref href=#toc-entry-5>4. further config</a></h2><p>在服务器安全设置中允许 50000～50050 这些端口的 TCP 与 UDP 连接。只用到四个端口，为了方便全都打开。<p>可以用这个 <a class="reference external" href=https://www.yougetsignal.com/tools/open-ports/>Open Port Check Tool</a> 检测端口的开放情况<p>此时运行 ./Server 就没什么问题了，但是每次 export 环境变量都很麻烦，所以我们新建一个运行脚本<div class=highlight><pre><span></span><span class=nb>cd</span><span class=w> </span>~/ds2.server
+
+vim<span class=w> </span>run.ds2.server.sh
+<span class=c1># 任意编辑器即可，或者 echo、 cat+EOF 等</span>
+</pre></div><p>脚本内容如下<div class=highlight><pre><span></span>#!/bin/bash
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/ds2.server/Server
+screen -dm -S ds2.server $HOME/ds2.server/Server/Server
+</pre></div><p>这里用到了 GNU 的 screen 来避免当前会话结束后任务被挂起<p>接着 chmod +x ds2.server 赋予可执行权限，然后运行脚本即可<p>可通过 screen -r 查看输出，并通过 control-a d 重新detach任务</div><div class=section id=play><h2><a class=toc-backref href=#toc-entry-6>4. Play!</a></h2><p>解压 windows.zip，运行 prerequisite 里面的文件安装环境， 接着打开 Loader 文件夹中的 Loader.exe，就能看到我们的自定义服务器了！<p><strong>值得注意的是</strong>，Loader 的存档位置不同于 steam 官方服务器的存档<div class=highlight><pre><span></span>Loader存档位置：C:/Users/用户名/AppData/Roaming/DarkSoulsII/一串数字/存档.ds3os
+官方服务器存档位置：...相同路径/存档.sl2
+</pre></div><p>可使用 Loader 下方的齿轮图标，打勾复制存档 <strong>数据无价，请注意备份！</strong></div>

@@ -1,4 +1,6 @@
-<!DOCTYPE html><html> <head><title>Dog Cat Dual Classification</title><meta charset=utf-8><meta name=viewport content="width=device-width" initial-scale=1><link rel=stylesheet href=/theme/css/main.css></head> <body> <h1>Dog Cat Dual Classification</h1> 2021-04-25 10:18 <hr> <div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>cv2</span>
+<!doctype html><title>
+Dog Cat Dual Classification
+    </title><meta charset=utf-8><meta content=width=device-width initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><body><h1>Dog Cat Dual Classification</h1> 2021-04-25 10:18 <hr><div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>cv2</span>
 <span class=kn>from</span> <span class=nn>matplotlib</span> <span class=kn>import</span> <span class=n>pyplot</span> <span class=k>as</span> <span class=n>plt</span>
 <span class=kn>import</span> <span class=nn>numpy</span> <span class=k>as</span> <span class=nn>np</span>
 <span class=kn>import</span> <span class=nn>torch</span>
@@ -8,15 +10,15 @@
 <span class=kn>import</span> <span class=nn>torchvision</span>
 <span class=kn>from</span> <span class=nn>torchvision</span> <span class=kn>import</span> <span class=n>transforms</span>
 <span class=kn>from</span> <span class=nn>torchvision.datasets</span> <span class=kn>import</span> <span class=n>ImageFolder</span>
-</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>transform</span> <span class=o>=</span> <span class=n>transforms</span><span class=o>.</span><span class=n>Compose</span><span class=p>([</span>
+</code></pre></div><div class=highlight><pre><span></span><code><span class=n>transform</span> <span class=o>=</span> <span class=n>transforms</span><span class=o>.</span><span class=n>Compose</span><span class=p>([</span>
     <span class=n>transforms</span><span class=o>.</span><span class=n>ToTensor</span><span class=p>(),</span>
     <span class=n>transforms</span><span class=o>.</span><span class=n>Resize</span><span class=p>([</span><span class=mi>128</span><span class=p>,</span> <span class=mi>128</span><span class=p>]),</span>
     <span class=n>transforms</span><span class=o>.</span><span class=n>Normalize</span><span class=p>((</span><span class=mf>0.5</span><span class=p>,</span> <span class=mf>0.5</span><span class=p>,</span> <span class=mf>0.5</span><span class=p>),</span> <span class=p>(</span><span class=mf>0.5</span><span class=p>,</span> <span class=mf>0.5</span><span class=p>,</span> <span class=mf>0.5</span><span class=p>)),</span>
 <span class=p>])</span>
 
-<span class=n>train_folder</span> <span class=o>=</span> <span class=n>ImageFolder</span><span class=p>(</span><span class=n>root</span><span class=o>=</span><span class=s1>&#39;./cat_dog/training_set&#39;</span><span class=p>,</span>
+<span class=n>train_folder</span> <span class=o>=</span> <span class=n>ImageFolder</span><span class=p>(</span><span class=n>root</span><span class=o>=</span><span class=s1>'./cat_dog/training_set'</span><span class=p>,</span>
                            <span class=n>transform</span> <span class=o>=</span> <span class=n>transform</span><span class=p>)</span>
-<span class=n>test_folder</span> <span class=o>=</span> <span class=n>ImageFolder</span><span class=p>(</span><span class=n>root</span><span class=o>=</span><span class=s1>&#39;./cat_dog/test_set&#39;</span><span class=p>,</span>
+<span class=n>test_folder</span> <span class=o>=</span> <span class=n>ImageFolder</span><span class=p>(</span><span class=n>root</span><span class=o>=</span><span class=s1>'./cat_dog/test_set'</span><span class=p>,</span>
                           <span class=n>transform</span> <span class=o>=</span> <span class=n>transform</span><span class=p>)</span>
 
 <span class=n>train_loader</span> <span class=o>=</span> <span class=n>DataLoader</span><span class=p>(</span><span class=n>train_folder</span><span class=p>,</span>
@@ -25,7 +27,7 @@
 <span class=n>test_loader</span> <span class=o>=</span> <span class=n>DataLoader</span><span class=p>(</span><span class=n>test_folder</span><span class=p>,</span>
                          <span class=n>batch_size</span> <span class=o>=</span> <span class=mi>100</span><span class=p>,</span>
                          <span class=n>shuffle</span> <span class=o>=</span> <span class=kc>True</span><span class=p>)</span>
-</code></pre></div> <div class=highlight><pre><span></span><code><span class=k>class</span> <span class=nc>Net</span><span class=p>(</span><span class=n>nn</span><span class=o>.</span><span class=n>Module</span><span class=p>):</span>
+</code></pre></div><div class=highlight><pre><span></span><code><span class=k>class</span> <span class=nc>Net</span><span class=p>(</span><span class=n>nn</span><span class=o>.</span><span class=n>Module</span><span class=p>):</span>
     <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
         <span class=nb>super</span><span class=p>(</span><span class=n>Net</span><span class=p>,</span> <span class=bp>self</span><span class=p>)</span><span class=o>.</span><span class=fm>__init__</span><span class=p>()</span>
         <span class=bp>self</span><span class=o>.</span><span class=n>cal</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Sequential</span><span class=p>(</span>
@@ -56,16 +58,16 @@
 
     <span class=k>def</span> <span class=nf>forward</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>x</span><span class=p>):</span>
         <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>cal</span><span class=p>(</span><span class=n>x</span><span class=p>)</span>
-</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>net</span> <span class=o>=</span> <span class=n>Net</span><span class=p>()</span><span class=o>.</span><span class=n>cuda</span><span class=p>()</span>
+</code></pre></div><div class=highlight><pre><span></span><code><span class=n>net</span> <span class=o>=</span> <span class=n>Net</span><span class=p>()</span><span class=o>.</span><span class=n>cuda</span><span class=p>()</span>
 <span class=n>torch</span><span class=o>.</span><span class=n>cuda</span><span class=o>.</span><span class=n>empty_cache</span><span class=p>()</span>
-</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>device</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>device</span><span class=p>(</span><span class=s1>&#39;cuda&#39;</span> <span class=k>if</span> <span class=n>torch</span><span class=o>.</span><span class=n>cuda</span><span class=o>.</span><span class=n>is_available</span><span class=p>()</span> <span class=k>else</span> <span class=s1>&#39;cpu&#39;</span><span class=p>)</span>
-<span class=nb>print</span><span class=p>(</span><span class=s1>&#39;Using: &#39;</span><span class=p>,</span> <span class=n>device</span><span class=p>)</span>
-<span class=k>if</span> <span class=ow>not</span> <span class=p>(</span><span class=n>device</span> <span class=o>==</span> <span class=s1>&#39;cpu&#39;</span><span class=p>):</span>
+</code></pre></div><div class=highlight><pre><span></span><code><span class=n>device</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>device</span><span class=p>(</span><span class=s1>'cuda'</span> <span class=k>if</span> <span class=n>torch</span><span class=o>.</span><span class=n>cuda</span><span class=o>.</span><span class=n>is_available</span><span class=p>()</span> <span class=k>else</span> <span class=s1>'cpu'</span><span class=p>)</span>
+<span class=nb>print</span><span class=p>(</span><span class=s1>'Using: '</span><span class=p>,</span> <span class=n>device</span><span class=p>)</span>
+<span class=k>if</span> <span class=ow>not</span> <span class=p>(</span><span class=n>device</span> <span class=o>==</span> <span class=s1>'cpu'</span><span class=p>):</span>
     <span class=n>net</span><span class=o>.</span><span class=n>to</span><span class=p>(</span><span class=n>device</span><span class=p>)</span>
 
 <span class=n>optimizer</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>optim</span><span class=o>.</span><span class=n>SGD</span><span class=p>(</span><span class=n>net</span><span class=o>.</span><span class=n>parameters</span><span class=p>(),</span> <span class=n>lr</span> <span class=o>=</span> <span class=mf>0.01</span><span class=p>)</span>
 <span class=n>loss_func</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>CrossEntropyLoss</span><span class=p>()</span>
-</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>epochs</span> <span class=o>=</span> <span class=mi>50</span>
+</code></pre></div><div class=highlight><pre><span></span><code><span class=n>epochs</span> <span class=o>=</span> <span class=mi>50</span>
 <span class=n>epoch_loss</span> <span class=o>=</span> <span class=p>[]</span>
 
 <span class=k>for</span> <span class=n>epoch</span> <span class=ow>in</span> <span class=nb>range</span><span class=p>(</span><span class=n>epochs</span><span class=p>):</span>
@@ -73,7 +75,7 @@
     <span class=k>for</span> <span class=n>i</span><span class=p>,</span> <span class=p>(</span><span class=n>inputs</span><span class=p>,</span> <span class=n>labels</span><span class=p>)</span> <span class=ow>in</span> <span class=nb>enumerate</span><span class=p>(</span><span class=n>train_loader</span><span class=p>):</span>
         <span class=c1># inputs [100, 3, 128, 128]</span>
         <span class=c1># labels [100]</span>
-        <span class=k>if</span> <span class=ow>not</span> <span class=p>(</span><span class=n>device</span> <span class=o>==</span> <span class=s1>&#39;cpu&#39;</span><span class=p>):</span>
+        <span class=k>if</span> <span class=ow>not</span> <span class=p>(</span><span class=n>device</span> <span class=o>==</span> <span class=s1>'cpu'</span><span class=p>):</span>
             <span class=n>inputs</span><span class=p>,</span> <span class=n>labels</span> <span class=o>=</span> <span class=n>data</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span><span class=o>.</span><span class=n>to</span><span class=p>(</span><span class=n>device</span><span class=p>),</span><span class=n>data</span><span class=p>[</span><span class=mi>1</span><span class=p>]</span><span class=o>.</span><span class=n>to</span><span class=p>(</span><span class=n>device</span><span class=p>)</span>
         <span class=k>else</span><span class=p>:</span>
             <span class=n>inputs</span><span class=p>,</span> <span class=n>labels</span> <span class=o>=</span> <span class=n>data</span>
@@ -92,8 +94,8 @@
         <span class=n>running_loss</span> <span class=o>+=</span> <span class=n>loss</span><span class=o>.</span><span class=n>item</span><span class=p>()</span>
 
     <span class=n>epoch_loss</span><span class=o>.</span><span class=n>append</span><span class=p>(</span><span class=n>running_loss</span> <span class=o>/</span> <span class=p>(</span><span class=n>i</span><span class=o>+</span><span class=mi>1</span><span class=p>))</span>
-    <span class=nb>print</span><span class=p>(</span><span class=s1>&#39;epoch </span><span class=si>%d</span><span class=s1>, loss: </span><span class=si>%.3f</span><span class=s1>&#39;</span> <span class=o>%</span> <span class=p>(</span><span class=n>epoch</span><span class=p>,</span> <span class=n>running_loss</span><span class=o>/</span><span class=p>(</span><span class=n>i</span><span class=o>+</span><span class=mi>1</span><span class=p>)))</span>
-</code></pre></div> <div class=highlight><pre><span></span><code>epoch 0, loss: 0.670
+    <span class=nb>print</span><span class=p>(</span><span class=s1>'epoch </span><span class=si>%d</span><span class=s1>, loss: </span><span class=si>%.3f</span><span class=s1>'</span> <span class=o>%</span> <span class=p>(</span><span class=n>epoch</span><span class=p>,</span> <span class=n>running_loss</span><span class=o>/</span><span class=p>(</span><span class=n>i</span><span class=o>+</span><span class=mi>1</span><span class=p>)))</span>
+</code></pre></div><div class=highlight><pre><span></span><code>epoch 0, loss: 0.670
 epoch 1, loss: 0.664
 epoch 2, loss: 0.659
 epoch 3, loss: 0.655
@@ -143,11 +145,11 @@ epoch 46, loss: 0.501
 epoch 47, loss: 0.480
 epoch 48, loss: 0.494
 epoch 49, loss: 0.478
-</code></pre></div> <div class=highlight><pre><span></span><code><span class=n>plt</span><span class=o>.</span><span class=n>plot</span><span class=p>(</span><span class=n>epoch_loss</span><span class=p>)</span>
-</code></pre></div> <p><img alt=png src=/files/Dog-Cat-Dual-Classification/output1.png></p> <div class=highlight><pre><span></span><code><span class=c1># save the model</span>
-<span class=n>model_path</span> <span class=o>=</span> <span class=s1>&#39;./caog_net.pkl&#39;</span>
+</code></pre></div><div class=highlight><pre><span></span><code><span class=n>plt</span><span class=o>.</span><span class=n>plot</span><span class=p>(</span><span class=n>epoch_loss</span><span class=p>)</span>
+</code></pre></div><p><img alt=png src=/files/Dog-Cat-Dual-Classification/output1.png><div class=highlight><pre><span></span><code><span class=c1># save the model</span>
+<span class=n>model_path</span> <span class=o>=</span> <span class=s1>'./caog_net.pkl'</span>
 <span class=n>torch</span><span class=o>.</span><span class=n>save</span><span class=p>(</span><span class=n>net</span><span class=o>.</span><span class=n>state_dict</span><span class=p>(),</span> <span class=n>model_path</span><span class=p>)</span>
 
 <span class=c1># load the model</span>
 <span class=n>net</span><span class=o>.</span><span class=n>load_state_dict</span><span class=p>(</span><span class=n>torch</span><span class=o>.</span><span class=n>load</span><span class=p>(</span><span class=n>model_path</span><span class=p>))</span>
-</code></pre></div> </body> </html>
+</code></pre></div>
