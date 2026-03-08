@@ -1,6 +1,6 @@
 <!doctype html><title>
 MNIST with LeNet
-    </title><meta charset=utf-8><meta content=width=device-width initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><body><h1>MNIST with LeNet</h1> 2021-05-02 00:03 <hr><h1>1. train part</h1><div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>time</span>
+    </title><meta charset=utf-8><meta content="width=device-width" initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><link href=/theme/css/pygments.css rel=stylesheet><body><h1>MNIST with LeNet</h1> 2021-05-02 00:03 <hr><div class=article-content><h1 id=1-train-part>1. train part</h1><div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>time</span>
 <span class=kn>import</span> <span class=nn>torch</span>
 <span class=kn>import</span> <span class=nn>numpy</span> <span class=k>as</span> <span class=nn>np</span>
 <span class=kn>import</span> <span class=nn>torch.nn</span> <span class=k>as</span> <span class=nn>nn</span>
@@ -125,7 +125,7 @@ Finished training, time used: 551.340
 <span class=n>torch</span><span class=o>.</span><span class=n>save</span><span class=p>(</span><span class=n>net</span><span class=o>.</span><span class=n>state_dict</span><span class=p>(),</span> <span class=n>model_path</span><span class=p>)</span>
 
 <span class=c1># net.load_state_dict(torch.load(model_path))</span>
-</code></pre></div><h1>2. test part</h1><div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>torch</span>
+</code></pre></div><h1 id=2-test-part>2. test part</h1><div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>torch</span>
 <span class=kn>import</span> <span class=nn>numpy</span> <span class=k>as</span> <span class=nn>np</span>
 <span class=kn>from</span> <span class=nn>mnist_net</span> <span class=kn>import</span> <span class=n>LeNet</span>
 <span class=kn>from</span> <span class=nn>torchvision</span> <span class=kn>import</span> <span class=n>transforms</span>
@@ -172,4 +172,4 @@ Finished training, time used: 551.340
 <span class=nb>print</span><span class=p>(</span><span class=s1>'Average accuracy of </span><span class=si>%d</span><span class=s1> tests: </span><span class=si>%.1f</span><span class=s1>'</span><span class=o>%</span><span class=p>((</span><span class=n>i</span><span class=o>+</span><span class=mi>1</span><span class=p>),</span> <span class=n>total_ac</span><span class=o>/</span><span class=p>(</span><span class=n>i</span><span class=o>+</span><span class=mi>1</span><span class=p>)))</span>
 </code></pre></div><div class=highlight><pre><span></span><code><span class=c1># output</span>
 <span class=n>Average</span> <span class=n>accuracy</span> <span class=n>of</span> <span class=mi>10</span> <span class=n>tests</span><span class=p>:</span> <span class=mf>98.3</span>
-</code></pre></div>
+</code></pre></div></div>
