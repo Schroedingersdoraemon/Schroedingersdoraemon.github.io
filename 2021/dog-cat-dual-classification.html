@@ -1,15 +1,15 @@
 <!doctype html><title>
 Dog Cat Dual Classification
-    </title><meta charset=utf-8><meta content="width=device-width" initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><link href=/theme/css/pygments.css rel=stylesheet><body><h1>Dog Cat Dual Classification</h1> 2021-04-25 10:18 <hr><div class=article-content><div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>cv2</span>
-<span class=kn>from</span> <span class=nn>matplotlib</span> <span class=kn>import</span> <span class=n>pyplot</span> <span class=k>as</span> <span class=n>plt</span>
-<span class=kn>import</span> <span class=nn>numpy</span> <span class=k>as</span> <span class=nn>np</span>
-<span class=kn>import</span> <span class=nn>torch</span>
-<span class=kn>import</span> <span class=nn>torch.nn</span> <span class=k>as</span> <span class=nn>nn</span>
-<span class=kn>import</span> <span class=nn>torch.nn.functional</span> <span class=k>as</span> <span class=nn>F</span>
-<span class=kn>from</span> <span class=nn>torch.utils.data</span> <span class=kn>import</span> <span class=n>DataLoader</span>
-<span class=kn>import</span> <span class=nn>torchvision</span>
-<span class=kn>from</span> <span class=nn>torchvision</span> <span class=kn>import</span> <span class=n>transforms</span>
-<span class=kn>from</span> <span class=nn>torchvision.datasets</span> <span class=kn>import</span> <span class=n>ImageFolder</span>
+    </title><meta charset=utf-8><meta content="width=device-width" initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><link href=/theme/css/pygments.css rel=stylesheet><body><h1>Dog Cat Dual Classification</h1> 2021-04-25 10:18 <hr><div class=article-content><div class=highlight><pre><span></span><code><span class=kn>import</span><span class=w> </span><span class=nn>cv2</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>matplotlib</span><span class=w> </span><span class=kn>import</span> <span class=n>pyplot</span> <span class=k>as</span> <span class=n>plt</span>
+<span class=kn>import</span><span class=w> </span><span class=nn>numpy</span><span class=w> </span><span class=k>as</span><span class=w> </span><span class=nn>np</span>
+<span class=kn>import</span><span class=w> </span><span class=nn>torch</span>
+<span class=kn>import</span><span class=w> </span><span class=nn>torch.nn</span><span class=w> </span><span class=k>as</span><span class=w> </span><span class=nn>nn</span>
+<span class=kn>import</span><span class=w> </span><span class=nn>torch.nn.functional</span><span class=w> </span><span class=k>as</span><span class=w> </span><span class=nn>F</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>torch.utils.data</span><span class=w> </span><span class=kn>import</span> <span class=n>DataLoader</span>
+<span class=kn>import</span><span class=w> </span><span class=nn>torchvision</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>torchvision</span><span class=w> </span><span class=kn>import</span> <span class=n>transforms</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>torchvision.datasets</span><span class=w> </span><span class=kn>import</span> <span class=n>ImageFolder</span>
 </code></pre></div><div class=highlight><pre><span></span><code><span class=n>transform</span> <span class=o>=</span> <span class=n>transforms</span><span class=o>.</span><span class=n>Compose</span><span class=p>([</span>
     <span class=n>transforms</span><span class=o>.</span><span class=n>ToTensor</span><span class=p>(),</span>
     <span class=n>transforms</span><span class=o>.</span><span class=n>Resize</span><span class=p>([</span><span class=mi>128</span><span class=p>,</span> <span class=mi>128</span><span class=p>]),</span>
@@ -27,8 +27,8 @@ Dog Cat Dual Classification
 <span class=n>test_loader</span> <span class=o>=</span> <span class=n>DataLoader</span><span class=p>(</span><span class=n>test_folder</span><span class=p>,</span>
                          <span class=n>batch_size</span> <span class=o>=</span> <span class=mi>100</span><span class=p>,</span>
                          <span class=n>shuffle</span> <span class=o>=</span> <span class=kc>True</span><span class=p>)</span>
-</code></pre></div><div class=highlight><pre><span></span><code><span class=k>class</span> <span class=nc>Net</span><span class=p>(</span><span class=n>nn</span><span class=o>.</span><span class=n>Module</span><span class=p>):</span>
-    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</code></pre></div><div class=highlight><pre><span></span><code><span class=k>class</span><span class=w> </span><span class=nc>Net</span><span class=p>(</span><span class=n>nn</span><span class=o>.</span><span class=n>Module</span><span class=p>):</span>
+    <span class=k>def</span><span class=w> </span><span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
         <span class=nb>super</span><span class=p>(</span><span class=n>Net</span><span class=p>,</span> <span class=bp>self</span><span class=p>)</span><span class=o>.</span><span class=fm>__init__</span><span class=p>()</span>
         <span class=bp>self</span><span class=o>.</span><span class=n>cal</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Sequential</span><span class=p>(</span>
             <span class=n>nn</span><span class=o>.</span><span class=n>Conv2d</span><span class=p>(</span><span class=n>in_channels</span> <span class=o>=</span> <span class=mi>3</span><span class=p>,</span>
@@ -56,7 +56,7 @@ Dog Cat Dual Classification
             <span class=n>nn</span><span class=o>.</span><span class=n>Softmax</span><span class=p>(</span><span class=n>dim</span> <span class=o>=</span> <span class=mi>1</span><span class=p>),</span>
         <span class=p>)</span>
 
-    <span class=k>def</span> <span class=nf>forward</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>x</span><span class=p>):</span>
+    <span class=k>def</span><span class=w> </span><span class=nf>forward</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>x</span><span class=p>):</span>
         <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>cal</span><span class=p>(</span><span class=n>x</span><span class=p>)</span>
 </code></pre></div><div class=highlight><pre><span></span><code><span class=n>net</span> <span class=o>=</span> <span class=n>Net</span><span class=p>()</span><span class=o>.</span><span class=n>cuda</span><span class=p>()</span>
 <span class=n>torch</span><span class=o>.</span><span class=n>cuda</span><span class=o>.</span><span class=n>empty_cache</span><span class=p>()</span>

@@ -1,17 +1,17 @@
 <!doctype html><title>
 CIFAR-10 with GoogLeNet
-    </title><meta charset=utf-8><meta content="width=device-width" initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><link href=/theme/css/pygments.css rel=stylesheet><body><h1>CIFAR-10 with GoogLeNet</h1> 2021-05-16 11:32 <hr><div class=article-content><h1 id=1-train-part>1. train part</h1><div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>PIL</span>
-<span class=kn>import</span> <span class=nn>time</span>
-<span class=kn>import</span> <span class=nn>torch</span>
-<span class=kn>import</span> <span class=nn>numpy</span> <span class=k>as</span> <span class=nn>np</span>
-<span class=kn>from</span> <span class=nn>torch</span> <span class=kn>import</span> <span class=n>nn</span>
-<span class=kn>from</span> <span class=nn>tqdm</span> <span class=kn>import</span> <span class=n>tqdm</span>
-<span class=kn>from</span> <span class=nn>torch</span> <span class=kn>import</span> <span class=n>optim</span>
-<span class=kn>from</span> <span class=nn>torchvision</span> <span class=kn>import</span> <span class=n>transforms</span>
-<span class=kn>from</span> <span class=nn>torch.nn</span> <span class=kn>import</span> <span class=n>functional</span> <span class=k>as</span> <span class=n>F</span>
-<span class=kn>from</span> <span class=nn>matplotlib</span> <span class=kn>import</span> <span class=n>pyplot</span> <span class=k>as</span> <span class=n>plt</span>
-<span class=kn>from</span> <span class=nn>torch.utils.data</span> <span class=kn>import</span> <span class=n>DataLoader</span>
-<span class=kn>from</span> <span class=nn>torchvision.datasets</span> <span class=kn>import</span> <span class=n>CIFAR10</span>
+    </title><meta charset=utf-8><meta content="width=device-width" initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><link href=/theme/css/pygments.css rel=stylesheet><body><h1>CIFAR-10 with GoogLeNet</h1> 2021-05-16 11:32 <hr><div class=article-content><h1 id=1-train-part>1. train part</h1><div class=highlight><pre><span></span><code><span class=kn>import</span><span class=w> </span><span class=nn>PIL</span>
+<span class=kn>import</span><span class=w> </span><span class=nn>time</span>
+<span class=kn>import</span><span class=w> </span><span class=nn>torch</span>
+<span class=kn>import</span><span class=w> </span><span class=nn>numpy</span><span class=w> </span><span class=k>as</span><span class=w> </span><span class=nn>np</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>torch</span><span class=w> </span><span class=kn>import</span> <span class=n>nn</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>tqdm</span><span class=w> </span><span class=kn>import</span> <span class=n>tqdm</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>torch</span><span class=w> </span><span class=kn>import</span> <span class=n>optim</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>torchvision</span><span class=w> </span><span class=kn>import</span> <span class=n>transforms</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>torch.nn</span><span class=w> </span><span class=kn>import</span> <span class=n>functional</span> <span class=k>as</span> <span class=n>F</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>matplotlib</span><span class=w> </span><span class=kn>import</span> <span class=n>pyplot</span> <span class=k>as</span> <span class=n>plt</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>torch.utils.data</span><span class=w> </span><span class=kn>import</span> <span class=n>DataLoader</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>torchvision.datasets</span><span class=w> </span><span class=kn>import</span> <span class=n>CIFAR10</span>
 </code></pre></div><div class=highlight><pre><span></span><code><span class=err>!</span><span class=n>wget</span> <span class=n>https</span><span class=p>:</span><span class=o>//</span><span class=n>www</span><span class=o>.</span><span class=n>cs</span><span class=o>.</span><span class=n>toronto</span><span class=o>.</span><span class=n>edu</span><span class=o>/~</span><span class=n>kriz</span><span class=o>/</span><span class=n>cifar</span><span class=o>-</span><span class=mi>10</span><span class=o>-</span><span class=n>python</span><span class=o>.</span><span class=n>tar</span><span class=o>.</span><span class=n>gz</span>
 </code></pre></div><p>--2021-05-16 11:43:20-- https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz<p>Loaded CA certificate '/etc/ssl/certs/ca-certificates.crt'<p>Resolving www.cs.toronto.edu (www.cs.toronto.edu)... 128.100.3.30<p>Connecting to www.cs.toronto.edu (www.cs.toronto.edu)|128.100.3.30|:443... connected.<p>HTTP request sent, awaiting response... 200 OK<p>Length: 170498071 (163M) [application/x-gzip]<p>Saving to: ‘cifar-10-python.tar.gz’<p>cifar-10-python.tar 100%[===================>] 162.60M 3.42MB/s in 50s<p>2021-05-16 11:44:11 (3.27 MB/s) - ‘cifar-10-python.tar.gz’ saved [170498071/170498071]<div class=highlight><pre><span></span><code><span class=n>transform</span> <span class=o>=</span> <span class=n>transforms</span><span class=o>.</span><span class=n>Compose</span><span class=p>([</span>
     <span class=n>transforms</span><span class=o>.</span><span class=n>ToTensor</span><span class=p>(),</span>
@@ -29,8 +29,8 @@ CIFAR-10 with GoogLeNet
     <span class=n>batch_size</span> <span class=o>=</span> <span class=mi>100</span><span class=p>,</span>
     <span class=n>shuffle</span> <span class=o>=</span> <span class=kc>True</span>
 <span class=p>)</span>
-</code></pre></div><div class=highlight><pre><span></span><code><span class=k>class</span> <span class=nc>Inception_A</span><span class=p>(</span><span class=n>nn</span><span class=o>.</span><span class=n>Module</span><span class=p>):</span>
-    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>in_channels</span><span class=p>):</span>
+</code></pre></div><div class=highlight><pre><span></span><code><span class=k>class</span><span class=w> </span><span class=nc>Inception_A</span><span class=p>(</span><span class=n>nn</span><span class=o>.</span><span class=n>Module</span><span class=p>):</span>
+    <span class=k>def</span><span class=w> </span><span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>in_channels</span><span class=p>):</span>
         <span class=nb>super</span><span class=p>(</span><span class=n>Inception_A</span><span class=p>,</span> <span class=bp>self</span><span class=p>)</span><span class=o>.</span><span class=fm>__init__</span><span class=p>()</span>
         <span class=bp>self</span><span class=o>.</span><span class=n>branch3x3_1</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Conv2d</span><span class=p>(</span><span class=n>in_channels</span><span class=p>,</span> <span class=mi>16</span><span class=p>,</span> <span class=mi>1</span><span class=p>)</span>
         <span class=bp>self</span><span class=o>.</span><span class=n>branch3x3_2</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Conv2d</span><span class=p>(</span><span class=mi>16</span><span class=p>,</span> <span class=mi>24</span><span class=p>,</span> <span class=mi>3</span><span class=p>,</span> <span class=n>padding</span> <span class=o>=</span> <span class=mi>1</span><span class=p>)</span>
@@ -43,7 +43,7 @@ CIFAR-10 with GoogLeNet
 
         <span class=bp>self</span><span class=o>.</span><span class=n>branch_pool</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Conv2d</span><span class=p>(</span><span class=n>in_channels</span><span class=p>,</span> <span class=mi>24</span><span class=p>,</span> <span class=mi>1</span><span class=p>)</span>
 
-    <span class=k>def</span> <span class=nf>forward</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>x</span><span class=p>):</span>
+    <span class=k>def</span><span class=w> </span><span class=nf>forward</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>x</span><span class=p>):</span>
         <span class=n>branch3x3</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>branch3x3_1</span><span class=p>(</span><span class=n>x</span><span class=p>)</span>
         <span class=n>branch3x3</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>branch3x3_2</span><span class=p>(</span><span class=n>branch3x3</span><span class=p>)</span>
         <span class=n>branch3x3</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>branch3x3_3</span><span class=p>(</span><span class=n>branch3x3</span><span class=p>)</span>
@@ -59,8 +59,8 @@ CIFAR-10 with GoogLeNet
         <span class=n>output</span> <span class=o>=</span> <span class=p>[</span><span class=n>branch1x1</span><span class=p>,</span> <span class=n>branch5x5</span><span class=p>,</span> <span class=n>branch3x3</span><span class=p>,</span> <span class=n>branch_pool</span><span class=p>]</span>
 
         <span class=k>return</span> <span class=n>torch</span><span class=o>.</span><span class=n>cat</span><span class=p>(</span><span class=n>output</span><span class=p>,</span> <span class=n>dim</span> <span class=o>=</span> <span class=mi>1</span><span class=p>)</span>
-</code></pre></div><div class=highlight><pre><span></span><code><span class=k>class</span> <span class=nc>GoogLeNet</span><span class=p>(</span><span class=n>nn</span><span class=o>.</span><span class=n>Module</span><span class=p>):</span>
-    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</code></pre></div><div class=highlight><pre><span></span><code><span class=k>class</span><span class=w> </span><span class=nc>GoogLeNet</span><span class=p>(</span><span class=n>nn</span><span class=o>.</span><span class=n>Module</span><span class=p>):</span>
+    <span class=k>def</span><span class=w> </span><span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
         <span class=nb>super</span><span class=p>(</span><span class=n>GoogLeNet</span><span class=p>,</span> <span class=bp>self</span><span class=p>)</span><span class=o>.</span><span class=fm>__init__</span><span class=p>()</span>
         <span class=bp>self</span><span class=o>.</span><span class=n>conv1</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Conv2d</span><span class=p>(</span><span class=mi>3</span><span class=p>,</span> <span class=mi>10</span><span class=p>,</span> <span class=mi>5</span><span class=p>)</span>
         <span class=bp>self</span><span class=o>.</span><span class=n>incep1</span> <span class=o>=</span> <span class=n>Inception_A</span><span class=p>(</span><span class=n>in_channels</span><span class=o>=</span><span class=mi>10</span><span class=p>)</span>
@@ -73,7 +73,7 @@ CIFAR-10 with GoogLeNet
         <span class=bp>self</span><span class=o>.</span><span class=n>fc</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Linear</span><span class=p>(</span><span class=mi>2200</span><span class=p>,</span> <span class=mi>10</span><span class=p>)</span>
         <span class=bp>self</span><span class=o>.</span><span class=n>cls</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Softmax</span><span class=p>(</span><span class=n>dim</span> <span class=o>=</span> <span class=mi>1</span><span class=p>)</span>
 
-    <span class=k>def</span> <span class=nf>forward</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>x</span><span class=p>):</span>
+    <span class=k>def</span><span class=w> </span><span class=nf>forward</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>x</span><span class=p>):</span>
         <span class=n>x</span> <span class=o>=</span> <span class=n>F</span><span class=o>.</span><span class=n>relu</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>mp</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>conv1</span><span class=p>(</span><span class=n>x</span><span class=p>)))</span>
         <span class=n>x</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>incep1</span><span class=p>(</span><span class=n>x</span><span class=p>)</span>
         <span class=n>x</span> <span class=o>=</span> <span class=n>F</span><span class=o>.</span><span class=n>relu</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>mp</span><span class=p>(</span><span class=bp>self</span><span class=o>.</span><span class=n>conv2</span><span class=p>(</span><span class=n>x</span><span class=p>)))</span>
@@ -157,11 +157,11 @@ CIFAR-10 with GoogLeNet
         <span class=n>total</span> <span class=o>+=</span> <span class=n>labels</span><span class=o>.</span><span class=n>size</span><span class=p>()[</span><span class=mi>0</span><span class=p>]</span>
 
 <span class=nb>print</span><span class=p>(</span><span class=s1>'accuracy: '</span><span class=p>,</span> <span class=n>ac</span><span class=o>/</span><span class=n>total</span><span class=p>)</span>
-</code></pre></div> <h1 id=2-test-part>2. test part</h1> <div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>torch</span>
-<span class=kn>from</span> <span class=nn>torchvision</span> <span class=kn>import</span> <span class=n>transforms</span>
-<span class=kn>from</span> <span class=nn>GoogLeNet_model</span> <span class=kn>import</span> <span class=n>GoogLeNet</span>
-<span class=kn>from</span> <span class=nn>torch.utils.data</span> <span class=kn>import</span> <span class=n>DataLoader</span>
-<span class=kn>from</span> <span class=nn>torchvision.datasets</span> <span class=kn>import</span> <span class=n>CIFAR10</span>
+</code></pre></div> <h1 id=2-test-part>2. test part</h1> <div class=highlight><pre><span></span><code><span class=kn>import</span><span class=w> </span><span class=nn>torch</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>torchvision</span><span class=w> </span><span class=kn>import</span> <span class=n>transforms</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>GoogLeNet_model</span><span class=w> </span><span class=kn>import</span> <span class=n>GoogLeNet</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>torch.utils.data</span><span class=w> </span><span class=kn>import</span> <span class=n>DataLoader</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>torchvision.datasets</span><span class=w> </span><span class=kn>import</span> <span class=n>CIFAR10</span>
 </code></pre></div> <div class=highlight><pre><span></span><code><span class=n>transform</span> <span class=o>=</span> <span class=n>transforms</span><span class=o>.</span><span class=n>Compose</span><span class=p>([</span>
     <span class=n>transforms</span><span class=o>.</span><span class=n>ToTensor</span><span class=p>(),</span>
     <span class=n>transforms</span><span class=o>.</span><span class=n>Normalize</span><span class=p>(</span><span class=n>mean</span> <span class=o>=</span> <span class=p>(</span><span class=mf>0.5</span><span class=p>,</span> <span class=mf>0.5</span><span class=p>,</span> <span class=mf>0.5</span><span class=p>),</span>

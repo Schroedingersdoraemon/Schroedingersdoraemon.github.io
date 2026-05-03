@@ -1,14 +1,14 @@
 <!doctype html><title>
 MNIST with LeNet
-    </title><meta charset=utf-8><meta content="width=device-width" initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><link href=/theme/css/pygments.css rel=stylesheet><body><h1>MNIST with LeNet</h1> 2021-05-02 00:03 <hr><div class=article-content><h1 id=1-train-part>1. train part</h1><div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>time</span>
-<span class=kn>import</span> <span class=nn>torch</span>
-<span class=kn>import</span> <span class=nn>numpy</span> <span class=k>as</span> <span class=nn>np</span>
-<span class=kn>import</span> <span class=nn>torch.nn</span> <span class=k>as</span> <span class=nn>nn</span>
-<span class=kn>from</span> <span class=nn>matplotlib</span> <span class=kn>import</span> <span class=n>pyplot</span> <span class=k>as</span> <span class=n>plt</span>
-<span class=kn>import</span> <span class=nn>torch.nn.functional</span> <span class=k>as</span> <span class=nn>F</span>
-<span class=kn>from</span> <span class=nn>torch.utils.data</span> <span class=kn>import</span> <span class=n>DataLoader</span>
-<span class=kn>from</span> <span class=nn>torchvision</span> <span class=kn>import</span> <span class=n>transforms</span>
-<span class=kn>from</span> <span class=nn>torchvision.datasets</span> <span class=kn>import</span> <span class=n>MNIST</span>
+    </title><meta charset=utf-8><meta content="width=device-width" initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><link href=/theme/css/pygments.css rel=stylesheet><body><h1>MNIST with LeNet</h1> 2021-05-02 00:03 <hr><div class=article-content><h1 id=1-train-part>1. train part</h1><div class=highlight><pre><span></span><code><span class=kn>import</span><span class=w> </span><span class=nn>time</span>
+<span class=kn>import</span><span class=w> </span><span class=nn>torch</span>
+<span class=kn>import</span><span class=w> </span><span class=nn>numpy</span><span class=w> </span><span class=k>as</span><span class=w> </span><span class=nn>np</span>
+<span class=kn>import</span><span class=w> </span><span class=nn>torch.nn</span><span class=w> </span><span class=k>as</span><span class=w> </span><span class=nn>nn</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>matplotlib</span><span class=w> </span><span class=kn>import</span> <span class=n>pyplot</span> <span class=k>as</span> <span class=n>plt</span>
+<span class=kn>import</span><span class=w> </span><span class=nn>torch.nn.functional</span><span class=w> </span><span class=k>as</span><span class=w> </span><span class=nn>F</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>torch.utils.data</span><span class=w> </span><span class=kn>import</span> <span class=n>DataLoader</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>torchvision</span><span class=w> </span><span class=kn>import</span> <span class=n>transforms</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>torchvision.datasets</span><span class=w> </span><span class=kn>import</span> <span class=n>MNIST</span>
 </code></pre></div><div class=highlight><pre><span></span><code><span class=n>transform</span> <span class=o>=</span> <span class=n>transforms</span><span class=o>.</span><span class=n>Compose</span><span class=p>([</span>
     <span class=n>transforms</span><span class=o>.</span><span class=n>ToTensor</span><span class=p>(),</span>
     <span class=n>transforms</span><span class=o>.</span><span class=n>Normalize</span><span class=p>((</span><span class=mf>0.1307</span><span class=p>,</span> <span class=p>),</span> <span class=p>(</span><span class=mf>0.3081</span><span class=p>,))</span>
@@ -32,8 +32,8 @@ MNIST with LeNet
     <span class=n>batch_size</span> <span class=o>=</span> <span class=mi>100</span><span class=p>,</span>
     <span class=n>shuffle</span> <span class=o>=</span> <span class=kc>True</span>
 <span class=p>)</span>
-</code></pre></div><div class=highlight><pre><span></span><code><span class=k>class</span> <span class=nc>LeNet</span><span class=p>(</span><span class=n>nn</span><span class=o>.</span><span class=n>Module</span><span class=p>):</span>
-    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</code></pre></div><div class=highlight><pre><span></span><code><span class=k>class</span><span class=w> </span><span class=nc>LeNet</span><span class=p>(</span><span class=n>nn</span><span class=o>.</span><span class=n>Module</span><span class=p>):</span>
+    <span class=k>def</span><span class=w> </span><span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
         <span class=nb>super</span><span class=p>(</span><span class=n>LeNet</span><span class=p>,</span> <span class=bp>self</span><span class=p>)</span><span class=o>.</span><span class=fm>__init__</span><span class=p>()</span>
         <span class=bp>self</span><span class=o>.</span><span class=n>cal</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Sequential</span><span class=p>(</span>
             <span class=n>nn</span><span class=o>.</span><span class=n>Conv2d</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span> <span class=mi>6</span><span class=p>,</span> <span class=mi>5</span><span class=p>,</span> <span class=mi>1</span><span class=p>,</span> <span class=mi>2</span><span class=p>),</span>
@@ -48,7 +48,7 @@ MNIST with LeNet
             <span class=n>nn</span><span class=o>.</span><span class=n>Linear</span><span class=p>(</span><span class=mi>84</span><span class=p>,</span> <span class=mi>10</span><span class=p>),</span>
             <span class=n>nn</span><span class=o>.</span><span class=n>Softmax</span><span class=p>(</span><span class=n>dim</span><span class=o>=</span><span class=mi>1</span><span class=p>)</span>
         <span class=p>)</span>
-    <span class=k>def</span> <span class=nf>forward</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>x</span><span class=p>):</span>
+    <span class=k>def</span><span class=w> </span><span class=nf>forward</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>x</span><span class=p>):</span>
         <span class=k>return</span> <span class=bp>self</span><span class=o>.</span><span class=n>cal</span><span class=p>(</span><span class=n>x</span><span class=p>)</span>
 </code></pre></div><div class=highlight><pre><span></span><code><span class=n>net</span> <span class=o>=</span> <span class=n>LeNet</span><span class=p>()</span>
 <span class=n>torch</span><span class=o>.</span><span class=n>cuda</span><span class=o>.</span><span class=n>empty_cache</span><span class=p>()</span>
@@ -125,13 +125,13 @@ Finished training, time used: 551.340
 <span class=n>torch</span><span class=o>.</span><span class=n>save</span><span class=p>(</span><span class=n>net</span><span class=o>.</span><span class=n>state_dict</span><span class=p>(),</span> <span class=n>model_path</span><span class=p>)</span>
 
 <span class=c1># net.load_state_dict(torch.load(model_path))</span>
-</code></pre></div><h1 id=2-test-part>2. test part</h1><div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>torch</span>
-<span class=kn>import</span> <span class=nn>numpy</span> <span class=k>as</span> <span class=nn>np</span>
-<span class=kn>from</span> <span class=nn>mnist_net</span> <span class=kn>import</span> <span class=n>LeNet</span>
-<span class=kn>from</span> <span class=nn>torchvision</span> <span class=kn>import</span> <span class=n>transforms</span>
-<span class=kn>from</span> <span class=nn>torch.utils.data</span> <span class=kn>import</span> <span class=n>DataLoader</span>
-<span class=kn>from</span> <span class=nn>torchvision.datasets</span> <span class=kn>import</span> <span class=n>MNIST</span>
-<span class=kn>from</span> <span class=nn>matplotlib</span> <span class=kn>import</span> <span class=n>pyplot</span> <span class=k>as</span> <span class=n>plt</span>
+</code></pre></div><h1 id=2-test-part>2. test part</h1><div class=highlight><pre><span></span><code><span class=kn>import</span><span class=w> </span><span class=nn>torch</span>
+<span class=kn>import</span><span class=w> </span><span class=nn>numpy</span><span class=w> </span><span class=k>as</span><span class=w> </span><span class=nn>np</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>mnist_net</span><span class=w> </span><span class=kn>import</span> <span class=n>LeNet</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>torchvision</span><span class=w> </span><span class=kn>import</span> <span class=n>transforms</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>torch.utils.data</span><span class=w> </span><span class=kn>import</span> <span class=n>DataLoader</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>torchvision.datasets</span><span class=w> </span><span class=kn>import</span> <span class=n>MNIST</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>matplotlib</span><span class=w> </span><span class=kn>import</span> <span class=n>pyplot</span> <span class=k>as</span> <span class=n>plt</span>
 </code></pre></div><div class=highlight><pre><span></span><code><span class=n>transform</span> <span class=o>=</span> <span class=n>transforms</span><span class=o>.</span><span class=n>Compose</span><span class=p>([</span>
     <span class=n>transforms</span><span class=o>.</span><span class=n>ToTensor</span><span class=p>(),</span>
     <span class=n>transforms</span><span class=o>.</span><span class=n>Normalize</span><span class=p>((</span><span class=mf>0.1307</span><span class=p>,</span> <span class=p>),</span> <span class=p>(</span><span class=mf>0.3081</span><span class=p>,))</span>

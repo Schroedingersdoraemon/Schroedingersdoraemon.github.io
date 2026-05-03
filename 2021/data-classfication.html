@@ -1,8 +1,8 @@
 <!doctype html><title>
 Data Classfication
-    </title><meta charset=utf-8><meta content="width=device-width" initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><link href=/theme/css/pygments.css rel=stylesheet><body><h1>Data Classfication</h1> 2021-04-18 13:16 <hr><div class=article-content><div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>torch</span>
-<span class=kn>import</span> <span class=nn>torch.nn</span> <span class=k>as</span> <span class=nn>nn</span>
-<span class=kn>from</span> <span class=nn>matplotlib</span> <span class=kn>import</span> <span class=n>pyplot</span> <span class=k>as</span> <span class=n>plt</span>
+    </title><meta charset=utf-8><meta content="width=device-width" initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><link href=/theme/css/pygments.css rel=stylesheet><body><h1>Data Classfication</h1> 2021-04-18 13:16 <hr><div class=article-content><div class=highlight><pre><span></span><code><span class=kn>import</span><span class=w> </span><span class=nn>torch</span>
+<span class=kn>import</span><span class=w> </span><span class=nn>torch.nn</span><span class=w> </span><span class=k>as</span><span class=w> </span><span class=nn>nn</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>matplotlib</span><span class=w> </span><span class=kn>import</span> <span class=n>pyplot</span> <span class=k>as</span> <span class=n>plt</span>
 </code></pre></div><div class=highlight><pre><span></span><code><span class=n>data</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>ones</span><span class=p>(</span><span class=mi>100</span><span class=p>,</span> <span class=mi>2</span><span class=p>)</span>
 <span class=n>x0</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>normal</span><span class=p>(</span><span class=n>data</span><span class=o>*</span><span class=mi>2</span><span class=p>,</span> <span class=mi>1</span><span class=p>)</span>
 <span class=n>x1</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>normal</span><span class=p>(</span><span class=n>data</span><span class=o>*-</span><span class=mi>2</span><span class=p>,</span> <span class=mi>1</span><span class=p>)</span>
@@ -11,8 +11,8 @@ Data Classfication
 <span class=n>y0</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>zeros</span><span class=p>(</span><span class=mi>100</span><span class=p>)</span>
 <span class=n>y1</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>ones</span><span class=p>(</span><span class=mi>100</span><span class=p>)</span>
 <span class=n>y</span> <span class=o>=</span> <span class=n>torch</span><span class=o>.</span><span class=n>cat</span><span class=p>([</span><span class=n>y0</span><span class=p>,</span> <span class=n>y1</span><span class=p>],</span> <span class=mi>0</span><span class=p>)</span><span class=o>.</span><span class=n>type</span><span class=p>(</span><span class=n>torch</span><span class=o>.</span><span class=n>LongTensor</span><span class=p>)</span>
-</code></pre></div><div class=highlight><pre><span></span><code><span class=k>class</span> <span class=nc>Net</span><span class=p>(</span><span class=n>nn</span><span class=o>.</span><span class=n>Module</span><span class=p>):</span>
-    <span class=k>def</span> <span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
+</code></pre></div><div class=highlight><pre><span></span><code><span class=k>class</span><span class=w> </span><span class=nc>Net</span><span class=p>(</span><span class=n>nn</span><span class=o>.</span><span class=n>Module</span><span class=p>):</span>
+    <span class=k>def</span><span class=w> </span><span class=fm>__init__</span><span class=p>(</span><span class=bp>self</span><span class=p>):</span>
         <span class=nb>super</span><span class=p>(</span><span class=n>Net</span><span class=p>,</span> <span class=bp>self</span><span class=p>)</span><span class=o>.</span><span class=fm>__init__</span><span class=p>()</span>
         <span class=bp>self</span><span class=o>.</span><span class=n>classify</span> <span class=o>=</span> <span class=n>nn</span><span class=o>.</span><span class=n>Sequential</span><span class=p>(</span>
             <span class=n>nn</span><span class=o>.</span><span class=n>Linear</span><span class=p>(</span><span class=mi>2</span><span class=p>,</span> <span class=mi>15</span><span class=p>),</span>
@@ -21,7 +21,7 @@ Data Classfication
             <span class=n>nn</span><span class=o>.</span><span class=n>Softmax</span><span class=p>(</span><span class=n>dim</span><span class=o>=</span><span class=mi>1</span><span class=p>)</span>
         <span class=p>)</span>
 
-    <span class=k>def</span> <span class=nf>forward</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>x</span><span class=p>):</span>
+    <span class=k>def</span><span class=w> </span><span class=nf>forward</span><span class=p>(</span><span class=bp>self</span><span class=p>,</span> <span class=n>x</span><span class=p>):</span>
         <span class=n>classification</span> <span class=o>=</span> <span class=bp>self</span><span class=o>.</span><span class=n>classify</span><span class=p>(</span><span class=n>x</span><span class=p>)</span>
         <span class=k>return</span> <span class=n>classification</span>
 </code></pre></div><div class=highlight><pre><span></span><code><span class=n>net</span> <span class=o>=</span> <span class=n>Net</span><span class=p>()</span>

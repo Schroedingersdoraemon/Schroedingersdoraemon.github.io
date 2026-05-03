@@ -2,7 +2,7 @@
 Python Crawler Tutorial of BIT
     </title><meta charset=utf-8><meta content="width=device-width" initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><link href=/theme/css/pygments.css rel=stylesheet><body><h1>Python Crawler Tutorial of BIT</h1> 2020-03-13 22:24 <hr><div class=article-content><h1 id=week1>一、Week1:规则</h1><h2 id=1-library-requests>1. Library: Requests</h2><h3 id=1-requests>(1). requests</h3><div class=highlight><pre><span></span><code>r = requests.get(url, params=None, **kwargs)
 </code></pre></div><div class=highlight><pre><span></span><code>  <span class=c1>#!/usr/bin/python</span>
-  <span class=kn>import</span> <span class=nn>requests</span>
+  <span class=kn>import</span><span class=w> </span><span class=nn>requests</span>
   <span class=n>r</span> <span class=o>=</span> <span class=n>request</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s1>'http://www.baidu.com'</span><span class=p>)</span>
   <span class=nb>type</span><span class=p>(</span><span class=n>r</span><span class=p>)</span>
   <span class=k>if</span> <span class=n>r</span><span class=o>.</span><span class=n>headers</span> <span class=o>==</span> <span class=mi>200</span><span class=p>:</span>
@@ -16,9 +16,9 @@ Python Crawler Tutorial of BIT
   <span class=n>r</span><span class=o>.</span><span class=n>apparent_encoding</span>   <span class=c1>#从内容中分析出的响应内容编码方式（备选）</span>
   <span class=n>r</span><span class=o>.</span><span class=n>content</span>
 </code></pre></div><h3 id=2-universal-framework>(2). universal framework</h3><table><thead><tr><th style=text-align:center><th style=text-align:center><tbody><tr><td style=text-align:center>requests.ConnectionError<td style=text-align:center>网络连接错误<tr><td style=text-align:center>requests.HTTPError<td style=text-align:center>HTTP错误异常<tr><td style=text-align:center>requests.URLRuquired<td style=text-align:center>URL缺失异常<tr><td style=text-align:center>requests.TooManyRedirects<td style=text-align:center>重定向<tr><td style=text-align:center>requests.ConnectTimeout<td style=text-align:center>连接远程服务器超时异常<tr><td style=text-align:center>requests.Timeout<td style=text-align:center>请求URL超时</table><div class=highlight><pre><span></span><code><span class=ch>#!/usr/bin/python</span>
-<span class=kn>import</span> <span class=nn>requests</span>
+<span class=kn>import</span><span class=w> </span><span class=nn>requests</span>
 
-<span class=k>def</span> <span class=nf>getHTMLtext</span><span class=p>(</span><span class=n>url</span><span class=p>):</span>
+<span class=k>def</span><span class=w> </span><span class=nf>getHTMLtext</span><span class=p>(</span><span class=n>url</span><span class=p>):</span>
     <span class=k>try</span><span class=p>:</span>
         <span class=n>r</span> <span class=o>=</span> <span class=n>requests</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=n>url</span><span class=p>,</span><span class=n>timeout</span> <span class=o>=</span> <span class=mi>30</span><span class=p>)</span>
         <span class=n>r</span><span class=o>.</span><span class=n>raise_for_status</span><span class=p>()</span> <span class=c1>#如果r.status！= 200，产生异常requests.HTTPError</span>
@@ -75,7 +75,7 @@ Python Crawler Tutorial of BIT
        <span class=s1>'https'</span><span class=p>:</span><span class=s1>'https://10.10.10.1:4321'</span> <span class=p>}</span>
 <span class=n>r</span> <span class=o>=</span> <span class=n>requests</span><span class=o>.</span><span class=n>request</span><span class=p>(</span><span class=s1>'GET'</span><span class=p>,</span><span class=n>URL</span><span class=p>,</span> <span class=n>proxies</span> <span class=o>=</span> <span class=n>pxs</span><span class=p>)</span>
 </code></pre></div><table><thead><tr><th style=text-align:center><th style=text-align:center>**args<th style=text-align:center><tbody><tr><td style=text-align:center>1<td style=text-align:center>params<td style=text-align:center>dictionary or text sequences<tr><td style=text-align:center>2<td style=text-align:center>data<td style=text-align:center>dictionary, text sequences or file object<tr><td style=text-align:center>3<td style=text-align:center>json<td style=text-align:center>ad titled<tr><td style=text-align:center>4<td style=text-align:center>headers<td style=text-align:center>HTTP headers<tr><td style=text-align:center>5<td style=text-align:center>cookies<td style=text-align:center>dict or CookieJar<tr><td style=text-align:center>6<td style=text-align:center>auth<td style=text-align:center>tuple<tr><td style=text-align:center>7<td style=text-align:center>files<td style=text-align:center>dict, file transfer<tr><td style=text-align:center>8<td style=text-align:center>timeout<td style=text-align:center>seconds<tr><td style=text-align:center>9<td style=text-align:center>proxies<td style=text-align:center>dict<tr><td style=text-align:center>10<td style=text-align:center>allow_redirects<td style=text-align:center>default: True<tr><td style=text-align:center>11<td style=text-align:center>stream<td style=text-align:center>fetch contents, download instantly(default: True)<tr><td style=text-align:center>12<td style=text-align:center>verify<td style=text-align:center>verify SSL certificate(default True)<tr><td style=text-align:center>13<td style=text-align:center>cer<td style=text-align:center>local SSL certificate path</table><h2 id=2>2. 爬虫的‘盗亦有道’</h2><h3 id=1>(1). 爬虫引发的问题</h3><blockquote><p>Requests: 小规模，数据量小，速度不敏感 Scrapy: 中规模，数据规模较大，速度敏感 Google, Bing: 大规模，搜索引擎，速度关键</blockquote><ul><li>Sources check：判断HTTP headers的User-Agent域<li>Annountment: Robots</ul><h3 id=2-robots-protocol>(2). Robots protocol</h3><p>Robots Exclusion Standard<br> location: <code>host/robots.txt</code><p>Grammar<blockquote><p>User-agent: * Disallow: /</blockquote><p>i.e. <em>https://www.jd.com/robots.txt</em><blockquote><p>User-agent: * <br> Disallow: /?<em> <br> Disallow: /pop/</em>.html <br> Disallow: /pinpai/<em>.html?</em> <br> User-agent: EtaoSpider <br> Disallow: /<br> User-agent: HuihuiSpider <br> Disallow: / <br> User-agent: GwdangSpider <br> Disallow: / <br> User-agent: WochachaSpider <br> Disallow: /</blockquote><h3 id=3-robots-protocol>(3). Robots protocol</h3><p>dylan 说：别吃牢饭就好～<h3 id=4-practice>(4). Practice</h3><h4 id=1-jdcom>1. jd.com</h4><p>京东上默认第一 Lolita 裙的信息（逃）<div class=highlight><pre><span></span><code><span class=ch>#!/usr/bin/python</span>
-<span class=kn>import</span> <span class=nn>requests</span>
+<span class=kn>import</span><span class=w> </span><span class=nn>requests</span>
 <span class=n>url</span> <span class=o>=</span> <span class=s1>'https://item.jd.com/55949296412.html'</span>
 <span class=k>try</span><span class=p>:</span>
     <span class=n>r</span> <span class=o>=</span> <span class=n>requests</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=n>url</span><span class=p>)</span>
@@ -84,7 +84,7 @@ Python Crawler Tutorial of BIT
     <span class=nb>print</span><span class=p>(</span><span class=n>r</span><span class=o>.</span><span class=n>text</span><span class=p>[:</span><span class=mi>1000</span><span class=p>])</span>
 <span class=k>except</span><span class=p>:</span>
     <span class=nb>print</span><span class=p>(</span><span class=s1>'Error occured'</span><span class=p>)</span>
-</code></pre></div><h4 id=2-amazon>2. Amazon</h4><p>Amazon上面的 Lolita 裙<div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>requests</span>
+</code></pre></div><h4 id=2-amazon>2. Amazon</h4><p>Amazon上面的 Lolita 裙<div class=highlight><pre><span></span><code><span class=kn>import</span><span class=w> </span><span class=nn>requests</span>
 <span class=n>url</span> <span class=o>=</span> <span class=s1>'https://www.amazon.cn/dp/B07MQSJQC4/ref=sr_1_12?__mk_zh_CN=</span><span class=si>%E</span><span class=s1>4%BA%9A</span><span class=si>%E</span><span class=s1>9%A9%AC</span><span class=si>%E</span><span class=s1>9</span><span class=si>%80%</span><span class=s1>8A</span><span class=si>%E</span><span class=s1>7%BD</span><span class=si>%91%</span><span class=s1>E7%AB%99&dchild=1&keywords=lolita&qid=1586515136&sr=8-12'</span>
 
 <span class=k>try</span><span class=p>:</span>
@@ -95,9 +95,9 @@ Python Crawler Tutorial of BIT
     <span class=nb>print</span><span class=p>(</span><span class=n>r</span><span class=o>.</span><span class=n>text</span><span class=p>[</span><span class=mi>1000</span><span class=p>:</span><span class=mi>2000</span><span class=p>])</span>
 <span class=k>except</span><span class=p>:</span>
     <span class=nb>print</span><span class=p>(</span><span class=s1>'Error occurred'</span><span class=p>)</span>
-</code></pre></div><h4 id=3-baidu>3. baidu关键词提交</h4><p><code>baidu api:</code> <code>https://www.baidu.com/s?wd=</code>+ keywords<div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>requests</span>
+</code></pre></div><h4 id=3-baidu>3. baidu关键词提交</h4><p><code>baidu api:</code> <code>https://www.baidu.com/s?wd=</code>+ keywords<div class=highlight><pre><span></span><code><span class=kn>import</span><span class=w> </span><span class=nn>requests</span>
 
-<span class=kn>import</span> 
+<span class=kn>import</span><span class=w> </span>
 <span class=nn>kw</span> <span class=o>=</span> <span class=p>{</span><span class=s1>'wd'</span><span class=p>:</span><span class=s1>'Lolita裙'</span><span class=p>}</span>
 <span class=n>kv</span> <span class=o>=</span> <span class=p>{</span><span class=s1>'User-Agent'</span><span class=p>:</span><span class=s1>'Mozilla/5.0'</span><span class=p>}</span>
 <span class=n>url</span> <span class=o>=</span> <span class=s1>'https://www.baidu.com/s'</span>
@@ -108,8 +108,8 @@ Python Crawler Tutorial of BIT
     <span class=nb>print</span><span class=p>(</span><span class=nb>len</span><span class=p>(</span><span class=n>r</span><span class=o>.</span><span class=n>text</span><span class=p>))</span>
 <span class=k>except</span><span class=p>:</span>
     <span class=nb>print</span><span class=p>(</span><span class=s1>'Error occurred'</span><span class=p>)</span>
-</code></pre></div><h4 id=4-pictures-videos>4. Pictures / Videos</h4><p>用途：老婆们的图 / 视频<div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>requests</span>
-<span class=kn>import</span> <span class=nn>os</span>
+</code></pre></div><h4 id=4-pictures-videos>4. Pictures / Videos</h4><p>用途：老婆们的图 / 视频<div class=highlight><pre><span></span><code><span class=kn>import</span><span class=w> </span><span class=nn>requests</span>
+<span class=kn>import</span><span class=w> </span><span class=nn>os</span>
 
 <span class=n>url</span> <span class=o>=</span> <span class=s1>'https://tva2.sinaimg.cn/large/87c01ec7gy1fsnqqz23i'</span>
 <span class=n>root</span> <span class=o>=</span> <span class=s1>'./'</span>
@@ -125,7 +125,7 @@ Python Crawler Tutorial of BIT
             <span class=nb>print</span><span class=p>(</span><span class=s1>'Successfully saved!'</span><span class=p>)</span>
 <span class=k>except</span><span class=p>:</span>
     <span class=nb>print</span><span class=p>(</span><span class=s1>'Failed'</span><span class=p>)</span>
-</code></pre></div><h4 id=5-ip-address>5. IP address</h4><div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>requests</span>
+</code></pre></div><h4 id=5-ip-address>5. IP address</h4><div class=highlight><pre><span></span><code><span class=kn>import</span><span class=w> </span><span class=nn>requests</span>
 <span class=n>url</span> <span class=o>=</span> <span class=s1>'http://m.ip138.com/ip.asp?ip='</span>
 <span class=n>ip</span> <span class=o>=</span> <span class=nb>input</span><span class=p>(</span><span class=s1>'Enter ur ip address:'</span><span class=p>)</span>
 <span class=n>kv</span> <span class=o>=</span> <span class=p>{</span><span class=s1>'User-Agent'</span><span class=p>:</span><span class=s1>'Mozilla/5.0'</span><span class=p>}</span>
@@ -136,14 +136,14 @@ Python Crawler Tutorial of BIT
     <span class=nb>print</span><span class=p>(</span><span class=n>r</span><span class=o>.</span><span class=n>text</span><span class=p>[</span><span class=o>-</span><span class=mi>500</span><span class=p>:])</span>
 <span class=k>except</span><span class=p>:</span>
     <span class=nb>print</span><span class=p>(</span><span class=s1>'Error occurred'</span><span class=p>)</span>
-</code></pre></div><h1 id=week2>二、Week2: 语音系列</h1><h2 id=1-beautiful-soup>1. 靓汤 Beautiful Soup</h2><h3 id=1_1>(1). 靓汤安装</h3><div class=highlight><pre><span></span><code><span class=kn>import</span> <span class=nn>requests</span>
+</code></pre></div><h1 id=week2>二、Week2: 语音系列</h1><h2 id=1-beautiful-soup>1. 靓汤 Beautiful Soup</h2><h3 id=1_1>(1). 靓汤安装</h3><div class=highlight><pre><span></span><code><span class=kn>import</span><span class=w> </span><span class=nn>requests</span>
 <span class=n>r</span> <span class=o>=</span> <span class=n>requests</span><span class=o>.</span><span class=n>get</span><span class=p>(</span><span class=s1>'http://python123.io/ws/demo.html'</span><span class=p>)</span>
 <span class=n>demo</span> <span class=o>=</span> <span class=n>r</span><span class=o>.</span><span class=n>text</span>
 
-<span class=kn>from</span> <span class=nn>bs4</span> <span class=kn>import</span> <span class=n>BeautifulSoup</span>
+<span class=kn>from</span><span class=w> </span><span class=nn>bs4</span><span class=w> </span><span class=kn>import</span> <span class=n>BeautifulSoup</span>
 <span class=n>soup</span> <span class=o>=</span> <span class=n>BeautifulSoup</span><span class=p>(</span><span class=n>demo</span><span class=p>,</span> <span class=s1>'html.parser'</span><span class=p>)</span>
 <span class=nb>print</span><span class=p>(</span><span class=n>soup</span><span class=o>.</span><span class=n>prettify</span><span class=p>())</span>
-</code></pre></div><h3 id=2_1>(2). 靓汤基本元素</h3><div class=highlight><pre><span></span><code><span class=kn>from</span> <span class=nn>bs4</span> <span class=kn>import</span> <span class=n>BeautifulSoup</span>
+</code></pre></div><h3 id=2_1>(2). 靓汤基本元素</h3><div class=highlight><pre><span></span><code><span class=kn>from</span><span class=w> </span><span class=nn>bs4</span><span class=w> </span><span class=kn>import</span> <span class=n>BeautifulSoup</span>
 <span class=n>soup</span> <span class=o>=</span> <span class=n>BeautifulSoup</span><span class=p>(</span><span class=s1>'&lt;html>data&lt;/html>'</span><span class=p>,</span> <span class=s1>'html.parser'</span><span class=p>)</span>
 <span class=n>soup2</span> <span class=o>=</span> <span class=n>BeautifulSoup</span><span class=p>(</span><span class=nb>open</span><span class=p>(</span><span class=s1>'./demo.html'</span><span class=p>),</span> <span class=s1>'html.parser'</span><span class=p>)</span>
 </code></pre></div><table><thead><tr><th style=text-align:center>parser<th style=text-align:center>use<tbody><tr><td style=text-align:center>bs4 HTML<td style=text-align:center>BeautifulSoup(mk, 'html.parser')<tr><td style=text-align:center>lxml HTML<td style=text-align:center>BeautifulSoup(mk, '<code>lxml</code>')<tr><td style=text-align:center>lxml XML<td style=text-align:center>BeautifulSoup(mk, '<code>xml</code>')<tr><td style=text-align:center>html5lib<td style=text-align:center>BeautifulSoup(mk, '<code>html5lib</code>')</table><table><thead><tr><th style=text-align:center>Element<th style=text-align:center>About<tbody><tr><td style=text-align:center>Tag<td style=text-align:center>&lt;>和&lt;/>标明开头结尾<tr><td style=text-align:center>Name<td style=text-align:center>标签名字, <code>&lt;p</code>>...`</table></div>
