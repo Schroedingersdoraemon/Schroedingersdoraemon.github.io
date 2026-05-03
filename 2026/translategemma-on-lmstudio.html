@@ -1,0 +1,37 @@
+<!doctype html><title>
+TranslateGemma on LMStudio
+    </title><meta charset=utf-8><meta content="width=device-width" initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><link href=/theme/css/pygments.css rel=stylesheet><body><h1>TranslateGemma on LMStudio</h1> 2026-04-24 22:05 <hr><div class=article-content><div class=toc><ul><li><a href=#0-my-web-browser-ver>0. my web browser ver</a><li><a href=#1-chatgpt-ver>1. ChatGPT Ver</a><li><a href=#2-zimo-ver>2. zimo ver</a></ul></div><h2 id=0-my-web-browser-ver>0. my web browser ver</h2><p>translate gemma 在 LMStudio 的 Jinja Template<p>提示词来自<a href=https://ollama.com/library/translategemma>这里</a><div class=highlight><pre><span></span><code><span class=cp>{{</span> <span class=nv>bos_token</span> <span class=cp>}}</span>
+<span class=x>&lt;start_of_turn>user</span>
+<span class=x>You are a professional English (en) to Chinese (zh-Hans) translator.</span>
+<span class=x>Your goal is to accurately convey the meaning and nuances of the original English text while adhering to Chinese grammar, vocabulary, and cultural sensitivities.</span>
+<span class=x>Produce only the Chinese translation, without any additional explanations or commentary.</span>
+<span class=x>Do not translate URLs, code, or proper nouns unless necessary.</span>
+<span class=x>Please translate the following English text into Chinese:</span>
+
+
+<span class=cp>{{</span> <span class=nv>messages</span><span class=o>[-</span><span class=m>1</span><span class=o>][</span><span class=s2>"content"</span><span class=o>]</span> <span class=o>|</span> <span class=nf>trim</span> <span class=cp>}}</span>
+<span class=x>&lt;end_of_turn></span>
+<span class=x>&lt;start_of_turn>model</span>
+</code></pre></div><h2 id=1-chatgpt-ver>1. ChatGPT Ver</h2><p>ChatGPT 分离了 Template 和 Prompt<p>Template<div class=highlight><pre><span></span><code><span class=cp>{{</span> <span class=nv>bos_token</span> <span class=cp>}}</span>
+<span class=cp>{%</span> <span class=k>for</span> <span class=nv>message</span> <span class=k>in</span> <span class=nv>messages</span> <span class=cp>%}</span>
+<span class=x>&lt;start_of_turn></span><span class=cp>{{</span> <span class=nv>message</span><span class=o>[</span><span class=s1>'role'</span><span class=o>]</span> <span class=cp>}}</span>
+<span class=cp>{{</span> <span class=nv>message</span><span class=o>[</span><span class=s1>'content'</span><span class=o>]</span> <span class=cp>}}</span>
+<span class=x>&lt;end_of_turn></span>
+<span class=cp>{%</span> <span class=k>endfor</span> <span class=cp>%}</span>
+<span class=x>&lt;start_of_turn>model</span>
+</code></pre></div><p>Prompt<div class=highlight><pre><span></span><code><span class=nv>You</span><span class=w> </span><span class=nv>are</span><span class=w> </span><span class=nv>a</span><span class=w> </span><span class=nv>professional</span><span class=w> </span><span class=nv>English</span><span class=w> </span><span class=ss>(</span><span class=nv>en</span><span class=ss>)</span><span class=w> </span><span class=nv>to</span><span class=w> </span><span class=nv>Chinese</span><span class=w> </span><span class=ss>(</span><span class=nv>zh</span><span class=o>-</span><span class=nv>Hans</span><span class=ss>)</span><span class=w> </span><span class=nv>translator</span>.
+<span class=nv>Your</span><span class=w> </span><span class=nv>goal</span><span class=w> </span><span class=nv>is</span><span class=w> </span><span class=nv>to</span><span class=w> </span><span class=nv>accurately</span><span class=w> </span><span class=nv>convey</span><span class=w> </span><span class=nv>the</span><span class=w> </span><span class=nv>meaning</span><span class=w> </span><span class=nv>and</span><span class=w> </span><span class=nv>nuances</span><span class=w> </span><span class=nv>of</span><span class=w> </span><span class=nv>the</span><span class=w> </span><span class=nv>original</span><span class=w> </span><span class=nv>English</span><span class=w> </span><span class=nv>text</span><span class=w> </span><span class=k>while</span><span class=w> </span><span class=nv>adhering</span><span class=w> </span><span class=nv>to</span><span class=w> </span><span class=nv>Chinese</span><span class=w> </span><span class=nv>grammar</span>,<span class=w> </span><span class=nv>vocabulary</span>,<span class=w> </span><span class=nv>and</span><span class=w> </span><span class=nv>cultural</span><span class=w> </span><span class=nv>sensitivities</span>.
+<span class=nv>Produce</span><span class=w> </span><span class=nv>only</span><span class=w> </span><span class=nv>the</span><span class=w> </span><span class=nv>Chinese</span><span class=w> </span><span class=nv>translation</span>,<span class=w> </span><span class=nv>without</span><span class=w> </span><span class=nv>any</span><span class=w> </span><span class=nv>additional</span><span class=w> </span><span class=nv>explanations</span><span class=w> </span><span class=nv>or</span><span class=w> </span><span class=nv>commentary</span>.
+<span class=nv>Please</span><span class=w> </span><span class=nv>translate</span><span class=w> </span><span class=nv>the</span><span class=w> </span><span class=nv>following</span><span class=w> </span><span class=nv>English</span><span class=w> </span><span class=nv>text</span><span class=w> </span><span class=nv>into</span><span class=w> </span><span class=nv>Chinese</span>:
+</code></pre></div><h2 id=2-zimo-ver>2. zimo ver</h2><p>从<a href=https://note.com/zimo/n/n02e7f10fc70d>zimo</a>学习到的<div class=highlight><pre><span></span><code><span class=cp>{{</span> <span class=nv>bos_token</span> <span class=cp>}}</span>
+<span class=cp>{%</span> <span class=k>for</span> <span class=nv>message</span> <span class=k>in</span> <span class=nv>messages</span> <span class=cp>%}</span>
+<span class=cp>{%</span> <span class=k>if</span> <span class=nv>message</span><span class=o>[</span><span class=s1>'role'</span><span class=o>]</span> <span class=o>==</span> <span class=s1>'user'</span> <span class=cp>%}</span>
+<span class=cp>{{</span> <span class=s1>'&lt;start_of_turn>user\n'</span> <span class=o>+</span> <span class=nv>message</span><span class=o>[</span><span class=s1>'content'</span><span class=o>]</span> <span class=o>+</span> <span class=s1>'&lt;end_of_turn>\n'</span> <span class=cp>}}</span>
+<span class=cp>{%</span> <span class=k>elif</span> <span class=nv>message</span><span class=o>[</span><span class=s1>'role'</span><span class=o>]</span> <span class=o>==</span> <span class=s1>'model'</span> <span class=cp>%}</span>
+<span class=cp>{{</span> <span class=s1>'&lt;start_of_turn>model\n'</span> <span class=o>+</span> <span class=nv>message</span><span class=o>[</span><span class=s1>'content'</span><span class=o>]</span> <span class=o>+</span> <span class=s1>'&lt;end_of_turn>\n'</span> <span class=cp>}}</span>
+<span class=cp>{%</span> <span class=k>endif</span> <span class=cp>%}</span>
+<span class=cp>{%</span> <span class=k>endfor</span> <span class=cp>%}</span>
+<span class=cp>{%</span> <span class=k>if</span> <span class=nv>add_generation_prompt</span> <span class=cp>%}</span>
+<span class=cp>{{</span> <span class=s1>'&lt;start_of_turn>model\n'</span> <span class=cp>}}</span>
+<span class=cp>{%</span> <span class=k>endif</span> <span class=cp>%}</span>
+</code></pre></div></div>

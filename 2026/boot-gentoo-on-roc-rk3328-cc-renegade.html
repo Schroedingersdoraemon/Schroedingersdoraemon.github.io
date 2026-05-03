@@ -1,0 +1,58 @@
+<!doctype html><title>
+boot gentoo on roc-rk3328-cc renegade
+    </title><meta charset=utf-8><meta content="width=device-width" initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><link href=/theme/css/pygments.css rel=stylesheet><body><h1>boot gentoo on roc-rk3328-cc renegade</h1> 2026-04-18 20:55 <hr><div class=article-content><div class=toc><ul><li><a href=#0-boot>0. boot</a><ul><li><a href=#00-compile-uboot>0.0. compile uboot</a><li><a href=#01-optional-retrieve-armbian-boot>0.1. (optional) retrieve armbian boot</a></ul><li><a href=#1-flash-your-card>1. flash your card</a><li><a href=#2-kernel>2. kernel</a><ul><li><a href=#21-compile-image-and-dtbs>2.1. compile Image and dtbs</a><li><a href=#22-optional-use-binary>2.2. (optional) use binary</a><ul><li><a href=#221-gentoo>2.2.1. gentoo</a><ul><li><a href=#2221-alarm>2.2.2.1. 获取 alarm 内核产物</a><li><a href=#2222-gentoo-stage3>2.2.2.2. gentoo stage3</a></ul><li><a href=#222-alarm>2.2.2. alarm</a></ul></ul><li><a href=#3-extlinux>3. extlinux</a><li><a href=#4-start>4. start</a></ul></div><h1 id=0-boot>0. boot</h1><p>boot 有两种方法<ul><li><a href=#00-compile-uboot>从头编译uboot</a><li><a href=#01-optional-retrieve-armbian-boot>拿来主义：巧得二进制</a></ul><h2 id=00-compile-uboot>0.0. compile uboot</h2><div class=highlight><pre><span></span><code>git<span class=w> </span>clone<span class=w> </span>--depth<span class=o>=</span><span class=m>1</span><span class=w> </span>https://github.com/u-boot/u-boot
+git<span class=w> </span>clone<span class=w> </span>--depth<span class=w> </span><span class=m>1</span><span class=w> </span>https://github.com/rockchip-linux/rkbin.git
+</code></pre></div><p>把 rk322xh_bl31_v1.49.elf 和 rk3328_ddr_400MHz_V1.21.bin 拿出来<div class=highlight><pre><span></span><code><span class=c1># 这里放到了 u-boot 里面</span>
+mkdir<span class=w> </span>u-boot/external.rockchip
+cp<span class=w> </span>rkbin/bin/rk33/<span class=o>{</span>rk322xh_bl31_v1.49.elf,rk3328_ddr_400MHz_V1.21.bin<span class=o>}</span><span class=w> </span><span class=se>\</span>
+<span class=w>    </span>u-boot/external.rockchip
+</code></pre></div><p>这两个环境变量很重要，否则无法编译成功<div class=highlight><pre><span></span><code><span class=nb>cd</span><span class=w> </span>u-boot/
+<span class=nb>export</span><span class=w> </span><span class=nv>BL31</span><span class=o>=</span>./external.rockchip/rk322xh_bl31_v1.49.elf
+<span class=nb>export</span><span class=w> </span><span class=nv>ROCKCHIP_TPL</span><span class=o>=</span>./external.rockchip/rk3328_ddr_400MHz_v1.21.bin
+</code></pre></div><p>根据文件 configs/roc-cc-rk3328_defconfig<div class=highlight><pre><span></span><code>make<span class=w> </span>roc-cc-rk3328_defconfig
+</code></pre></div><p>u-boot 现在需要 as 等工具，所以只能暂且使用 crossdev<div class=highlight><pre><span></span><code>doas<span class=w> </span>crossdev<span class=w> </span>--stage2<span class=w> </span>--target<span class=w> </span>aarch64-unknown-linux-gnu
+</code></pre></div><p>如此这般就获得了 aarch64-unknown-linux-gnu- 系列的工具<p>编译之前请检查 pyelftools，gentoo 可以通过 app-misc/paxutils python 避免增加 world 条目 否则不会产生 u-boot.itb，且会报错如下：<blockquote><p>Wrote map file './simple-bin.map' to show errors binman: Node '/binman/simple-bin/fit': subnode 'images/@atf-SEQ': Failed to read ELF file: Python: No module named 'elftools'</blockquote><p>最后编译如下：<div class=highlight><pre><span></span><code>make<span class=w> </span><span class=nv>HOSTCC</span><span class=o>=</span>clang<span class=w> </span><span class=nv>LLVM</span><span class=o>=</span><span class=m>1</span><span class=w> </span><span class=nv>CROSS_COMPILE</span><span class=o>=</span>aarch64-unknown-linux-gnu-<span class=w> </span><span class=nv>CC</span><span class=o>=</span>clang<span class=w> </span>-j10
+</code></pre></div><p>获得了 <strong>idbloader.img</strong> 和 <strong>u-boot.itb</strong>。<h2 id=01-optional-retrieve-armbian-boot>0.1. (optional) retrieve armbian boot</h2><p>首先获取 <a href=https://mirrors.bfsu.edu.cn/armbian-releases/renegade/archive>armbian renegade noble</a><blockquote><p>Noble Ubuntu 24.04 LTS<br> Resolute Ubuntu 26.04<br> Trixie Debian 13<br> <em>help yourself</em></blockquote><p>可以拿出固件部分，也可以直接 pipe 到 of=/dev/sdX<div class=highlight><pre><span></span><code>xz<span class=w> </span>-d<span class=w> </span>-c<span class=w> </span>./Armbian_26.2.1_Renegade_noble_current_6.18.8_minimal.img.xz<span class=w> </span><span class=se>\</span>
+<span class=w>    </span><span class=p>|</span><span class=w> </span>doas<span class=w> </span>dd<span class=w> </span><span class=nv>of</span><span class=o>=</span>rk3328_boot.bin<span class=w> </span><span class=nv>bs</span><span class=o>=</span><span class=m>512</span><span class=w> </span><span class=nv>count</span><span class=o>=</span><span class=m>32768</span>
+</code></pre></div><h1 id=1-flash-your-card>1. flash your card</h1><p>初始化 tf 卡，数据无价，谨慎操作！<div class=highlight><pre><span></span><code>doas<span class=w> </span>fdisk<span class=w> </span>/dev/sdb
+g<span class=w> </span><span class=c1># new GPT disklabel</span>
+w<span class=w> </span><span class=c1># write</span>
+q<span class=w> </span><span class=c1># quit</span>
+</code></pre></div><p>为 /dev/sdX 设备 dd 写入 固件分区<div class=highlight><pre><span></span><code>doas<span class=w> </span>dd<span class=w> </span><span class=k>if</span><span class=o>=</span>./rk3328_boot.bin<span class=w> </span><span class=nv>of</span><span class=o>=</span>/dev/sdb<span class=w> </span><span class=nv>bs</span><span class=o>=</span><span class=m>512</span><span class=w> </span><span class=nv>count</span><span class=o>=</span><span class=m>32768</span><span class=w> </span><span class=nv>status</span><span class=o>=</span>progress
+</code></pre></div><p>接着重建 gpt 分区表<p><strong>不要 remove 现存 ext4 signature</strong><div class=highlight><pre><span></span><code>doas<span class=w> </span>fdisk<span class=w> </span>/dev/sdb
+g<span class=w> </span><span class=c1># new GPT disklabel</span>
+n<span class=w> </span><span class=c1># 创建新分区</span>
+<span class=m>1</span><span class=w> </span><span class=c1># 分区号默认是1</span>
+<span class=m>32768</span><span class=w> </span><span class=c1>#        重要！ 从 16M （512kb/扇区 x 32768 扇区）处开始</span>
+回车<span class=w> </span><span class=c1># 扩展到最后</span>
+n<span class=w> </span><span class=c1>#           重要！ 不要擦除 signature</span>
+w<span class=w> </span><span class=c1># write</span>
+q<span class=w> </span><span class=c1># quit</span>
+</code></pre></div><p>最后 mkfs<div class=highlight><pre><span></span><code>doas<span class=w> </span>mkfs.ext4<span class=w> </span>/dev/sdb1
+<span class=c1># 如果寻求更高性能，且无需 log，可 doas mkfs.ext4 -O ^has_journal /dev/sdb1</span>
+</code></pre></div><blockquote><p>请忽略此处<br> 如果直接 dd 某 img，那么此处可能需要这些指令。<p>doas e2fsck -f /dev/sdb1<br> doas resize2fs /dev/sdb1</blockquote><h1 id=2-kernel>2. kernel</h1><p>类似的，kernel 也有两种方法<ul><li><a href=#21-compile-image-and-dtbs>编译 Image dtbs from scratch</a><li><a href=#22-optional-use-binary>拿来主义：获得现成发行产物</a></ul><h2 id=21-compile-image-and-dtbs>2.1. compile Image and dtbs</h2><p>copy gentoo-sources to your workspace<div class=highlight><pre><span></span><code>make<span class=w> </span><span class=nv>ARCH</span><span class=o>=</span>arm64<span class=w> </span>defconfig
+make<span class=w> </span><span class=nv>ARCH</span><span class=o>=</span>arm64<span class=w> </span>menuconfig
+</code></pre></div><p>然后 platforms 只保留 rockchip platforms<p>再按照需求 disable 某些特性，例如 virtualization 和无用的驱动<div class=highlight><pre><span></span><code>make<span class=w> </span><span class=nv>ARCH</span><span class=o>=</span>arm64<span class=w> </span><span class=nv>LLVM</span><span class=o>=</span><span class=m>1</span><span class=w> </span><span class=nv>LLVM_IAS</span><span class=o>=</span><span class=m>0</span><span class=w> </span><span class=se>\</span>
+<span class=w>     </span><span class=nv>CROSS_COMPILE</span><span class=o>=</span>aarch64-unknown-linux-gnu-<span class=w> </span><span class=se>\</span>
+<span class=w>     </span>-j<span class=k>$(</span>nproc<span class=k>)</span><span class=w> </span><span class=se>\</span>
+<span class=w>     </span>Image<span class=w> </span>dtbs<span class=w> </span>modules
+</code></pre></div><p>然后 arch/arm64/boot 处获得 Image 和 .../dts/rockchip/rk3328-roc-cc.dtb<p>再安装 modules<div class=highlight><pre><span></span><code>doas<span class=w> </span>make<span class=w> </span><span class=nv>ARCH</span><span class=o>=</span>arm64<span class=w> </span><span class=nv>INSTALL_MOD_PATH</span><span class=o>=</span>/mnt<span class=w> </span>modules_install
+</code></pre></div><p>如果需要 initramfs，除了 menuconfig 中麻烦配置。<p>还可以通过 systemd-nspawn 异构 chroot 中 mkinitcpio<blockquote><p>ls /lib/modules<br> 6.19.11-1-aarch64-ARCH 7.0.1-gentoo</blockquote><div class=highlight><pre><span></span><code>mkinitcpio<span class=w> </span>-k<span class=w> </span><span class=m>7</span>.0.1-gentoo<span class=w> </span>-g<span class=w> </span>initramfs-gentoo.img
+</code></pre></div><p>然后把产物放在 /boot 中并修改 extlinux.conf<h2 id=22-optional-use-binary>2.2. (optional) use binary</h2><p>根据你的发行版偏好要求<ul><li><a href=#221-gentoo>gentoo</a><li><a href=#222-alarm>archlinux</a></ul><h3 id=221-gentoo>2.2.1. gentoo</h3><h4 id=2221-alarm>2.2.2.1. 获取 alarm 内核产物</h4><p>选择镜像 <a href=https://mirrors.bfsu.edu.cn/archlinuxarm/os/>bfsu mirror</a> 获得 ArchLinuxArm-aarch64-latest.tar.gz ， 并解压出 boot<div class=highlight><pre><span></span><code>tar<span class=w> </span>xpfv<span class=w> </span>ArchLinuxArm-aarch64-latest.tar.gz<span class=w> </span>./boot
+<span class=c1># 复制 boot 的 Image initramfs-linux.img dtbs/rockchip/rk3328-roc-cc.dtb</span>
+cp<span class=w> </span>./boot/<span class=o>{</span>Image,initramfs-linux.img,dtbs/rockchip/rk3328-roc-cc.dtb<span class=o>}</span><span class=w> </span>/mnt
+</code></pre></div><p>另外要把 arch rootfs 里面的 modules 拷贝过去<div class=highlight><pre><span></span><code>tar<span class=w> </span>xpfv<span class=w> </span>ArchLinuxArm-aarch64-latest.tar.gz<span class=w> </span>./usr/lib/modules
+</code></pre></div><h4 id=2222-gentoo-stage3>2.2.2.2. gentoo stage3</h4><p>grab gentoo stage3 files<p>选择镜像 <a href=https://mirrors.bfsu.edu.cn/gentoo/releases>bfsu mirror</a> 获得 gentoo arm64 的 current-stage3-arm64-systemd 的 tar.xz 文件。<p>此处记得挂载分区到 /mnt，以 gentoo 之方式解压 stage3<div class=highlight><pre><span></span><code>doas<span class=w> </span>tar<span class=w> </span>xfpv<span class=w> </span>stage3-*.tar.xz<span class=w> </span>--xattrs-include<span class=o>=</span><span class=s1>'*.*'</span><span class=w> </span>--numeric-owner<span class=w> </span>-C<span class=w> </span>/mnt
+</code></pre></div><h3 id=222-alarm>2.2.2. alarm</h3><p>当然，如果想避免麻烦，直接 archlinux arm 最为简洁。<div class=highlight><pre><span></span><code>doas<span class=w> </span>bsdtar<span class=w> </span>-xpf<span class=w> </span>./ArchLinuxARM-aarch64-latest.tar.gz<span class=w> </span>-C<span class=w> </span>/mnt
+</code></pre></div><h1 id=3-extlinux>3. extlinux</h1><div class=highlight><pre><span></span><code><span class=nb>cd</span><span class=w> </span>/mnt/boot
+doas<span class=w> </span>mkdir<span class=w> </span>extlinux
+<span class=nb>cd</span><span class=w> </span>extlinux
+doas<span class=w> </span>tee<span class=w> </span>extlinux.conf<span class=w> </span><span class=s>&lt;&lt; EOF</span>
+<span class=s>label gentoo</span>
+<span class=s>    kernel /boot/Image</span>
+<span class=s>    initrd /boot/initramfs-linux.img</span>
+<span class=s>    fdt /boot/dtbs/rockchip/rk3328-roc-cc.dtb</span>
+<span class=s>    append root=PARTUUID=$(blkid /dev/sdb1) rw rootwait console=ttyS2,1500000</span>
+<span class=s>    # 除了 /boot 下对应的文件，切记 PARTUUID 和 UUID 的辨析。</span>
+<span class=s>EOF</span>
+</code></pre></div><h1 id=4-start>4. start</h1><p>BOOM! 成功启动</div>
