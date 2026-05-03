@@ -1,6 +1,6 @@
 <!doctype html><title>
 Nearest Neighbor Classfier
-    </title><meta charset=utf-8><meta content="width=device-width" initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><link href=/theme/css/pygments.css rel=stylesheet><body><h1>Nearest Neighbor Classfier</h1> 2020-09-26 16:23 <hr><div class=article-content><p>首先需要<a href=http://www.cs.toronto.edu/~kriz/cifar.html>下载cifar-10数据集</a><p>然后将训练集的 6 个batch合并到一个数组中去，程序如下：<div class=highlight><pre><span></span><code><span class=c1># cifar-10数据集的保存格式， 需要pickle解码</span>
+    </title><meta charset=utf-8><meta content="width=device-width" initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><link href=/theme/css/pygments.css rel=stylesheet><link href=/files/favicon.ico rel=icon type=image/x-icon><body><h1>Nearest Neighbor Classfier</h1> 2020-09-26 16:23 <hr><div class=article-content><p>首先需要<a href=http://www.cs.toronto.edu/~kriz/cifar.html>下载cifar-10数据集</a><p>然后将训练集的 6 个batch合并到一个数组中去，程序如下：<div class=highlight><pre><span></span><code><span class=c1># cifar-10数据集的保存格式， 需要pickle解码</span>
 <span class=kn>import</span><span class=w> </span><span class=nn>pickle</span>
 <span class=kn>import</span><span class=w> </span><span class=nn>numpy</span><span class=w> </span><span class=k>as</span><span class=w> </span><span class=nn>np</span>
 
