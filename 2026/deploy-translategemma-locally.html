@@ -1,0 +1,101 @@
+<!doctype html><title>
+Deploy TranslateGemma Locally
+    </title><meta charset=utf-8><meta content="width=device-width" initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><link href=/theme/css/pygments.css rel=stylesheet><link href=/files/favicon.ico rel=icon type=image/x-icon><body><h1>Deploy TranslateGemma Locally</h1> 2026-05-06 22:05 <hr><div class=article-content><div class=toc><ul><li><a href=#0-llamacpp>0. llama.cpp</a><li><a href=#1-llama-translatorservice>1. llama-translator.service</a><li><a href=#2-jinja-template>2. jinja template</a><li><a href=#3-for-immersivetrans>3. for ImmersiveTrans</a><li><a href=#deprecated-ver-lmstudio>(deprecated ver). lmstudio</a></ul></div><h2 id=0-llamacpp>0. llama.cpp</h2><p>gentoo 若要启用 <code>--cache-type-k q8_0</code> 特性，请增加 AMDGPU_TARGETS<div class=highlight><pre><span></span><code><span class=gh>#</span> 6750gre 12g 是 gfx1031，但是某些特性依赖 gfx1030
+AMDGPU_TARGETS="gfx1031 gfx1030"
+</code></pre></div><h2 id=1-llama-translatorservice>1. llama-translator.service</h2><p>edit <code>~/.config/systemd/user/llama-translator.service</code><div class=highlight><pre><span></span><code><span class=k>[Unit]</span>
+<span class=na>Description</span><span class=o>=</span><span class=s>llama.cpp translation service</span>
+<span class=na>After</span><span class=o>=</span><span class=s>network.target</span>
+
+<span class=k>[Service]</span>
+<span class=na>Type</span><span class=o>=</span><span class=s>simple</span>
+
+<span class=c1># 工作目录（模型和脚本都在这里）</span>
+<span class=na>WorkingDirectory</span><span class=o>=</span><span class=s>%h/.llm.models/translategemma-4b-it</span>
+
+<span class=c1># 环境变量（避免写死路径）</span>
+<span class=na>Environment</span><span class=o>=</span><span class=s>"MODEL=translategemma-4b-it"</span>
+<span class=c1># 如果要用到 --cache-type-k 等特性，需要 uncomment 以下</span>
+<span class=c1># Environment="HSA_OVERRIDE_GFX_VERSION=10.3.0"</span>
+
+<span class=c1># 启动命令</span>
+<span class=na>ExecStart</span><span class=o>=</span><span class=s>/usr/bin/llama-server </span>\
+<span class=w>  </span><span class=s>--model ${MODEL}.q4_k_s.gguf </span>\
+<span class=w>  </span><span class=s>--host 0.0.0.0 </span>\
+<span class=w>  </span><span class=s>--port 1234 </span>\
+<span class=w>  </span><span class=s>--sleep-idle-seconds 300 </span>\
+<span class=w>  </span><span class=s>--kv-unified </span>\
+<span class=w>  </span><span class=s>--parallel 8 </span>\
+<span class=w>  </span><span class=s>--ctx-size 4096 </span>\
+<span class=w>  </span><span class=s>--temperature 0.1 </span>\
+<span class=w>  </span><span class=s>--jinja </span>\
+<span class=w>  </span><span class=s>--chat-template-file en_zh_translate.jinja </span>\
+
+<span class=c1># --metrics \</span>
+<span class=c1># --verbose</span>
+
+<span class=c1># 自动重启</span>
+<span class=c1># Restart=always</span>
+<span class=c1># RestartSec=2</span>
+
+<span class=c1># 日志直接进 journald</span>
+<span class=na>StandardOutput</span><span class=o>=</span><span class=s>journal</span>
+<span class=na>StandardError</span><span class=o>=</span><span class=s>journal</span>
+
+<span class=c1># 可选：限制资源（建议加）</span>
+<span class=c1># MemoryMax=8G</span>
+<span class=c1># CPUQuota=200%</span>
+
+<span class=k>[Install]</span>
+<span class=na>WantedBy</span><span class=o>=</span><span class=s>default.target</span>
+</code></pre></div><h2 id=2-jinja-template>2. jinja template</h2><p><code>~/.llm.models/translategemma-4b-it/en_zh_translate.jinja</code><div class=highlight><pre><span></span><code><span class=cp>{{</span> <span class=nv>bos_token</span> -<span class=cp>}}</span>
+<span class=x>&lt;start_of_turn>user</span>
+<span class=x>You are a professional English (en) to Chinese (zh-CN) translator.</span>
+<span class=x>Your goal is to accurately convey the meaning and nuances of the original English text while adhering to Chinese grammar, vocabulary, and cultural sensitivities.</span>
+
+<span class=x># Translation Rules</span>
+<span class=x>1. Produce only the translated text. Do not include any tags, explanations, or quotes.</span>
+<span class=x>2. Do not translate URLs, code, units, proper nouns unless necessary.</span>
+<span class=x>3. Maintain the original paragraph structure and format.</span>
+<span class=x>4. If the text contains HTML tags, maintain their appropriate placement in the translation.</span>
+
+<span class=x># Text to be translated:</span>
+<span class=cp>{{</span> <span class=o>(</span><span class=nv>messages</span> <span class=o>|</span> <span class=nf>last</span><span class=o>)</span><span class=nv>.content</span> <span class=o>|</span> <span class=nf>trim</span>  <span class=cp>}}</span>
+<span class=x>&lt;end_of_turn></span>
+<span class=x>&lt;start_of_turn>model</span>
+</code></pre></div><h2 id=3-for-immersivetrans>3. for ImmersiveTrans</h2><p>沉浸式翻译有三个 prompt<ul><li>system prompt<li>multi-paragraph prompt<li>single-paragraph prompt</ul><p>既然我们已经在 llama-server 的 jinja 指定了 system prompt，<strong>此处留空</strong>。<p>对于 multi-paragraph prompt：<ul><li>1.可以手动制定 %% 为分隔符</ul><div class=highlight><pre><span></span><code><span class=x>Translate these paragraphs using %% as separator:</span>
+<span class=cp>{{</span><span class=nv>text</span><span class=cp>}}</span>
+</code></pre></div><ul><li>2.也可直接传入原段落，问题不大</ul><div class=highlight><pre><span></span><code><span class=cp>{{</span><span class=nv>text</span><span class=cp>}}</span>
+</code></pre></div><p>对于 single-paragraph prompt 同样只保留 <code>{{text}}</code> 即可。<p><strong>值得注意的是！多/单段提示词必须至少保留 {{text}}，不然就会输出 Lorem</strong><div class=highlight><pre><span></span><code>敏捷的狐狸跳过...
+我能够吞下玻璃...
+</code></pre></div><p>由于 llama-server 制定了 <code>--parallel 8</code>，我们可以设置<p><code>每秒最大请求数2 x 每次请求最大段落数4 = parallel 8</code><h2 id=deprecated-ver-lmstudio>(deprecated ver). lmstudio</h2><p>提示词来自<a href=https://ollama.com/library/translategemma>这里</a><p>concise version<div class=highlight><pre><span></span><code><span class=cp>{{</span> <span class=nv>bos_token</span> <span class=cp>}}</span>
+<span class=x>&lt;start_of_turn>user</span>
+<span class=x>You are an English to Chinese translator.</span>
+<span class=x>Translate accurately and naturally.</span>
+<span class=x>Only output the translation. No explanations.</span>
+
+<span class=cp>{{</span> <span class=nv>messages</span><span class=o>[-</span><span class=m>1</span><span class=o>][</span><span class=s2>"content"</span><span class=o>]</span> <span class=o>|</span> <span class=nf>trim</span> <span class=cp>}}</span>
+<span class=x>&lt;end_of_turn></span>
+<span class=x>&lt;start_of_turn>model</span>
+</code></pre></div><p>ChatGPT 分离了 Template 和 Prompt<p>Template<div class=highlight><pre><span></span><code><span class=cp>{{</span> <span class=nv>bos_token</span> <span class=cp>}}</span>
+<span class=cp>{%</span> <span class=k>for</span> <span class=nv>message</span> <span class=k>in</span> <span class=nv>messages</span> <span class=cp>%}</span>
+<span class=x>&lt;start_of_turn></span><span class=cp>{{</span> <span class=nv>message</span><span class=o>[</span><span class=s1>'role'</span><span class=o>]</span> <span class=cp>}}</span>
+<span class=cp>{{</span> <span class=nv>message</span><span class=o>[</span><span class=s1>'content'</span><span class=o>]</span> <span class=cp>}}</span>
+<span class=x>&lt;end_of_turn></span>
+<span class=cp>{%</span> <span class=k>endfor</span> <span class=cp>%}</span>
+<span class=x>&lt;start_of_turn>model</span>
+</code></pre></div><p>Prompt<div class=highlight><pre><span></span><code><span class=nv>You</span><span class=w> </span><span class=nv>are</span><span class=w> </span><span class=nv>a</span><span class=w> </span><span class=nv>professional</span><span class=w> </span><span class=nv>English</span><span class=w> </span><span class=ss>(</span><span class=nv>en</span><span class=ss>)</span><span class=w> </span><span class=nv>to</span><span class=w> </span><span class=nv>Chinese</span><span class=w> </span><span class=ss>(</span><span class=nv>zh</span><span class=o>-</span><span class=nv>Hans</span><span class=ss>)</span><span class=w> </span><span class=nv>translator</span>.
+<span class=nv>Your</span><span class=w> </span><span class=nv>goal</span><span class=w> </span><span class=nv>is</span><span class=w> </span><span class=nv>to</span><span class=w> </span><span class=nv>accurately</span><span class=w> </span><span class=nv>convey</span><span class=w> </span><span class=nv>the</span><span class=w> </span><span class=nv>meaning</span><span class=w> </span><span class=nv>and</span><span class=w> </span><span class=nv>nuances</span><span class=w> </span><span class=nv>of</span><span class=w> </span><span class=nv>the</span><span class=w> </span><span class=nv>original</span><span class=w> </span><span class=nv>English</span><span class=w> </span><span class=nv>text</span><span class=w> </span><span class=k>while</span><span class=w> </span><span class=nv>adhering</span><span class=w> </span><span class=nv>to</span><span class=w> </span><span class=nv>Chinese</span><span class=w> </span><span class=nv>grammar</span>,<span class=w> </span><span class=nv>vocabulary</span>,<span class=w> </span><span class=nv>and</span><span class=w> </span><span class=nv>cultural</span><span class=w> </span><span class=nv>sensitivities</span>.
+<span class=nv>Produce</span><span class=w> </span><span class=nv>only</span><span class=w> </span><span class=nv>the</span><span class=w> </span><span class=nv>Chinese</span><span class=w> </span><span class=nv>translation</span>,<span class=w> </span><span class=nv>without</span><span class=w> </span><span class=nv>any</span><span class=w> </span><span class=nv>additional</span><span class=w> </span><span class=nv>explanations</span><span class=w> </span><span class=nv>or</span><span class=w> </span><span class=nv>commentary</span>.
+<span class=nv>Please</span><span class=w> </span><span class=nv>translate</span><span class=w> </span><span class=nv>the</span><span class=w> </span><span class=nv>following</span><span class=w> </span><span class=nv>English</span><span class=w> </span><span class=nv>text</span><span class=w> </span><span class=nv>into</span><span class=w> </span><span class=nv>Chinese</span>:
+</code></pre></div><p>从<a href=https://note.com/zimo/n/n02e7f10fc70d>zimo</a>学习到的<div class=highlight><pre><span></span><code><span class=cp>{{</span> <span class=nv>bos_token</span> <span class=cp>}}</span>
+<span class=cp>{%</span> <span class=k>for</span> <span class=nv>message</span> <span class=k>in</span> <span class=nv>messages</span> <span class=cp>%}</span>
+<span class=cp>{%</span> <span class=k>if</span> <span class=nv>message</span><span class=o>[</span><span class=s1>'role'</span><span class=o>]</span> <span class=o>==</span> <span class=s1>'user'</span> <span class=cp>%}</span>
+<span class=cp>{{</span> <span class=s1>'&lt;start_of_turn>user\n'</span> <span class=o>+</span> <span class=nv>message</span><span class=o>[</span><span class=s1>'content'</span><span class=o>]</span> <span class=o>+</span> <span class=s1>'&lt;end_of_turn>\n'</span> <span class=cp>}}</span>
+<span class=cp>{%</span> <span class=k>elif</span> <span class=nv>message</span><span class=o>[</span><span class=s1>'role'</span><span class=o>]</span> <span class=o>==</span> <span class=s1>'model'</span> <span class=cp>%}</span>
+<span class=cp>{{</span> <span class=s1>'&lt;start_of_turn>model\n'</span> <span class=o>+</span> <span class=nv>message</span><span class=o>[</span><span class=s1>'content'</span><span class=o>]</span> <span class=o>+</span> <span class=s1>'&lt;end_of_turn>\n'</span> <span class=cp>}}</span>
+<span class=cp>{%</span> <span class=k>endif</span> <span class=cp>%}</span>
+<span class=cp>{%</span> <span class=k>endfor</span> <span class=cp>%}</span>
+<span class=cp>{%</span> <span class=k>if</span> <span class=nv>add_generation_prompt</span> <span class=cp>%}</span>
+<span class=cp>{{</span> <span class=s1>'&lt;start_of_turn>model\n'</span> <span class=cp>}}</span>
+<span class=cp>{%</span> <span class=k>endif</span> <span class=cp>%}</span>
+</code></pre></div></div>

@@ -12,6 +12,15 @@ TranslateGemma on LMStudio
 <span class=cp>{{</span> <span class=nv>messages</span><span class=o>[-</span><span class=m>1</span><span class=o>][</span><span class=s2>"content"</span><span class=o>]</span> <span class=o>|</span> <span class=nf>trim</span> <span class=cp>}}</span>
 <span class=x>&lt;end_of_turn></span>
 <span class=x>&lt;start_of_turn>model</span>
+</code></pre></div><p>concise and final version<div class=highlight><pre><span></span><code><span class=cp>{{</span> <span class=nv>bos_token</span> <span class=cp>}}</span>
+<span class=x>&lt;start_of_turn>user</span>
+<span class=x>You are an English to Chinese translator.</span>
+<span class=x>Translate accurately and naturally.</span>
+<span class=x>Only output the translation. No explanations.</span>
+
+<span class=cp>{{</span> <span class=nv>messages</span><span class=o>[-</span><span class=m>1</span><span class=o>][</span><span class=s2>"content"</span><span class=o>]</span> <span class=o>|</span> <span class=nf>trim</span> <span class=cp>}}</span>
+<span class=x>&lt;end_of_turn></span>
+<span class=x>&lt;start_of_turn>model</span>
 </code></pre></div><h2 id=1-chatgpt-ver>1. ChatGPT Ver</h2><p>ChatGPT 分离了 Template 和 Prompt<p>Template<div class=highlight><pre><span></span><code><span class=cp>{{</span> <span class=nv>bos_token</span> <span class=cp>}}</span>
 <span class=cp>{%</span> <span class=k>for</span> <span class=nv>message</span> <span class=k>in</span> <span class=nv>messages</span> <span class=cp>%}</span>
 <span class=x>&lt;start_of_turn></span><span class=cp>{{</span> <span class=nv>message</span><span class=o>[</span><span class=s1>'role'</span><span class=o>]</span> <span class=cp>}}</span>
