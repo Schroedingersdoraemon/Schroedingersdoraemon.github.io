@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Random Gibberish - 2024</title><link href="https://dylanz.site/" rel="alternate"/><link href="https://dylanz.site/feeds/2024.atom.xml" rel="self"/><id>https://dylanz.site/</id><updated>2024-12-14T00:16:00+08:00</updated><entry><title>Dark Souls 2 Custom Server</title><link href="https://dylanz.site/2024/dark-souls-2-custom-server.html" rel="alternate"/><published>2024-12-14T00:16:00+08:00</published><updated>2024-12-14T00:16:00+08:00</updated><author><name>Big Pineapple</name></author><id>tag:dylanz.site,2024-12-14:/2024/dark-souls-2-custom-server.html</id><summary type="html">
+&lt;div class="section" id="intro"&gt;
+&lt;h2&gt;0. intro&lt;/h2&gt;
+&lt;p&gt;bearer of the curse...&lt;/p&gt;
+&lt;p&gt;受制于网络问题，我和另一位游魂的联机不是很流畅&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;客户端 &amp;lt;==&amp;gt; 服 …&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="contents topic" id="topic-1"&gt;
+&lt;p class="topic-title"&gt;&lt;a class="reference internal" href="#top"&gt;目录&lt;/a&gt;&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#intro" id="toc-entry-1"&gt;0. intro&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#my-download-mcdonald" id="toc-entry-2"&gt;1. My Download != McDonald&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#steamcmd" id="toc-entry-3"&gt;2. steamcmd&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#server-config" id="toc-entry-4"&gt;3. server config&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#further-config" id="toc-entry-5"&gt;4. further config&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#play" id="toc-entry-6"&gt;4. Play!&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="intro"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-1"&gt;0. intro&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;bearer of the curse...&lt;/p&gt;
+&lt;p&gt;受制于网络问题，我和另一位游魂的联机不是很流畅&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;客户端 &amp;lt;==&amp;gt; 服务器：画符出现的速度
+客户端 &amp;lt;==&amp;gt; 客户端：与好友的p2p联机延迟
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;于是自建了服务器。最近服务器快到期了，所以记录一下自建
+服务器的流程。&lt;/p&gt;
+&lt;p&gt;首先来到 &lt;a class="reference external" href="https://github.com/TLeonardUK/ds3os"&gt;github.com/TLeonardUK/ds3os 这个项目&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;这个项目是黑魂2（原罪学者）和黑魂3游戏服务器的开源实现，可在线mod而不被ban&lt;/p&gt;
+&lt;p&gt;另外只支持正版，因为需要校验steam&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="my-download-mcdonald"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-2"&gt;1. My Download != McDonald&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;来到 &lt;a class="reference external" href="https://github.com/TLeonardUK/ds3os/releases"&gt;github releases&lt;/a&gt;
+复制 linux.zip 下载链接&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;如果只希望连接到他人服务器，只下载 windows.zip 即可&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;ssh 到服务器上，使用 &lt;em&gt;wget&lt;/em&gt; 或者其他工具下载&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;wget&lt;span class="w"&gt; &lt;/span&gt;https://github.com/TLeonardUK/ds3os/releases/download/v0.42.0.0-main/linux.zip
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;创建文件夹存放相关数据，这里命名为 &lt;strong&gt;ds2.server&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;mkdir&lt;span class="w"&gt; &lt;/span&gt;ds2.server
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;将下载的压缩包解压到 ds2.server 文件夹&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;unzip&lt;span class="w"&gt; &lt;/span&gt;linux.zip&lt;span class="w"&gt; &lt;/span&gt;-d&lt;span class="w"&gt; &lt;/span&gt;ds2.server
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;进入到 ds2.server 文件夹&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;ds2.server
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;里面的Server目录下有&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;（暂不）可执行文件 Server
+WebUI/
+libsteam_api.so
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="steamcmd"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-3"&gt;2. steamcmd&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;来到 &lt;a class="reference external" href="https://developer.valvesoftware.com/wiki/SteamCMD"&gt;valve 开发者wiki的steamcmd页面&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;下载 steamcmd，如果是 ubuntu 就执行下面，其他发行版就看对应的方法&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;add-apt-repository&lt;span class="w"&gt; &lt;/span&gt;multiverse&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;dpkg&lt;span class="w"&gt; &lt;/span&gt;--add-architecture&lt;span class="w"&gt; &lt;/span&gt;i386&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;apt&lt;span class="w"&gt; &lt;/span&gt;update
+sudo&lt;span class="w"&gt; &lt;/span&gt;apt&lt;span class="w"&gt; &lt;/span&gt;install&lt;span class="w"&gt; &lt;/span&gt;steamcmd
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;运行 &lt;em&gt;steamcmd&lt;/em&gt; 进入到 steam 命令行环境中&lt;/p&gt;
+&lt;p&gt;设置游戏服务器路径为 ds2.server&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;force_install_dir&lt;span class="w"&gt; &lt;/span&gt;~/ds2.server
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;随后登录 steam，匿名登录即可&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;login&lt;span class="w"&gt; &lt;/span&gt;anonymous
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;输入quit退出steam环境&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="server-config"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-4"&gt;3. server config&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;进入到 ds2.server 下的 Server 目录，为 Server 文件增加可执行属性&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;ds2.server/Server
+chmod&lt;span class="w"&gt; &lt;/span&gt;+x&lt;span class="w"&gt; &lt;/span&gt;./Server
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;./Server 运行 Server 文件，会提示下面的报错&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;./Server: error while loading shared libraries: libsteam_api.so:
+cannot open shared object file: no such file or directory
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;不难注意到，Server 目录下除了可执行文件 Server，还有这个缺少的 libsteam_api.so&lt;/p&gt;
+&lt;p&gt;所以我们可以通过&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;export&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;LD_LIBRARY_PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$LD_LIBRARY_PATH&lt;/span&gt;:&lt;span class="nv"&gt;$HOME&lt;/span&gt;/ds2.server/Server
+&lt;span class="c1"&gt;# 后面会有更自动化的方法，这个命令只对当前会话有效&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;然后 ./Server 运行，又会发现另一个错误&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;steamclient.so: cannot open shared obect file: No such file or directory
+dlopen failed trying to load:
+/home/steam/.steam/sdk64/steamclient.so: cannot open shared object file
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;这里 steamclient.so 的位置在另一个地方，所以软链接过来&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;ln&lt;span class="w"&gt; &lt;/span&gt;-s&lt;span class="w"&gt; &lt;/span&gt;~/.local/share/Steam/steamcmd/linux64/steamclient.so&lt;span class="w"&gt; &lt;/span&gt;~/.steam/sdk64/
+&lt;span class="c1"&gt;# 非ubuntu系统 *可能* 并不在 前面这个位置，可以自己找一下&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;然后编辑一下服务器的配置文件 Saved/default/config.json&lt;/p&gt;
+&lt;p&gt;需要编辑的地方&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Header：进服务器时的标题
+Body：标题下面的文字
+ServerName：选择服务器时显示的名字
+ServerDescription：服务器描述
+ServerHostname：服务器公网ip
+Password：服务器密码（可选）
+GameType：默认黑魂3，如果魂2则改为 DarkSouls2
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="further-config"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-5"&gt;4. further config&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;在服务器安全设置中允许 50000～50050 这些端口的 TCP 与 UDP 连接。只用到四个端口，为了方便全都打开。&lt;/p&gt;
+&lt;p&gt;可以用这个 &lt;a class="reference external" href="https://www.yougetsignal.com/tools/open-ports/"&gt;Open Port Check Tool&lt;/a&gt;
+检测端口的开放情况&lt;/p&gt;
+&lt;p&gt;此时运行 ./Server 就没什么问题了，但是每次 export 环境变量都很麻烦，所以我们新建一个运行脚本&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;cd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;~/ds2.server
+
+vim&lt;span class="w"&gt; &lt;/span&gt;run.ds2.server.sh
+&lt;span class="c1"&gt;# 任意编辑器即可，或者 echo、 cat+EOF 等&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;脚本内容如下&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;#!/bin/bash
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/ds2.server/Server
+screen -dm -S ds2.server $HOME/ds2.server/Server/Server
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;这里用到了 GNU 的 screen 来避免当前会话结束后任务被挂起&lt;/p&gt;
+&lt;p&gt;接着 chmod +x ds2.server 赋予可执行权限，然后运行脚本即可&lt;/p&gt;
+&lt;p&gt;可通过 screen -r 查看输出，并通过 control-a d 重新detach任务&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="play"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-6"&gt;4. Play!&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;解压 windows.zip，运行 prerequisite 里面的文件安装环境，
+接着打开 Loader 文件夹中的 Loader.exe，就能看到我们的自定义服务器了！&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;值得注意的是&lt;/strong&gt;，Loader 的存档位置不同于 steam 官方服务器的存档&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Loader存档位置：C:/Users/用户名/AppData/Roaming/DarkSoulsII/一串数字/存档.ds3os
+官方服务器存档位置：...相同路径/存档.sl2
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;可使用 Loader 下方的齿轮图标，打勾复制存档 &lt;strong&gt;数据无价，请注意备份！&lt;/strong&gt;&lt;/p&gt;
+&lt;/div&gt;
+</content><category term="2024"/><category term="game"/></entry><entry><title>Word Power Made Easy</title><link href="https://dylanz.site/2024/word-power-made-easy.html" rel="alternate"/><published>2024-06-25T00:10:00+08:00</published><updated>2024-06-25T00:10:00+08:00</updated><author><name>Big Pineapple</name></author><id>tag:dylanz.site,2024-06-25:/2024/word-power-made-easy.html</id><summary type="html">
+&lt;div class="section" id="personality-types"&gt;
+&lt;h2&gt;1. Personality Types&lt;/h2&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;&lt;strong&gt;ego&lt;/strong&gt;&lt;/dt&gt;
+&lt;dd&gt;&lt;em&gt;Latin&lt;/em&gt; I, self&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p&gt;egoist&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;me first&lt;/p&gt;
+&lt;p&gt;supremely selfish&lt;/p&gt;
+&lt;p&gt;believes in self-advancement&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;egotist&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;the height of conceit, incredibly conceited&lt;/p&gt;
+&lt;p&gt;talks about accomplishments&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;egocentric&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;extreme form of egoist&lt;/p&gt;
+&lt;p&gt;excessively fixated on his own&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;egomaniac&lt;/p&gt;
+&lt;blockquote&gt;
+morbid obsession&lt;/blockquote&gt;
+&lt;hr class="docutils" /&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;&lt;strong&gt;alter&lt;/strong&gt;&lt;/dt&gt;
+&lt;dd&gt;&lt;em&gt;Latin&lt;/em&gt; other&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p&gt;altruist&lt;/p&gt;
+&lt;blockquote&gt;
+concern yourself with …&lt;/blockquote&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="contents topic" id="topic-1"&gt;
+&lt;p class="topic-title"&gt;&lt;a class="reference internal" href="#top"&gt;目录&lt;/a&gt;&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#personality-types" id="toc-entry-1"&gt;1. Personality Types&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="personality-types"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-1"&gt;1. Personality Types&lt;/a&gt;&lt;/h2&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;&lt;strong&gt;ego&lt;/strong&gt;&lt;/dt&gt;
+&lt;dd&gt;&lt;em&gt;Latin&lt;/em&gt; I, self&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p&gt;egoist&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;me first&lt;/p&gt;
+&lt;p&gt;supremely selfish&lt;/p&gt;
+&lt;p&gt;believes in self-advancement&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;egotist&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;the height of conceit, incredibly conceited&lt;/p&gt;
+&lt;p&gt;talks about accomplishments&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;egocentric&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;extreme form of egoist&lt;/p&gt;
+&lt;p&gt;excessively fixated on his own&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;egomaniac&lt;/p&gt;
+&lt;blockquote&gt;
+morbid obsession&lt;/blockquote&gt;
+&lt;hr class="docutils" /&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;&lt;strong&gt;alter&lt;/strong&gt;&lt;/dt&gt;
+&lt;dd&gt;&lt;em&gt;Latin&lt;/em&gt; other&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p&gt;altruist&lt;/p&gt;
+&lt;blockquote&gt;
+concern yourself with the welfare of others&lt;/blockquote&gt;
+&lt;p&gt;altruism&lt;/p&gt;
+&lt;blockquote&gt;
+philosophy of putting another's welfare above one's own&lt;/blockquote&gt;
+&lt;p&gt;alternate&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;v. skip one and take others&lt;/p&gt;
+&lt;p&gt;adj. the &lt;em&gt;other&lt;/em&gt; person&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;alternative&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;em&gt;other&lt;/em&gt; choice&lt;/blockquote&gt;
+&lt;p&gt;alteration&lt;/p&gt;
+&lt;blockquote&gt;
+change&lt;/blockquote&gt;
+&lt;p&gt;altercation&lt;/p&gt;
+&lt;blockquote&gt;
+verbal dispute&lt;/blockquote&gt;
+&lt;p&gt;alter ego&lt;/p&gt;
+&lt;blockquote&gt;
+one's &lt;em&gt;other&lt;/em&gt; self&lt;/blockquote&gt;
+&lt;hr class="docutils" /&gt;
+&lt;p&gt;&lt;strong&gt;verto&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;em&gt;Latin&lt;/em&gt; to turn&lt;/blockquote&gt;
+&lt;p&gt;introvert&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;prefer solitude&lt;/p&gt;
+&lt;p&gt;turns thoughts inward&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;extrovert&lt;/p&gt;
+&lt;blockquote&gt;
+turn thoughts outward&lt;/blockquote&gt;
+&lt;p&gt;ambivert&lt;/p&gt;
+&lt;blockquote&gt;
+turn thoughts both inward and outward&lt;/blockquote&gt;
+&lt;hr class="docutils" /&gt;
+&lt;p&gt;&lt;strong&gt;ambi&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+both&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;dexter&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;em&gt;Latin&lt;/em&gt; right hand&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;droid&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;em&gt;French&lt;/em&gt; right hand&lt;/blockquote&gt;
+&lt;p&gt;adroit, adroitness&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;skillfull and clever&lt;/p&gt;
+&lt;p&gt;quickwitted&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;dexterous&lt;/p&gt;
+&lt;blockquote&gt;
+skillfull&lt;/blockquote&gt;
+&lt;p&gt;ambidextrous, ambidexterity&lt;/p&gt;
+&lt;blockquote&gt;
+able to use both hands with equal skill&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;sinister&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;em&gt;Latin&lt;/em&gt; left hand&lt;/p&gt;
+&lt;p&gt;threatening, evil, dangerous&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;gauche&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;em&gt;French&lt;/em&gt; left hand&lt;/p&gt;
+&lt;p&gt;social awkwardness, clumsiness&lt;/p&gt;
+&lt;p&gt;without fi'nesse&lt;/p&gt;
+&lt;p&gt;n. gaucherie&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;hr class="docutils" /&gt;
+&lt;p&gt;&lt;strong&gt;anthropos&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;em&gt;Greek&lt;/em&gt; mankind&lt;/p&gt;
+&lt;p&gt;phil'anthropy, philanthropist&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;misanthrope&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;cynical&lt;/p&gt;
+&lt;p&gt;hates people&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;misogynist&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;gyne&lt;/strong&gt; woman&lt;/p&gt;
+&lt;p&gt;hates woman&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;gynecologist&lt;/p&gt;
+&lt;blockquote&gt;
+medical specialist who treats femail disorders&lt;/blockquote&gt;
+&lt;p&gt;misogamist&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;gamoes&lt;/strong&gt; marriage&lt;/p&gt;
+&lt;p&gt;hates marriage&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;monogamy&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;mono&lt;/strong&gt; one&lt;/p&gt;
+&lt;p&gt;one marriage at a time&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;bigamy&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;bi&lt;/strong&gt; two&lt;/p&gt;
+&lt;p&gt;the unlawful act of contracting another marriage without divorcing one's
+current legal spouse&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;poly'gamy&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;poly&lt;/strong&gt; many&lt;/p&gt;
+&lt;p&gt;plural marriage for either males or females&lt;/p&gt;
+&lt;p&gt;poly'gyny&lt;/p&gt;
+&lt;p&gt;polyandry&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;strong&gt;andros&lt;/strong&gt; &lt;em&gt;Greek&lt;/em&gt; male&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+&lt;hr class="docutils" /&gt;
+&lt;p&gt;&lt;strong&gt;asketes&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;em&gt;Greek&lt;/em&gt; monk or hermit&lt;/blockquote&gt;
+&lt;p&gt;ascetic&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;austerity&lt;/p&gt;
+&lt;p&gt;abstinence from fleshly, earthly pleasure&lt;/p&gt;
+&lt;p&gt;n. ascet'icism&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;A monk lives a lonely life - not for him the pleasures of the fleshpots,
+the laughter and merriment of convivial gatherings, the dissipations of
+high living. Rather, days of contemplation, study, and rough toil, nights
+on a hard bet in a simple cell, and the kind of self-denial that leads
+to a purification of the soul.
+
+That person is an ascetic who leads an existence, voluntarily of course,
+that compares in austerity, simplicity, and rigorous hardship with the
+life of a monk.
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/blockquote&gt;
+&lt;/div&gt;
+</content><category term="2024"/><category term="English"/></entry></feed>

@@ -1,0 +1,496 @@
+<!doctype html><title>
+network programming: echo server
+    </title><meta charset=utf-8><meta content="width=device-width" initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><link href=/theme/css/pygments.css rel=stylesheet><link href=/files/favicon.ico rel=icon type=image/x-icon><body><h1>network programming: echo server</h1> 2026-05-14 00:31 <hr><div class=article-content><div class=toc><ul><li><a href=#0-intro>0. intro</a><li><a href=#1-echo-client-server>1. 单线程 echo client-server</a><ul><li><a href=#11-echo-server>1.1. echo server</a><li><a href=#12-echo-client>1.2. echo client</a></ul><li><a href=#2-echo-client-server>2. 多进程 echo client-server</a><ul><li><a href=#21-multi-process-echo-server>2.1. multi-process echo server</a><li><a href=#22-multi-process-echo-client>2.2. multi-process echo client</a></ul></ul></div><h1 id=0-intro>0. intro</h1><h1 id=1-echo-client-server>1. 单线程 echo client-server</h1><p>思考再三，不知保留全部还是只 skeleton，暂且先这样吧，且听下回分解。<h2 id=11-echo-server>1.1. echo server</h2><details><summary>为避免代码之纷繁扰乱加了折叠</summary> <div class=highlight><pre><span></span><code><span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;arpa/inet.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;netdb.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;stdbool.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;stddef.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;stdio.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;stdlib.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;string.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;sys/socket.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;sys/types.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;unistd.h></span>
+
+<span class=kt>int</span><span class=w> </span><span class=nf>main</span><span class=p>()</span>
+<span class=p>{</span>
+<span class=w>    </span><span class=c1>// addrinfo: protocol agnostic</span>
+<span class=w>    </span><span class=k>struct</span><span class=w> </span><span class=nc>addrinfo</span><span class=w> </span><span class=n>hints</span><span class=p>,</span><span class=w> </span><span class=o>*</span><span class=n>result</span><span class=p>;</span>
+<span class=w>    </span><span class=n>memset</span><span class=p>(</span><span class=o>&</span><span class=n>hints</span><span class=p>,</span><span class=w> </span><span class=mi>0</span><span class=p>,</span><span class=w> </span><span class=k>sizeof</span><span class=p>(</span><span class=n>hints</span><span class=p>));</span>
+<span class=w>    </span><span class=n>hints</span><span class=p>.</span><span class=n>ai_family</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>AF_UNSPEC</span><span class=p>;</span><span class=w> </span><span class=c1>// ipv4 or ipv6</span>
+<span class=w>    </span><span class=n>hints</span><span class=p>.</span><span class=n>ai_socktype</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>SOCK_STREAM</span><span class=p>;</span>
+<span class=w>    </span><span class=n>hints</span><span class=p>.</span><span class=n>ai_flags</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>AI_PASSIVE</span><span class=p>;</span><span class=w> </span><span class=c1>// assign localhost</span>
+
+<span class=w>    </span><span class=kt>int</span><span class=w> </span><span class=n>res</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>getaddrinfo</span><span class=p>(</span><span class=s>"127.0.0.1"</span><span class=p>,</span><span class=w> </span><span class=s>"3490"</span><span class=p>,</span><span class=w> </span><span class=o>&</span><span class=n>hints</span><span class=p>,</span><span class=w> </span><span class=o>&</span><span class=n>result</span><span class=p>);</span>
+<span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>res</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=mi>0</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=n>fprintf</span><span class=p>(</span><span class=n>stderr</span><span class=p>,</span><span class=w> </span><span class=s>"getaddrinfo: %s</span><span class=se>\n</span><span class=s>"</span><span class=p>,</span><span class=w> </span><span class=n>gai_strerror</span><span class=p>(</span><span class=n>res</span><span class=p>));</span>
+<span class=w>        </span><span class=n>exit</span><span class=p>(</span><span class=n>EXIT_FAILURE</span><span class=p>);</span>
+<span class=w>    </span><span class=p>}</span>
+
+<span class=w>    </span><span class=kt>int</span><span class=w> </span><span class=n>sockfd</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>socket</span><span class=p>(</span><span class=n>result</span><span class=o>-></span><span class=n>ai_family</span><span class=p>,</span>
+<span class=w>        </span><span class=n>result</span><span class=o>-></span><span class=n>ai_socktype</span><span class=p>,</span>
+<span class=w>        </span><span class=n>result</span><span class=o>-></span><span class=n>ai_protocol</span><span class=p>);</span>
+<span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>sockfd</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=mi>-1</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=n>perror</span><span class=p>(</span><span class=s>"socket"</span><span class=p>);</span>
+<span class=w>        </span><span class=n>exit</span><span class=p>(</span><span class=n>EXIT_FAILURE</span><span class=p>);</span>
+<span class=w>    </span><span class=p>}</span>
+
+<span class=w>    </span><span class=n>res</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>bind</span><span class=p>(</span><span class=n>sockfd</span><span class=p>,</span><span class=w> </span><span class=n>result</span><span class=o>-></span><span class=n>ai_addr</span><span class=p>,</span><span class=w> </span><span class=n>result</span><span class=o>-></span><span class=n>ai_addrlen</span><span class=p>);</span>
+<span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>res</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=mi>0</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=n>perror</span><span class=p>(</span><span class=s>"bind"</span><span class=p>);</span>
+<span class=w>        </span><span class=n>exit</span><span class=p>(</span><span class=n>EXIT_FAILURE</span><span class=p>);</span>
+<span class=w>    </span><span class=p>}</span>
+
+<span class=c1>// established yet accepted queue length</span>
+<span class=cp>#define backlog 8</span>
+<span class=w>    </span><span class=n>res</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>listen</span><span class=p>(</span><span class=n>sockfd</span><span class=p>,</span><span class=w> </span><span class=n>backlog</span><span class=p>);</span>
+<span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>res</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=mi>0</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=n>perror</span><span class=p>(</span><span class=s>"listen"</span><span class=p>);</span>
+<span class=w>        </span><span class=n>exit</span><span class=p>(</span><span class=n>EXIT_FAILURE</span><span class=p>);</span>
+<span class=w>    </span><span class=p>}</span>
+
+<span class=w>    </span><span class=c1>// 没有此while，首次client连接断开，server亦会断开</span>
+<span class=w>    </span><span class=k>while</span><span class=w> </span><span class=p>(</span><span class=nb>true</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=k>struct</span><span class=w> </span><span class=nc>sockaddr_storage</span><span class=w> </span><span class=n>peer</span><span class=p>;</span>
+<span class=w>        </span><span class=kt>socklen_t</span><span class=w> </span><span class=n>peer_len</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>sizeof</span><span class=p>(</span><span class=k>struct</span><span class=w> </span><span class=nc>sockaddr_storage</span><span class=p>);</span>
+
+<span class=w>        </span><span class=c1>// grab an established connection from kernel accept Q</span>
+<span class=w>        </span><span class=kt>int</span><span class=w> </span><span class=n>peer_sockfd</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>accept</span><span class=p>(</span><span class=n>sockfd</span><span class=p>,</span><span class=w> </span><span class=p>(</span><span class=k>struct</span><span class=w> </span><span class=nc>sockaddr</span><span class=o>*</span><span class=p>)</span><span class=o>&</span><span class=n>peer</span><span class=p>,</span><span class=w> </span><span class=o>&</span><span class=n>peer_len</span><span class=p>);</span>
+
+<span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>peer_sockfd</span><span class=w> </span><span class=o>&lt;</span><span class=w> </span><span class=mi>0</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>            </span><span class=n>perror</span><span class=p>(</span><span class=s>"accept"</span><span class=p>);</span>
+<span class=w>            </span><span class=c1>// continue;</span>
+<span class=w>            </span><span class=n>exit</span><span class=p>(</span><span class=n>EXIT_FAILURE</span><span class=p>);</span>
+<span class=w>        </span><span class=p>}</span>
+
+<span class=w>        </span><span class=kt>char</span><span class=w> </span><span class=n>ipstr</span><span class=p>[</span><span class=n>INET6_ADDRSTRLEN</span><span class=p>];</span>
+<span class=w>        </span><span class=kt>void</span><span class=o>*</span><span class=w> </span><span class=n>addr</span><span class=p>;</span>
+<span class=w>        </span><span class=kt>uint16_t</span><span class=w> </span><span class=n>port</span><span class=p>;</span>
+
+<span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>peer</span><span class=p>.</span><span class=n>ss_family</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=n>AF_INET</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>            </span><span class=k>struct</span><span class=w> </span><span class=nc>sockaddr_in</span><span class=o>*</span><span class=w> </span><span class=n>ipv4</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=p>(</span><span class=k>struct</span><span class=w> </span><span class=nc>sockaddr_in</span><span class=o>*</span><span class=p>)</span><span class=o>&</span><span class=n>peer</span><span class=p>;</span>
+<span class=w>            </span><span class=n>addr</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=o>&</span><span class=p>(</span><span class=n>ipv4</span><span class=o>-></span><span class=n>sin_addr</span><span class=p>);</span>
+<span class=w>            </span><span class=c1>// network 大端字节序 -> host 字节序</span>
+<span class=w>            </span><span class=n>port</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>ntohs</span><span class=p>(</span><span class=n>ipv4</span><span class=o>-></span><span class=n>sin_port</span><span class=p>);</span>
+<span class=w>        </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span>
+<span class=w>            </span><span class=k>struct</span><span class=w> </span><span class=nc>sockaddr_in6</span><span class=o>*</span><span class=w> </span><span class=n>ipv6</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=p>(</span><span class=k>struct</span><span class=w> </span><span class=nc>sockaddr_in6</span><span class=o>*</span><span class=p>)</span><span class=o>&</span><span class=n>peer</span><span class=p>;</span>
+<span class=w>            </span><span class=n>addr</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=o>&</span><span class=p>(</span><span class=n>ipv6</span><span class=o>-></span><span class=n>sin6_addr</span><span class=p>);</span>
+<span class=w>            </span><span class=n>port</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>ntohs</span><span class=p>(</span><span class=n>ipv6</span><span class=o>-></span><span class=n>sin6_port</span><span class=p>);</span>
+<span class=w>        </span><span class=p>}</span>
+<span class=w>        </span><span class=n>inet_ntop</span><span class=p>(</span><span class=n>peer</span><span class=p>.</span><span class=n>ss_family</span><span class=p>,</span><span class=w> </span><span class=n>addr</span><span class=p>,</span><span class=w> </span><span class=n>ipstr</span><span class=p>,</span><span class=w> </span><span class=k>sizeof</span><span class=p>(</span><span class=n>ipstr</span><span class=p>));</span>
+<span class=w>        </span><span class=n>printf</span><span class=p>(</span><span class=s>"connection from %s:%d</span><span class=se>\n</span><span class=s>"</span><span class=p>,</span><span class=w> </span><span class=n>ipstr</span><span class=p>,</span><span class=w> </span><span class=n>port</span><span class=p>);</span>
+
+<span class=w>        </span><span class=kt>char</span><span class=w> </span><span class=n>buffer</span><span class=p>[</span><span class=mi>15</span><span class=p>];</span>
+<span class=w>        </span><span class=c1>// while 放在 accept 之后</span>
+<span class=w>        </span><span class=c1>// 若此 while 包括accpet，会阻塞在第二次 accept，后续不再 recv</span>
+<span class=w>        </span><span class=k>while</span><span class=w> </span><span class=p>(</span><span class=nb>true</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>            </span><span class=kt>int</span><span class=w> </span><span class=n>recv_cnt</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>recv</span><span class=p>(</span><span class=n>peer_sockfd</span><span class=p>,</span><span class=w> </span><span class=n>buffer</span><span class=p>,</span><span class=w> </span><span class=k>sizeof</span><span class=p>(</span><span class=n>buffer</span><span class=p>),</span><span class=w> </span><span class=mi>0</span><span class=p>);</span>
+<span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>recv_cnt</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=mi>-1</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>                </span><span class=n>perror</span><span class=p>(</span><span class=s>"recv"</span><span class=p>);</span>
+<span class=w>                </span><span class=c1>// 如果 continue，则 client 断开后会无限循环</span>
+<span class=w>                </span><span class=k>break</span><span class=p>;</span>
+<span class=w>            </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>recv_cnt</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=mi>0</span><span class=p>)</span><span class=w> </span><span class=c1>// TCP EOF</span>
+<span class=w>            </span><span class=p>{</span>
+<span class=w>                </span><span class=n>printf</span><span class=p>(</span><span class=s>"connection from %s: %d closed</span><span class=se>\n</span><span class=s>"</span><span class=p>,</span><span class=w> </span><span class=n>ipstr</span><span class=p>,</span><span class=w> </span><span class=n>port</span><span class=p>);</span>
+<span class=w>                </span><span class=c1>// 如果 continue，则 client 断开后会无限循环</span>
+<span class=w>                </span><span class=k>break</span><span class=p>;</span>
+<span class=w>            </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span>
+<span class=w>                </span><span class=n>printf</span><span class=p>(</span><span class=s>"received %d bytes: "</span><span class=p>,</span><span class=w> </span><span class=n>recv_cnt</span><span class=p>);</span>
+
+<span class=w>                </span><span class=n>fflush</span><span class=p>(</span><span class=n>stdout</span><span class=p>);</span>
+<span class=w>                </span><span class=n>write</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span><span class=w> </span><span class=n>buffer</span><span class=p>,</span><span class=w> </span><span class=n>recv_cnt</span><span class=p>);</span>
+<span class=w>                </span><span class=n>printf</span><span class=p>(</span><span class=s>"</span><span class=se>\n</span><span class=s>"</span><span class=p>);</span>
+<span class=w>            </span><span class=p>}</span>
+
+<span class=w>            </span><span class=kt>int</span><span class=w> </span><span class=n>sent_cnt</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>send</span><span class=p>(</span><span class=n>peer_sockfd</span><span class=p>,</span><span class=w> </span><span class=n>buffer</span><span class=p>,</span><span class=w> </span><span class=n>recv_cnt</span><span class=p>,</span><span class=w> </span><span class=mi>0</span><span class=p>);</span>
+<span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>sent_cnt</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=mi>-1</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>                </span><span class=n>perror</span><span class=p>(</span><span class=s>"send back"</span><span class=p>);</span>
+<span class=w>                </span><span class=k>continue</span><span class=p>;</span>
+<span class=w>            </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span>
+<span class=w>                </span><span class=n>printf</span><span class=p>(</span><span class=s>"   sent %d bytes: "</span><span class=p>,</span><span class=w> </span><span class=n>sent_cnt</span><span class=p>);</span>
+
+<span class=w>                </span><span class=n>fflush</span><span class=p>(</span><span class=n>stdout</span><span class=p>);</span>
+<span class=w>                </span><span class=n>write</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span><span class=w> </span><span class=n>buffer</span><span class=p>,</span><span class=w> </span><span class=n>sent_cnt</span><span class=p>);</span>
+<span class=w>                </span><span class=n>printf</span><span class=p>(</span><span class=s>"</span><span class=se>\n</span><span class=s>"</span><span class=p>);</span>
+<span class=w>            </span><span class=p>}</span>
+
+<span class=w>            </span><span class=c1>// sleep(1);</span>
+<span class=w>        </span><span class=p>}</span>
+<span class=w>        </span><span class=n>close</span><span class=p>(</span><span class=n>peer_sockfd</span><span class=p>);</span>
+<span class=w>    </span><span class=p>}</span>
+<span class=w>    </span><span class=n>close</span><span class=p>(</span><span class=n>sockfd</span><span class=p>);</span>
+<span class=w>    </span><span class=n>freeaddrinfo</span><span class=p>(</span><span class=n>result</span><span class=p>);</span>
+
+<span class=w>    </span><span class=k>return</span><span class=w> </span><span class=mi>0</span><span class=p>;</span>
+<span class=p>}</span>
+</code></pre></div></details><h2 id=12-echo-client>1.2. echo client</h2><details><summary>为避免代码之纷繁扰乱加了折叠</summary> <div class=highlight><pre><span></span><code><span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;arpa/inet.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;fcntl.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;netdb.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;stdbool.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;stddef.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;stdio.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;stdlib.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;string.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;sys/socket.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;sys/types.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;unistd.h></span>
+
+<span class=kt>int</span><span class=w> </span><span class=nf>main</span><span class=p>()</span>
+<span class=p>{</span>
+<span class=w>    </span><span class=kt>int</span><span class=w> </span><span class=n>sockfd</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>socket</span><span class=p>(</span><span class=n>PF_INET</span><span class=p>,</span><span class=w> </span><span class=n>SOCK_STREAM</span><span class=p>,</span><span class=w> </span><span class=mi>0</span><span class=p>);</span>
+<span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>sockfd</span><span class=w> </span><span class=o>&lt;</span><span class=w> </span><span class=mi>0</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=n>perror</span><span class=p>(</span><span class=s>"socket"</span><span class=p>);</span>
+<span class=w>        </span><span class=n>exit</span><span class=p>(</span><span class=n>EXIT_FAILURE</span><span class=p>);</span>
+<span class=w>    </span><span class=p>}</span>
+
+<span class=w>    </span><span class=k>struct</span><span class=w> </span><span class=nc>addrinfo</span><span class=w> </span><span class=n>hints</span><span class=p>,</span><span class=w> </span><span class=o>*</span><span class=n>result</span><span class=p>;</span>
+<span class=w>    </span><span class=n>memset</span><span class=p>(</span><span class=o>&</span><span class=n>hints</span><span class=p>,</span><span class=w> </span><span class=mi>0</span><span class=p>,</span><span class=w> </span><span class=k>sizeof</span><span class=p>(</span><span class=k>struct</span><span class=w> </span><span class=nc>addrinfo</span><span class=p>));</span>
+<span class=w>    </span><span class=n>hints</span><span class=p>.</span><span class=n>ai_family</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>AF_UNSPEC</span><span class=p>;</span>
+<span class=w>    </span><span class=n>hints</span><span class=p>.</span><span class=n>ai_socktype</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>SOCK_STREAM</span><span class=p>;</span>
+
+<span class=w>    </span><span class=kt>int</span><span class=w> </span><span class=n>res</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>getaddrinfo</span><span class=p>(</span><span class=s>"127.0.0.1"</span><span class=p>,</span><span class=w> </span><span class=s>"3490"</span><span class=p>,</span><span class=w> </span><span class=o>&</span><span class=n>hints</span><span class=p>,</span><span class=w> </span><span class=o>&</span><span class=n>result</span><span class=p>);</span>
+
+<span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>res</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=mi>0</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=n>fprintf</span><span class=p>(</span><span class=n>stderr</span><span class=p>,</span><span class=w> </span><span class=s>"getaddrinfo: %s</span><span class=se>\n</span><span class=s>"</span><span class=p>,</span><span class=w> </span><span class=n>gai_strerror</span><span class=p>(</span><span class=n>res</span><span class=p>));</span>
+<span class=w>        </span><span class=n>exit</span><span class=p>(</span><span class=n>EXIT_FAILURE</span><span class=p>);</span>
+<span class=w>    </span><span class=p>}</span>
+
+<span class=w>    </span><span class=n>res</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>connect</span><span class=p>(</span><span class=n>sockfd</span><span class=p>,</span><span class=w> </span><span class=n>result</span><span class=o>-></span><span class=n>ai_addr</span><span class=p>,</span><span class=w> </span><span class=n>result</span><span class=o>-></span><span class=n>ai_addrlen</span><span class=p>);</span>
+<span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>res</span><span class=w> </span><span class=o>&lt;</span><span class=w> </span><span class=mi>0</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=n>perror</span><span class=p>(</span><span class=s>"connect"</span><span class=p>);</span>
+<span class=w>        </span><span class=n>exit</span><span class=p>(</span><span class=n>EXIT_FAILURE</span><span class=p>);</span>
+<span class=w>    </span><span class=p>}</span>
+<span class=w>    </span><span class=c1>// fcntl(sockfd, F_SETFL, O_NONBLOCK);</span>
+
+<span class=w>    </span><span class=kt>char</span><span class=w> </span><span class=n>buffer</span><span class=p>[</span><span class=mi>37</span><span class=p>];</span>
+<span class=w>    </span><span class=n>strcpy</span><span class=p>(</span><span class=n>buffer</span><span class=p>,</span><span class=w> </span><span class=s>"123456789ABCDEFG"</span><span class=p>);</span>
+
+<span class=w>    </span><span class=kt>char</span><span class=w> </span><span class=n>recv_buf</span><span class=p>[</span><span class=mi>10</span><span class=p>];</span>
+
+<span class=w>    </span><span class=k>while</span><span class=w> </span><span class=p>(</span><span class=nb>true</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=c1>// snprintf(buffer, sizeof(buffer), "%d", pid);</span>
+<span class=w>        </span><span class=c1>// strcpy(buffer, "hello word");</span>
+<span class=w>        </span><span class=c1>// write data to kernel send buffer</span>
+<span class=w>        </span><span class=kt>int</span><span class=w> </span><span class=n>sent_cnt</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>send</span><span class=p>(</span><span class=n>sockfd</span><span class=p>,</span><span class=w> </span><span class=n>buffer</span><span class=p>,</span><span class=w> </span><span class=n>strlen</span><span class=p>(</span><span class=n>buffer</span><span class=p>),</span><span class=w> </span><span class=mi>0</span><span class=p>);</span>
+<span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>sent_cnt</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=mi>-1</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>            </span><span class=n>perror</span><span class=p>(</span><span class=s>"send"</span><span class=p>);</span>
+<span class=w>            </span><span class=k>continue</span><span class=p>;</span>
+<span class=w>        </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span>
+<span class=w>            </span><span class=n>printf</span><span class=p>(</span><span class=s>"</span><span class=se>\n</span><span class=s>%d bytes sent: "</span><span class=p>,</span><span class=w> </span><span class=n>sent_cnt</span><span class=p>);</span>
+
+<span class=w>            </span><span class=n>fflush</span><span class=p>(</span><span class=n>stdout</span><span class=p>);</span>
+<span class=w>            </span><span class=n>write</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span><span class=w> </span><span class=n>buffer</span><span class=p>,</span><span class=w> </span><span class=n>sent_cnt</span><span class=p>);</span>
+<span class=w>            </span><span class=n>printf</span><span class=p>(</span><span class=s>"</span><span class=se>\n</span><span class=s>"</span><span class=p>);</span>
+<span class=w>        </span><span class=p>}</span>
+
+<span class=w>        </span><span class=kt>int</span><span class=w> </span><span class=n>recv_cnt</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>recv</span><span class=p>(</span><span class=n>sockfd</span><span class=p>,</span><span class=w> </span><span class=n>recv_buf</span><span class=p>,</span><span class=w> </span><span class=k>sizeof</span><span class=p>(</span><span class=n>recv_buf</span><span class=p>),</span><span class=w> </span><span class=mi>0</span><span class=p>);</span>
+<span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>recv_cnt</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=mi>-1</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>            </span><span class=n>perror</span><span class=p>(</span><span class=s>"recv"</span><span class=p>);</span>
+<span class=w>            </span><span class=k>continue</span><span class=p>;</span>
+<span class=w>        </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span>
+<span class=w>            </span><span class=n>printf</span><span class=p>(</span><span class=s>"received %d bytes: "</span><span class=p>,</span><span class=w> </span><span class=n>recv_cnt</span><span class=p>);</span>
+
+<span class=w>            </span><span class=n>fflush</span><span class=p>(</span><span class=n>stdout</span><span class=p>);</span>
+<span class=w>            </span><span class=n>write</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span><span class=w> </span><span class=n>recv_buf</span><span class=p>,</span><span class=w> </span><span class=n>recv_cnt</span><span class=p>);</span>
+<span class=w>            </span><span class=n>printf</span><span class=p>(</span><span class=s>"</span><span class=se>\n</span><span class=s>"</span><span class=p>);</span>
+<span class=w>        </span><span class=p>}</span>
+<span class=w>        </span><span class=n>sleep</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
+<span class=w>    </span><span class=p>}</span>
+
+<span class=w>    </span><span class=n>close</span><span class=p>(</span><span class=n>sockfd</span><span class=p>);</span>
+<span class=w>    </span><span class=c1>// sleep(999);</span>
+<span class=w>    </span><span class=n>freeaddrinfo</span><span class=p>(</span><span class=n>result</span><span class=p>);</span>
+
+<span class=w>    </span><span class=k>return</span><span class=w> </span><span class=mi>0</span><span class=p>;</span>
+<span class=p>}</span>
+</code></pre></div></details><h1 id=2-echo-client-server>2. 多进程 echo client-server</h1><p>代码改动不多，关于多进程需注意<p>parent: accept + fork<p>child: recv/send + close(listen_sockfd) + _exit()<p>parent: close(peer_sockfd) + continue accept<ul><li><ol><li>fork 即使 CoW 也成本高</ol><li><p>1.1. 分配内存空间、创建内核对象、<strong>拷贝页表</strong>、task_struct 等</p><li><p>1.2. 上下文切换：vaddrspace 切换、页表切换（导致 TLB 失效，查询慢速物理页表，性能抖动）</p><li><p>1.3. recv 阻塞不占用 cpu，但是占用 mem / scheduler slot</p><li><ol><li>内存独立，需要<strong>进程间通信 IPC</strong>：管道、消息队列、共享内存</ol><li><ol><li>文件描述符是引用计数，fork 后及时关闭</ol><li>3.1. parent: close(peer_sockfd)，若不关 child 退出还有引用计数，TCP 不触发 FIN，耗尽 fd<li><p>3.2. child: close(listen_sockfd)</p><li><ol><li>忽略信号</ol></ul><p>SIGCHLD：子进程状态变化（terminate、被信号 stop、resume 时，kernel发给父进程的通知信号<p>child _exit() -> kernel 标记 zombie -> kernel 给 parent 发 SIGCHLD<p>parent 收到信号 -> parent waitpid() -> kernel 释放资源 -> zombie 消失<ul><li><ol><li>使用 <strong>_exit()</strong>：fork parent 缓冲区，使用 exit() 可能导致已打印内容退出时重复输出</ol></ul><div class=highlight><pre><span></span><code><span class=c1>// 关于信号处理部分的代码</span>
+<span class=kt>void</span><span class=w> </span><span class=nf>sigchild_handler</span><span class=p>(</span><span class=kt>int</span><span class=w> </span><span class=n>sig</span><span class=p>)</span>
+<span class=p>{</span>
+<span class=w>    </span><span class=c1>// prevent waitpid 覆盖主程序的 error</span>
+<span class=w>    </span><span class=kt>int</span><span class=w> </span><span class=n>saved_errno</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>errno</span><span class=p>;</span>
+
+<span class=w>    </span><span class=c1>// 回收所有已退出子进程</span>
+<span class=w>    </span><span class=k>while</span><span class=w> </span><span class=p>(</span><span class=n>waitpid</span><span class=p>(</span><span class=mi>-1</span><span class=p>,</span><span class=w> </span><span class=nb>NULL</span><span class=p>,</span><span class=w> </span><span class=n>WNOHANG</span><span class=p>)</span><span class=w> </span><span class=o>></span><span class=w> </span><span class=mi>0</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>      </span><span class=c1>// WNOHANG 避免阻塞</span>
+<span class=w>      </span><span class=c1>// while 循环面向 **signal coalescing**：多 signal 不排队</span>
+<span class=w>      </span><span class=c1>// 多进程同时退出，kernel 可能只向 parent 发送一个 SIGCHLD</span>
+<span class=w>    </span><span class=p>}</span>
+<span class=w>    </span><span class=n>errno</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>saved_errno</span><span class=p>;</span>
+<span class=p>}</span>
+
+<span class=kt>int</span><span class=w> </span><span class=nf>main</span><span class=p>(){</span>
+<span class=w>    </span><span class=k>struct</span><span class=w> </span><span class=nc>sigaction</span><span class=w> </span><span class=n>sa</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=mi>0</span><span class=w> </span><span class=p>};</span>
+<span class=w>    </span><span class=n>sa</span><span class=p>.</span><span class=n>sa_handler</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>sigchild_handler</span><span class=p>;</span>
+<span class=w>    </span><span class=n>sigemptyset</span><span class=p>(</span><span class=o>&</span><span class=n>sa</span><span class=p>.</span><span class=n>sa_mask</span><span class=p>);</span>
+<span class=w>    </span><span class=n>sa</span><span class=p>.</span><span class=n>sa_flags</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>SA_RESTART</span><span class=w> </span><span class=o>|</span><span class=w> </span><span class=n>SA_NOCLDSTOP</span><span class=p>;</span>
+<span class=w>    </span><span class=c1>// SA_RESTART</span>
+<span class=w>    </span><span class=c1>// parent 平时阻塞在 accept()，若某 child 退出，kernel 触发 SIGCHLD 。</span>
+<span class=w>    </span><span class=c1>// 暂停 accept()，跳转 sigchld_handler，执行完 handler 后回归。</span>
+<span class=w>    </span><span class=c1>// 若无 SA_RESTART, accept() 会直接报错返回 -1</span>
+<span class=w>    </span><span class=c1>// 并将 errno 设置为 EINTR（Interrupted system call）。</span>
+<span class=w>    </span><span class=c1>// 一旦设置 SA_RESTART：kernel 自动重新启动被中断的 accept()</span>
+
+<span class=w>    </span><span class=c1>// SA_NOCLDSTOP</span>
+<span class=w>    </span><span class=c1>// client: ctrl-z  SIGSTOP, SIGCONT等</span>
+
+<span class=w>    </span><span class=c1>// SIGCHLD  child 状态变化</span>
+<span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>sigaction</span><span class=p>(</span><span class=n>SIGCHLD</span><span class=p>,</span><span class=w> </span><span class=o>&</span><span class=n>sa</span><span class=p>,</span><span class=w> </span><span class=nb>NULL</span><span class=p>)</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=mi>-1</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=n>perror</span><span class=p>(</span><span class=s>"sigaction"</span><span class=p>);</span>
+<span class=w>        </span><span class=n>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
+<span class=w>    </span><span class=p>}</span>
+<span class=p>}</span>
+</code></pre></div><h2 id=21-multi-process-echo-server>2.1. multi-process echo server</h2><details><summary>为避免代码之纷繁扰乱加了折叠</summary> <div class=highlight><pre><span></span><code><span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;arpa/inet.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;errno.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;netdb.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;signal.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;stdbool.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;stddef.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;stdio.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;stdlib.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;string.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;sys/socket.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;sys/types.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;sys/wait.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;unistd.h></span>
+
+<span class=kt>void</span><span class=w> </span><span class=nf>sigchild_handler</span><span class=p>(</span><span class=kt>int</span><span class=w> </span><span class=n>sig</span><span class=p>)</span>
+<span class=p>{</span>
+<span class=w>    </span><span class=c1>// prevent waitpid 覆盖主程序的 error</span>
+<span class=w>    </span><span class=kt>int</span><span class=w> </span><span class=n>saved_errno</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>errno</span><span class=p>;</span>
+
+<span class=w>    </span><span class=c1>// sleep(2);</span>
+<span class=w>    </span><span class=c1>// 回收所有已退出子进程</span>
+<span class=w>    </span><span class=k>while</span><span class=w> </span><span class=p>(</span><span class=n>waitpid</span><span class=p>(</span><span class=mi>-1</span><span class=p>,</span><span class=w> </span><span class=nb>NULL</span><span class=p>,</span><span class=w> </span><span class=n>WNOHANG</span><span class=p>)</span><span class=w> </span><span class=o>></span><span class=w> </span><span class=mi>0</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=c1>// 循环因为信号不排队，多进程同时退出，kernel可能只向父进程发送一个 SIGCHLD</span>
+<span class=w>    </span><span class=p>}</span>
+<span class=w>    </span><span class=n>errno</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>saved_errno</span><span class=p>;</span>
+<span class=p>}</span>
+
+<span class=kt>int</span><span class=w> </span><span class=nf>main</span><span class=p>()</span>
+<span class=p>{</span>
+<span class=w>    </span><span class=k>struct</span><span class=w> </span><span class=nc>sigaction</span><span class=w> </span><span class=n>sa</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=p>{</span><span class=w> </span><span class=mi>0</span><span class=w> </span><span class=p>};</span>
+<span class=w>    </span><span class=n>sa</span><span class=p>.</span><span class=n>sa_handler</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>sigchild_handler</span><span class=p>;</span>
+<span class=w>    </span><span class=n>sigemptyset</span><span class=p>(</span><span class=o>&</span><span class=n>sa</span><span class=p>.</span><span class=n>sa_mask</span><span class=p>);</span>
+<span class=w>    </span><span class=n>sa</span><span class=p>.</span><span class=n>sa_flags</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>SA_RESTART</span><span class=w> </span><span class=o>|</span><span class=w> </span><span class=n>SA_NOCLDSTOP</span><span class=p>;</span>
+<span class=w>    </span><span class=c1>// SA_RESTART</span>
+<span class=w>    </span><span class=c1>// parent 平时阻塞在 accept()，若某 child 退出，kernel 触发 SIGCHLD 。</span>
+<span class=w>    </span><span class=c1>// 暂停 accept()，跳转 sigchld_handler，执行完 handler 后回归。</span>
+<span class=w>    </span><span class=c1>// 若无 SA_RESTART, accept() 会直接报错返回 -1</span>
+<span class=w>    </span><span class=c1>// 并将 errno 设置为 EINTR（Interrupted system call）。</span>
+<span class=w>    </span><span class=c1>// 一旦设置 SA_RESTART：kernel 自动重新启动被中断的 accept()</span>
+
+<span class=w>    </span><span class=c1>// SA_NOCLDSTOP</span>
+<span class=w>    </span><span class=c1>// client: ctrl-z  SIGSTOP, SIGCONT等</span>
+
+<span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>sigaction</span><span class=p>(</span><span class=n>SIGCHLD</span><span class=p>,</span><span class=w> </span><span class=o>&</span><span class=n>sa</span><span class=p>,</span><span class=w> </span><span class=nb>NULL</span><span class=p>)</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=mi>-1</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=n>perror</span><span class=p>(</span><span class=s>"sigaction"</span><span class=p>);</span>
+<span class=w>        </span><span class=n>exit</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
+<span class=w>    </span><span class=p>}</span>
+
+<span class=w>    </span><span class=c1>// addrinfo: protocol agnostic</span>
+<span class=w>    </span><span class=k>struct</span><span class=w> </span><span class=nc>addrinfo</span><span class=w> </span><span class=n>hints</span><span class=p>,</span>
+<span class=w>        </span><span class=o>*</span><span class=n>result</span><span class=p>;</span>
+<span class=w>    </span><span class=n>memset</span><span class=p>(</span><span class=o>&</span><span class=n>hints</span><span class=p>,</span><span class=w> </span><span class=mi>0</span><span class=p>,</span><span class=w> </span><span class=k>sizeof</span><span class=p>(</span><span class=n>hints</span><span class=p>));</span>
+<span class=w>    </span><span class=n>hints</span><span class=p>.</span><span class=n>ai_family</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>AF_UNSPEC</span><span class=p>;</span><span class=w> </span><span class=c1>// ipv4 or ipv6</span>
+<span class=w>    </span><span class=n>hints</span><span class=p>.</span><span class=n>ai_socktype</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>SOCK_STREAM</span><span class=p>;</span>
+<span class=w>    </span><span class=n>hints</span><span class=p>.</span><span class=n>ai_flags</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>AI_PASSIVE</span><span class=p>;</span><span class=w> </span><span class=c1>// 用于 node = NULL 时，bind any</span>
+
+<span class=w>    </span><span class=kt>int</span><span class=w> </span><span class=n>res</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>getaddrinfo</span><span class=p>(</span><span class=s>"127.0.0.1"</span><span class=p>,</span><span class=w> </span><span class=s>"3490"</span><span class=p>,</span><span class=w> </span><span class=o>&</span><span class=n>hints</span><span class=p>,</span><span class=w> </span><span class=o>&</span><span class=n>result</span><span class=p>);</span>
+<span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>res</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=mi>0</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=n>fprintf</span><span class=p>(</span><span class=n>stderr</span><span class=p>,</span><span class=w> </span><span class=s>"getaddrinfo: %s</span><span class=se>\n</span><span class=s>"</span><span class=p>,</span><span class=w> </span><span class=n>gai_strerror</span><span class=p>(</span><span class=n>res</span><span class=p>));</span>
+<span class=w>        </span><span class=n>exit</span><span class=p>(</span><span class=n>EXIT_FAILURE</span><span class=p>);</span>
+<span class=w>    </span><span class=p>}</span>
+
+<span class=w>    </span><span class=kt>int</span><span class=w> </span><span class=n>sockfd</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>socket</span><span class=p>(</span><span class=n>result</span><span class=o>-></span><span class=n>ai_family</span><span class=p>,</span>
+<span class=w>        </span><span class=n>result</span><span class=o>-></span><span class=n>ai_socktype</span><span class=p>,</span>
+<span class=w>        </span><span class=n>result</span><span class=o>-></span><span class=n>ai_protocol</span><span class=p>);</span>
+<span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>sockfd</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=mi>-1</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=n>perror</span><span class=p>(</span><span class=s>"socket"</span><span class=p>);</span>
+<span class=w>        </span><span class=n>exit</span><span class=p>(</span><span class=n>EXIT_FAILURE</span><span class=p>);</span>
+<span class=w>    </span><span class=p>}</span>
+
+<span class=w>    </span><span class=n>res</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>bind</span><span class=p>(</span><span class=n>sockfd</span><span class=p>,</span><span class=w> </span><span class=n>result</span><span class=o>-></span><span class=n>ai_addr</span><span class=p>,</span><span class=w> </span><span class=n>result</span><span class=o>-></span><span class=n>ai_addrlen</span><span class=p>);</span>
+<span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>res</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=mi>0</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=n>perror</span><span class=p>(</span><span class=s>"bind"</span><span class=p>);</span>
+<span class=w>        </span><span class=n>exit</span><span class=p>(</span><span class=n>EXIT_FAILURE</span><span class=p>);</span>
+<span class=w>    </span><span class=p>}</span>
+
+<span class=c1>// established yet accepted queue length</span>
+<span class=cp>#define backlog 8</span>
+<span class=w>    </span><span class=n>res</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>listen</span><span class=p>(</span><span class=n>sockfd</span><span class=p>,</span><span class=w> </span><span class=n>backlog</span><span class=p>);</span>
+<span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>res</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=mi>0</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=n>perror</span><span class=p>(</span><span class=s>"listen"</span><span class=p>);</span>
+<span class=w>        </span><span class=n>exit</span><span class=p>(</span><span class=n>EXIT_FAILURE</span><span class=p>);</span>
+<span class=w>    </span><span class=p>}</span>
+
+<span class=w>    </span><span class=c1>// 没有此while，首次client连接断开，server亦会断开</span>
+<span class=w>    </span><span class=k>while</span><span class=w> </span><span class=p>(</span><span class=nb>true</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=k>struct</span><span class=w> </span><span class=nc>sockaddr_storage</span><span class=w> </span><span class=n>peer</span><span class=p>;</span>
+<span class=w>        </span><span class=kt>socklen_t</span><span class=w> </span><span class=n>peer_len</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=k>sizeof</span><span class=p>(</span><span class=k>struct</span><span class=w> </span><span class=nc>sockaddr_storage</span><span class=p>);</span>
+
+<span class=w>        </span><span class=c1>// grab an established connection from kernel accept Q</span>
+<span class=w>        </span><span class=kt>int</span><span class=w> </span><span class=n>peer_sockfd</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>accept</span><span class=p>(</span><span class=n>sockfd</span><span class=p>,</span><span class=w> </span><span class=p>(</span><span class=k>struct</span><span class=w> </span><span class=nc>sockaddr</span><span class=o>*</span><span class=p>)</span><span class=o>&</span><span class=n>peer</span><span class=p>,</span><span class=w> </span><span class=o>&</span><span class=n>peer_len</span><span class=p>);</span>
+<span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>peer_sockfd</span><span class=w> </span><span class=o>&lt;</span><span class=w> </span><span class=mi>0</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>            </span><span class=n>perror</span><span class=p>(</span><span class=s>"accept"</span><span class=p>);</span>
+<span class=w>            </span><span class=c1>// continue;</span>
+<span class=w>            </span><span class=n>exit</span><span class=p>(</span><span class=n>EXIT_FAILURE</span><span class=p>);</span>
+<span class=w>        </span><span class=p>}</span>
+
+<span class=w>        </span><span class=kt>pid_t</span><span class=w> </span><span class=n>pid</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>fork</span><span class=p>();</span>
+<span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>pid</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=mi>-1</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>            </span><span class=n>perror</span><span class=p>(</span><span class=s>"fork"</span><span class=p>);</span>
+<span class=w>            </span><span class=n>exit</span><span class=p>(</span><span class=n>EXIT_FAILURE</span><span class=p>);</span>
+<span class=w>        </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>pid</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=mi>0</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>            </span><span class=c1>// child</span>
+
+<span class=w>            </span><span class=c1>// child 不接受新连接</span>
+<span class=w>            </span><span class=n>close</span><span class=p>(</span><span class=n>sockfd</span><span class=p>);</span>
+
+<span class=w>            </span><span class=kt>char</span><span class=w> </span><span class=n>ipstr</span><span class=p>[</span><span class=n>INET6_ADDRSTRLEN</span><span class=p>];</span>
+<span class=w>            </span><span class=kt>void</span><span class=o>*</span><span class=w> </span><span class=n>addr</span><span class=p>;</span>
+<span class=w>            </span><span class=kt>uint16_t</span><span class=w> </span><span class=n>port</span><span class=p>;</span>
+
+<span class=w>            </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>peer</span><span class=p>.</span><span class=n>ss_family</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=n>AF_INET</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>                </span><span class=k>struct</span><span class=w> </span><span class=nc>sockaddr_in</span><span class=o>*</span><span class=w> </span><span class=n>ipv4</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=p>(</span><span class=k>struct</span><span class=w> </span><span class=nc>sockaddr_in</span><span class=o>*</span><span class=p>)</span><span class=o>&</span><span class=n>peer</span><span class=p>;</span>
+<span class=w>                </span><span class=n>addr</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=o>&</span><span class=p>(</span><span class=n>ipv4</span><span class=o>-></span><span class=n>sin_addr</span><span class=p>);</span>
+<span class=w>                </span><span class=c1>// network 大端字节序 -> host 字节序</span>
+<span class=w>                </span><span class=n>port</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>ntohs</span><span class=p>(</span><span class=n>ipv4</span><span class=o>-></span><span class=n>sin_port</span><span class=p>);</span>
+<span class=w>            </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span>
+<span class=w>                </span><span class=k>struct</span><span class=w> </span><span class=nc>sockaddr_in6</span><span class=o>*</span><span class=w> </span><span class=n>ipv6</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=p>(</span><span class=k>struct</span><span class=w> </span><span class=nc>sockaddr_in6</span><span class=o>*</span><span class=p>)</span><span class=o>&</span><span class=n>peer</span><span class=p>;</span>
+<span class=w>                </span><span class=n>addr</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=o>&</span><span class=p>(</span><span class=n>ipv6</span><span class=o>-></span><span class=n>sin6_addr</span><span class=p>);</span>
+<span class=w>                </span><span class=n>port</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>ntohs</span><span class=p>(</span><span class=n>ipv6</span><span class=o>-></span><span class=n>sin6_port</span><span class=p>);</span>
+<span class=w>            </span><span class=p>}</span>
+<span class=w>            </span><span class=n>inet_ntop</span><span class=p>(</span><span class=n>peer</span><span class=p>.</span><span class=n>ss_family</span><span class=p>,</span><span class=w> </span><span class=n>addr</span><span class=p>,</span><span class=w> </span><span class=n>ipstr</span><span class=p>,</span><span class=w> </span><span class=k>sizeof</span><span class=p>(</span><span class=n>ipstr</span><span class=p>));</span>
+<span class=w>            </span><span class=n>printf</span><span class=p>(</span><span class=s>"server %d: connection from %s:%d</span><span class=se>\n</span><span class=s>"</span><span class=p>,</span><span class=w> </span><span class=n>getpid</span><span class=p>(),</span><span class=w> </span><span class=n>ipstr</span><span class=p>,</span><span class=w> </span><span class=n>port</span><span class=p>);</span>
+
+<span class=w>            </span><span class=kt>char</span><span class=w> </span><span class=n>buffer</span><span class=p>[</span><span class=mi>20</span><span class=p>];</span>
+<span class=w>            </span><span class=c1>// while 放在 accept 之后</span>
+<span class=w>            </span><span class=c1>// 若此 while 包括accpet，会阻塞在第二次 accept，后续不再 recv</span>
+<span class=w>            </span><span class=k>while</span><span class=w> </span><span class=p>(</span><span class=nb>true</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>                </span><span class=kt>int</span><span class=w> </span><span class=n>recv_cnt</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>recv</span><span class=p>(</span><span class=n>peer_sockfd</span><span class=p>,</span><span class=w> </span><span class=n>buffer</span><span class=p>,</span><span class=w> </span><span class=k>sizeof</span><span class=p>(</span><span class=n>buffer</span><span class=p>),</span><span class=w> </span><span class=mi>0</span><span class=p>);</span>
+<span class=w>                </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>recv_cnt</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=mi>-1</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>                    </span><span class=n>perror</span><span class=p>(</span><span class=s>"recv"</span><span class=p>);</span>
+<span class=w>                    </span><span class=c1>// 如果 continue，则 client 断开后会无限循环</span>
+<span class=w>                    </span><span class=k>break</span><span class=p>;</span>
+<span class=w>                </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>recv_cnt</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=mi>0</span><span class=p>)</span><span class=w> </span><span class=c1>// TCP EOF</span>
+<span class=w>                </span><span class=p>{</span>
+<span class=w>                    </span><span class=n>printf</span><span class=p>(</span><span class=s>"connection from %s: %d closed</span><span class=se>\n</span><span class=s>"</span><span class=p>,</span><span class=w> </span><span class=n>ipstr</span><span class=p>,</span><span class=w> </span><span class=n>port</span><span class=p>);</span>
+<span class=w>                    </span><span class=c1>// 如果 continue，则 client 断开后会无限循环</span>
+<span class=w>                    </span><span class=k>break</span><span class=p>;</span>
+<span class=w>                </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span>
+<span class=w>                    </span><span class=n>printf</span><span class=p>(</span><span class=s>"received %d bytes: "</span><span class=p>,</span><span class=w> </span><span class=n>recv_cnt</span><span class=p>);</span>
+
+<span class=w>                    </span><span class=n>fflush</span><span class=p>(</span><span class=n>stdout</span><span class=p>);</span>
+<span class=w>                    </span><span class=n>write</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span><span class=w> </span><span class=n>buffer</span><span class=p>,</span><span class=w> </span><span class=n>recv_cnt</span><span class=p>);</span>
+<span class=w>                    </span><span class=n>printf</span><span class=p>(</span><span class=s>"</span><span class=se>\n</span><span class=s>"</span><span class=p>);</span>
+<span class=w>                </span><span class=p>}</span>
+
+<span class=w>                </span><span class=kt>int</span><span class=w> </span><span class=n>sent_cnt</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>send</span><span class=p>(</span><span class=n>peer_sockfd</span><span class=p>,</span><span class=w> </span><span class=n>buffer</span><span class=p>,</span><span class=w> </span><span class=n>recv_cnt</span><span class=p>,</span><span class=w> </span><span class=mi>0</span><span class=p>);</span>
+<span class=w>                </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>sent_cnt</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=mi>-1</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>                    </span><span class=n>perror</span><span class=p>(</span><span class=s>"send back"</span><span class=p>);</span>
+<span class=w>                    </span><span class=k>continue</span><span class=p>;</span>
+<span class=w>                </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span>
+<span class=w>                    </span><span class=n>printf</span><span class=p>(</span><span class=s>"   sent %d bytes: "</span><span class=p>,</span><span class=w> </span><span class=n>sent_cnt</span><span class=p>);</span>
+
+<span class=w>                    </span><span class=n>fflush</span><span class=p>(</span><span class=n>stdout</span><span class=p>);</span>
+<span class=w>                    </span><span class=n>write</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span><span class=w> </span><span class=n>buffer</span><span class=p>,</span><span class=w> </span><span class=n>sent_cnt</span><span class=p>);</span>
+<span class=w>                    </span><span class=n>printf</span><span class=p>(</span><span class=s>"</span><span class=se>\n</span><span class=s>"</span><span class=p>);</span>
+<span class=w>                </span><span class=p>}</span>
+<span class=w>            </span><span class=p>}</span>
+
+<span class=w>            </span><span class=c1>// sleep(1);</span>
+<span class=w>            </span><span class=n>sleep</span><span class=p>(</span><span class=mi>5</span><span class=p>);</span>
+<span class=w>            </span><span class=n>close</span><span class=p>(</span><span class=n>peer_sockfd</span><span class=p>);</span>
+<span class=w>            </span><span class=n>_exit</span><span class=p>(</span><span class=mi>0</span><span class=p>);</span>
+<span class=w>        </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span>
+<span class=w>            </span><span class=c1>// parent</span>
+<span class=w>            </span><span class=n>close</span><span class=p>(</span><span class=n>peer_sockfd</span><span class=p>);</span>
+<span class=w>        </span><span class=p>}</span>
+<span class=w>    </span><span class=p>}</span>
+
+<span class=w>    </span><span class=n>freeaddrinfo</span><span class=p>(</span><span class=n>result</span><span class=p>);</span>
+
+<span class=w>    </span><span class=k>return</span><span class=w> </span><span class=mi>0</span><span class=p>;</span>
+<span class=p>}</span>
+</code></pre></div></details><h2 id=22-multi-process-echo-client>2.2. multi-process echo client</h2><details><summary>为避免代码之纷繁扰乱加了折叠</summary> <div class=highlight><pre><span></span><code><span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;arpa/inet.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;fcntl.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;netdb.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;stdbool.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;stddef.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;stdio.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;stdlib.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;string.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;sys/socket.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;sys/types.h></span>
+<span class=cp>#include</span><span class=w> </span><span class=cpf>&lt;unistd.h></span>
+
+<span class=kt>int</span><span class=w> </span><span class=nf>main</span><span class=p>()</span>
+<span class=p>{</span>
+<span class=w>    </span><span class=kt>int</span><span class=w> </span><span class=n>sockfd</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>socket</span><span class=p>(</span><span class=n>PF_INET</span><span class=p>,</span><span class=w> </span><span class=n>SOCK_STREAM</span><span class=p>,</span><span class=w> </span><span class=mi>0</span><span class=p>);</span>
+<span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>sockfd</span><span class=w> </span><span class=o>&lt;</span><span class=w> </span><span class=mi>0</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=n>perror</span><span class=p>(</span><span class=s>"socket"</span><span class=p>);</span>
+<span class=w>        </span><span class=n>exit</span><span class=p>(</span><span class=n>EXIT_FAILURE</span><span class=p>);</span>
+<span class=w>    </span><span class=p>}</span>
+
+<span class=w>    </span><span class=k>struct</span><span class=w> </span><span class=nc>addrinfo</span><span class=w> </span><span class=n>hints</span><span class=p>,</span><span class=w> </span><span class=o>*</span><span class=n>result</span><span class=p>;</span>
+<span class=w>    </span><span class=n>memset</span><span class=p>(</span><span class=o>&</span><span class=n>hints</span><span class=p>,</span><span class=w> </span><span class=mi>0</span><span class=p>,</span><span class=w> </span><span class=k>sizeof</span><span class=p>(</span><span class=k>struct</span><span class=w> </span><span class=nc>addrinfo</span><span class=p>));</span>
+<span class=w>    </span><span class=n>hints</span><span class=p>.</span><span class=n>ai_family</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>AF_UNSPEC</span><span class=p>;</span>
+<span class=w>    </span><span class=n>hints</span><span class=p>.</span><span class=n>ai_socktype</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>SOCK_STREAM</span><span class=p>;</span>
+
+<span class=w>    </span><span class=kt>int</span><span class=w> </span><span class=n>res</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>getaddrinfo</span><span class=p>(</span><span class=s>"127.0.0.1"</span><span class=p>,</span><span class=w> </span><span class=s>"3490"</span><span class=p>,</span><span class=w> </span><span class=o>&</span><span class=n>hints</span><span class=p>,</span><span class=w> </span><span class=o>&</span><span class=n>result</span><span class=p>);</span>
+
+<span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>res</span><span class=w> </span><span class=o>!=</span><span class=w> </span><span class=mi>0</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=n>fprintf</span><span class=p>(</span><span class=n>stderr</span><span class=p>,</span><span class=w> </span><span class=s>"getaddrinfo: %s</span><span class=se>\n</span><span class=s>"</span><span class=p>,</span><span class=w> </span><span class=n>gai_strerror</span><span class=p>(</span><span class=n>res</span><span class=p>));</span>
+<span class=w>        </span><span class=n>exit</span><span class=p>(</span><span class=n>EXIT_FAILURE</span><span class=p>);</span>
+<span class=w>    </span><span class=p>}</span>
+
+<span class=w>    </span><span class=n>res</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>connect</span><span class=p>(</span><span class=n>sockfd</span><span class=p>,</span><span class=w> </span><span class=n>result</span><span class=o>-></span><span class=n>ai_addr</span><span class=p>,</span><span class=w> </span><span class=n>result</span><span class=o>-></span><span class=n>ai_addrlen</span><span class=p>);</span>
+<span class=w>    </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>res</span><span class=w> </span><span class=o>&lt;</span><span class=w> </span><span class=mi>0</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=n>perror</span><span class=p>(</span><span class=s>"connect"</span><span class=p>);</span>
+<span class=w>        </span><span class=n>exit</span><span class=p>(</span><span class=n>EXIT_FAILURE</span><span class=p>);</span>
+<span class=w>    </span><span class=p>}</span>
+<span class=w>    </span><span class=c1>// fcntl(sockfd, F_SETFL, O_NONBLOCK);</span>
+
+<span class=w>    </span><span class=kt>char</span><span class=w> </span><span class=n>buffer</span><span class=p>[</span><span class=mi>37</span><span class=p>];</span>
+<span class=w>    </span><span class=c1>// strcpy(buffer, "%d ABCDEFG");</span>
+
+<span class=w>    </span><span class=n>snprintf</span><span class=p>(</span><span class=n>buffer</span><span class=p>,</span><span class=w> </span><span class=k>sizeof</span><span class=p>(</span><span class=n>buffer</span><span class=p>),</span><span class=w> </span><span class=s>"%d: ABCDEFG"</span><span class=p>,</span><span class=w> </span><span class=n>getpid</span><span class=p>());</span>
+
+<span class=w>    </span><span class=kt>char</span><span class=w> </span><span class=n>recv_buf</span><span class=p>[</span><span class=mi>20</span><span class=p>];</span>
+
+<span class=w>    </span><span class=k>while</span><span class=w> </span><span class=p>(</span><span class=nb>true</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=c1>// snprintf(buffer, sizeof(buffer), "%d", pid);</span>
+<span class=w>        </span><span class=c1>// strcpy(buffer, "hello word");</span>
+<span class=w>        </span><span class=c1>// write data to kernel send buffer</span>
+<span class=w>        </span><span class=kt>int</span><span class=w> </span><span class=n>sent_cnt</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>send</span><span class=p>(</span><span class=n>sockfd</span><span class=p>,</span><span class=w> </span><span class=n>buffer</span><span class=p>,</span><span class=w> </span><span class=n>strlen</span><span class=p>(</span><span class=n>buffer</span><span class=p>),</span><span class=w> </span><span class=mi>0</span><span class=p>);</span>
+<span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>sent_cnt</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=mi>-1</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>            </span><span class=n>perror</span><span class=p>(</span><span class=s>"send"</span><span class=p>);</span>
+<span class=w>            </span><span class=k>continue</span><span class=p>;</span>
+<span class=w>        </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span>
+<span class=w>            </span><span class=n>printf</span><span class=p>(</span><span class=s>"</span><span class=se>\n</span><span class=s>%d bytes sent: "</span><span class=p>,</span><span class=w> </span><span class=n>sent_cnt</span><span class=p>);</span>
+
+<span class=w>            </span><span class=n>fflush</span><span class=p>(</span><span class=n>stdout</span><span class=p>);</span>
+<span class=w>            </span><span class=n>write</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span><span class=w> </span><span class=n>buffer</span><span class=p>,</span><span class=w> </span><span class=n>sent_cnt</span><span class=p>);</span>
+<span class=w>            </span><span class=n>printf</span><span class=p>(</span><span class=s>"</span><span class=se>\n</span><span class=s>"</span><span class=p>);</span>
+<span class=w>        </span><span class=p>}</span>
+
+<span class=w>        </span><span class=kt>int</span><span class=w> </span><span class=n>recv_cnt</span><span class=w> </span><span class=o>=</span><span class=w> </span><span class=n>recv</span><span class=p>(</span><span class=n>sockfd</span><span class=p>,</span><span class=w> </span><span class=n>recv_buf</span><span class=p>,</span><span class=w> </span><span class=k>sizeof</span><span class=p>(</span><span class=n>recv_buf</span><span class=p>),</span><span class=w> </span><span class=mi>0</span><span class=p>);</span>
+<span class=w>        </span><span class=k>if</span><span class=w> </span><span class=p>(</span><span class=n>recv_cnt</span><span class=w> </span><span class=o>==</span><span class=w> </span><span class=mi>-1</span><span class=p>)</span><span class=w> </span><span class=p>{</span>
+<span class=w>            </span><span class=n>perror</span><span class=p>(</span><span class=s>"recv"</span><span class=p>);</span>
+<span class=w>            </span><span class=k>continue</span><span class=p>;</span>
+<span class=w>        </span><span class=p>}</span><span class=w> </span><span class=k>else</span><span class=w> </span><span class=p>{</span>
+<span class=w>            </span><span class=n>printf</span><span class=p>(</span><span class=s>"received %d bytes: "</span><span class=p>,</span><span class=w> </span><span class=n>recv_cnt</span><span class=p>);</span>
+
+<span class=w>            </span><span class=n>fflush</span><span class=p>(</span><span class=n>stdout</span><span class=p>);</span>
+<span class=w>            </span><span class=n>write</span><span class=p>(</span><span class=mi>1</span><span class=p>,</span><span class=w> </span><span class=n>recv_buf</span><span class=p>,</span><span class=w> </span><span class=n>recv_cnt</span><span class=p>);</span>
+<span class=w>            </span><span class=n>printf</span><span class=p>(</span><span class=s>"</span><span class=se>\n</span><span class=s>"</span><span class=p>);</span>
+<span class=w>        </span><span class=p>}</span>
+<span class=w>        </span><span class=n>sleep</span><span class=p>(</span><span class=mi>1</span><span class=p>);</span>
+<span class=w>    </span><span class=p>}</span>
+
+<span class=w>    </span><span class=n>close</span><span class=p>(</span><span class=n>sockfd</span><span class=p>);</span>
+<span class=w>    </span><span class=c1>// sleep(999);</span>
+<span class=w>    </span><span class=n>freeaddrinfo</span><span class=p>(</span><span class=n>result</span><span class=p>);</span>
+
+<span class=w>    </span><span class=k>return</span><span class=w> </span><span class=mi>0</span><span class=p>;</span>
+<span class=p>}</span>
+</code></pre></div></details></div>

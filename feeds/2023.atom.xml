@@ -1,0 +1,1346 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Random Gibberish - 2023</title><link href="https://dylanz.site/" rel="alternate"/><link href="https://dylanz.site/feeds/2023.atom.xml" rel="self"/><id>https://dylanz.site/</id><updated>2023-06-14T20:35:00+08:00</updated><entry><title>ANSI.Common.Lisp</title><link href="https://dylanz.site/2023/ansicommonlisp.html" rel="alternate"/><published>2023-06-14T20:35:00+08:00</published><updated>2023-06-14T20:35:00+08:00</updated><author><name>Big Pineapple</name></author><id>tag:dylanz.site,2023-06-14:/2023/ansicommonlisp.html</id><summary type="html"/><content type="html">&lt;div class="contents topic" id="topic-1"&gt;
+&lt;p class="topic-title"&gt;&lt;a class="reference internal" href="#top"&gt;目录&lt;/a&gt;&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="toc-entry-1"&gt;1. Introduction&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#new-tools" id="toc-entry-2"&gt;1.1. New Tools&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#new-techniques" id="toc-entry-3"&gt;1.2. New Techniques&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#a-new-approach" id="toc-entry-4"&gt;1.3. A New Approach&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#welcome-to-lisp" id="toc-entry-5"&gt;2. Welcome to Lisp&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#form" id="toc-entry-6"&gt;2.1. form&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#evaluation" id="toc-entry-7"&gt;2.2. evaluation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#data" id="toc-entry-8"&gt;2.3. data&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#list-operation" id="toc-entry-9"&gt;2.4. list operation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#truth" id="toc-entry-10"&gt;2.5. truth&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#functions" id="toc-entry-11"&gt;2.6. functions&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#recursion" id="toc-entry-12"&gt;2.7. recursion&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#reading-lisp" id="toc-entry-13"&gt;2.8. reading lisp&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#input-and-output" id="toc-entry-14"&gt;2.9. input and output&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#variables" id="toc-entry-15"&gt;2.10. variables&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#assignment" id="toc-entry-16"&gt;2.11. assignment&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#funcional-programming" id="toc-entry-17"&gt;2.12. funcional programming&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#iteration" id="toc-entry-18"&gt;2.13. iteration&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#functions-as-objects" id="toc-entry-19"&gt;2.14. functions as objects&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#types" id="toc-entry-20"&gt;2.15. types&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#looking-forward" id="toc-entry-21"&gt;2.16. looking forward&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#exercise" id="toc-entry-22"&gt;2.17. exercise&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#lists" id="toc-entry-23"&gt;3. Lists&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#conses" id="toc-entry-24"&gt;3.1. conses&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#equality" id="toc-entry-25"&gt;3.2. equality&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-1"&gt;1. Introduction&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;John McCarthy, 1958&lt;/p&gt;
+&lt;p&gt;designed to evolve&lt;/p&gt;
+&lt;p&gt;This introduction may seem a collection of grand and possibily meaningless
+claims.&lt;/p&gt;
+&lt;div class="section" id="new-tools"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-2"&gt;1.1. New Tools&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Reward: you will feel as suffocated programming in C++ as an experienced C++
+programmer would feel programming in Basic.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="new-techniques"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-3"&gt;1.2. New Techniques&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;extensible, reusable, rapid prototyping&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="a-new-approach"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-4"&gt;1.3. A New Approach&lt;/a&gt;&lt;/h3&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;interactive environments&lt;/li&gt;
+&lt;li&gt;garbage collection&lt;/li&gt;
+&lt;li&gt;run-time typing&lt;/li&gt;
+&lt;li&gt;...&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="welcome-to-lisp"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-5"&gt;2. Welcome to Lisp&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="section" id="form"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-6"&gt;2.1. form&lt;/a&gt;&lt;/h3&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;&lt;em&gt;toplevel&lt;/em&gt;&lt;/dt&gt;
+&lt;dd&gt;interactive front-end&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p&gt;(+ 2 3) prefix notation&lt;/p&gt;
+&lt;p&gt;(operator argument1, argument2, ...)&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="evaluation"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-7"&gt;2.2. evaluation&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;when lisp evaluates a function call like (+ 2 3)&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;arguments are evaluated, from left to right&lt;/li&gt;
+&lt;li&gt;arguments are passed to the function named by the operator&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;lisp provides the quote as a way of &lt;em&gt;protecting&lt;/em&gt; expressions from evaluation&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;quote&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;return the singly taken argument verbatim&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="data"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-8"&gt;2.3. data&lt;/a&gt;&lt;/h3&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;integer - a series of digits&lt;/li&gt;
+&lt;li&gt;string - characters surrounded by double-quotes&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;symbols&lt;/strong&gt; - words, ordinarily converted to uppercase. To refer it, quote it.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;lists&lt;/strong&gt; - (&lt;em&gt;list&lt;/em&gt; arg1 arg2 ...) build lists&lt;/li&gt;
+&lt;li&gt;empty list - () or NIL&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="list-operation"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-9"&gt;2.4. list operation&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;em&gt;cons&lt;/em&gt; builds lists. If its 2nd argument is a list, a new list with the 1st
+argument prepended to the front.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cons&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;#39;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;c&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;d&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;A&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;B&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;C&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;D&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;em&gt;car&lt;/em&gt; gets the first element, &lt;em&gt;cdr&lt;/em&gt; for the rest&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;car&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;c&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="nv"&gt;A&lt;/span&gt;
+&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cdr&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;c&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;B&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;C&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;For instance, to get 3rd element&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;car&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cdr&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cdr&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;c&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;d&lt;/span&gt;&lt;span class="p"&gt;))))&lt;/span&gt;
+&lt;span class="nv"&gt;C&lt;/span&gt;
+&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;third&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;c&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;d&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="nv"&gt;C&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="truth"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-10"&gt;2.5. truth&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;em&gt;listp&lt;/em&gt; returns true, symbol &lt;em&gt;t&lt;/em&gt;, if its argument is a list&lt;/p&gt;
+&lt;p&gt;Common Lisp &lt;em&gt;predicates&lt;/em&gt; often have names end with p.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;null&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;nil&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; *null* returns true of the empty list&lt;/span&gt;
+&lt;span class="no"&gt;T&lt;/span&gt;
+&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;not&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;nil&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; *not* returns true if its argument is false&lt;/span&gt;
+&lt;span class="no"&gt;T&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;(&lt;em&gt;if&lt;/em&gt; &lt;em&gt;test&lt;/em&gt; &lt;em&gt;then&lt;/em&gt; &lt;em&gt;[else]&lt;/em&gt;)&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;listp&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;c&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;6&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="mi"&gt;3&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;if &lt;em&gt;else&lt;/em&gt; is omitted, it defaults to &lt;em&gt;nil&lt;/em&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;listp&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;24&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="no"&gt;NIL&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Everything except for &lt;em&gt;nil&lt;/em&gt; represents &lt;em&gt;true&lt;/em&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;24&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="mi"&gt;4&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;em&gt;and&lt;/em&gt; and &lt;em&gt;or&lt;/em&gt; resemble conditionals.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;and&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; and&lt;/span&gt;
+&lt;span class="mi"&gt;3&lt;/span&gt;
+
+&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;or&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;; and or are macros&lt;/span&gt;
+&lt;span class="mi"&gt;4&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="functions"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-11"&gt;2.6. functions&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defun&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;sum-greater&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;y&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;z&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;y&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;z&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="nv"&gt;SUM-GREATER&lt;/span&gt;
+&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;sum-greater&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="no"&gt;T&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="recursion"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-12"&gt;2.7. recursion&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defun&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;my-member&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;obj&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;null&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;NIL&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;eql&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;obj&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;car&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;my-member&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;obj&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cdr&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;)))))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="reading-lisp"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-13"&gt;2.8. reading lisp&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;read code by indentation, with an editor supporting matching parentheses.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="input-and-output"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-14"&gt;2.9. input and output&lt;/a&gt;&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;p&gt;(&lt;em&gt;format&lt;/em&gt; arg1 arg2 args)&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;arg1 - where the output is to be printed
+- t - output is sent to default place, toplevel&lt;/li&gt;
+&lt;li&gt;arg2 - string template
+- ~A indicates a position to be filled, ~% is a newline&lt;/li&gt;
+&lt;li&gt;args - to be inserted into template&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;format&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;~A plus ~A equals ~A.~%&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;plus&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;equals&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;
+&lt;span class="no"&gt;NIL&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c1"&gt;; returned by the call to format&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="variables"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-15"&gt;2.10. variables&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;em&gt;set&lt;/em&gt; allows to introduce new &lt;em&gt;local&lt;/em&gt; variables&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;let&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="vg"&gt;*variable*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="vg"&gt;*expression*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defun&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;ask-number&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;format&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;please enter a number&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;let&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nv"&gt;var&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;read&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;numberp&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;var&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="nv"&gt;var&lt;/span&gt;
+&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;ask-number&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;give a symbol and a value to &lt;em&gt;defparameter&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;or define global constants by &lt;em&gt;defconstant&lt;/em&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defparameter&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="vg"&gt;*glob*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;99&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="vg"&gt;*GLOB*&lt;/span&gt;
+&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defconstant&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;limit&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="vg"&gt;*glob*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="nv"&gt;LIMIT&lt;/span&gt;
+
+&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;boundp&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;#39;*glob*&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="no"&gt;T&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="assignment"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-16"&gt;2.11. assignment&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;setf&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="vg"&gt;*glob*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;37&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="vg"&gt;*GLOB*&lt;/span&gt;
+&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;let&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nv"&gt;n&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;setf&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;n&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nv"&gt;n&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;setf&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;b&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="nv"&gt;c&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;d&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c1"&gt;; equals two assignments respectively&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="funcional-programming"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-17"&gt;2.12. funcional programming&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;It means writing programs that work by returning values, instead of by modifying
+things, which is the dominant paradigm in Lisp.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;setf&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;b&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;c&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;d&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;A&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;B&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;C&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;A&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;D&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;remove&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;#39;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;B&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;C&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;D&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;setf&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;remove&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;#39;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c1"&gt;; the original lst remains untouched&lt;/span&gt;
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;B&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;C&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;D&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="iteration"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-18"&gt;2.13. iteration&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defun&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;show-squares&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;start&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;end&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;do&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nv"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;start&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c1"&gt;; (variable initial update)&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;10&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;#39;done&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c1"&gt;; (stop criteria, expression evaluated when stop)&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;format&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;~A ~A~%&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;i&lt;/span&gt;&lt;span class="p"&gt;))))&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c1"&gt;; body of the loop&lt;/span&gt;
+
+&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;show-squares&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;
+&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;9&lt;/span&gt;
+&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;16&lt;/span&gt;
+&lt;span class="nv"&gt;DONE&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defun&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;show-squares&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;end&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;end&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="ss"&gt;&amp;#39;done&lt;/span&gt;
+&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;progn&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c1"&gt;; evaluates expressions in order, return the value of last&lt;/span&gt;
+&lt;span class="w"&gt;             &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;format&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;~A ~A~%&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;i&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="w"&gt;             &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;show-squares&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;end&lt;/span&gt;&lt;span class="p"&gt;))))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;em&gt;dolist&lt;/em&gt; takes an argument of the form (&lt;em&gt;variable&lt;/em&gt; &lt;em&gt;expression&lt;/em&gt;), followed by a
+body of expressions. The body will be evaluated with &lt;em&gt;variable&lt;/em&gt; bound to
+successive elements of the list returned by &lt;em&gt;expression&lt;/em&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defun&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;our-length&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;let&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nv"&gt;len&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;dolist&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;obj&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c1"&gt;; (variable expression&lt;/span&gt;
+&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;setf&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;len&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;len&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c1"&gt;; body of expressions&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="nv"&gt;len&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defun&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;our-length&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;null&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;
+&lt;span class="w"&gt;         &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;our-length&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cdr&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="functions-as-objects"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-19"&gt;2.14. functions as objects&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;function that takes a function as an argument is &lt;em&gt;apply&lt;/em&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;apply&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;#&amp;#39;&lt;/span&gt;&lt;span class="nb"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="mi"&gt;6&lt;/span&gt;
+&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;apply&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;#&amp;#39;&lt;/span&gt;&lt;span class="nb"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c1"&gt;; any number of arguments, so long as the last is a list&lt;/span&gt;
+&lt;span class="mi"&gt;15&lt;/span&gt;
+&lt;span class="c1"&gt;; funcall does the same thing but does not need the arguments to be&lt;/span&gt;
+&lt;span class="nv"&gt;packaged&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;in&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;list&lt;/span&gt;
+&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;funcall&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;#&amp;#39;&lt;/span&gt;&lt;span class="nb"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="mi"&gt;6&lt;/span&gt;
+
+&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;funcall&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;#&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;lambda&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="w"&gt;             &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="mi"&gt;2&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="types"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-20"&gt;2.15. types&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;cl types from a hierachy of subtypes and supertypes.
+27 is of type &lt;em&gt;fixnum, integer, rational, real, number, atom, and t&lt;/em&gt;, in order of increasing generality.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;typep&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;27&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;#39;integer&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="no"&gt;T&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="looking-forward"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-21"&gt;2.16. looking forward&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;So far we have barely scratched the surface of Lisp.&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;interactive on toplevel&lt;/li&gt;
+&lt;li&gt;prefix syntax means any number of arguments&lt;/li&gt;
+&lt;li&gt;parentheses are not an issue, we use indentation&lt;/li&gt;
+&lt;li&gt;funcional programming, which avoid side-effects, is the dominant paradigm&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="exercise"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-22"&gt;2.17. exercise&lt;/a&gt;&lt;/h3&gt;
+&lt;ol class="arabic"&gt;
+&lt;li&gt;&lt;p class="first"&gt;describe what happens when the following expressions are evaluated&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;(+ (- 5 1) (+ 3 7))  ; 14&lt;/li&gt;
+&lt;li&gt;(list 1 (+ 2 3))  ; (1 5)&lt;/li&gt;
+&lt;li&gt;(if (listp 1) (+ 1 2) (+ 3 4))  ; 7&lt;/li&gt;
+&lt;li&gt;(list (and (listp 3) t) (+ 1 2))  ; (nil 3)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;give three distinct &lt;em&gt;cons&lt;/em&gt; expressions that return (a b c)&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;(cons 'a '(b c))&lt;/li&gt;
+&lt;li&gt;(cons 'a (cons 'b '(c)))&lt;/li&gt;
+&lt;li&gt;I can't think of another solution...&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;using &lt;em&gt;car&lt;/em&gt; and &lt;em&gt;cdr&lt;/em&gt;, define a function to return the fourth element of a list&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defun&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;my-fourth&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;car&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cdr&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cdr&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cdr&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;)))))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;define a function that takes two arguments and returns the greater of the two&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defun&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;my-greater&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;y&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;y&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="nv"&gt;y&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;what do these functions do&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defun&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;enigma&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;and&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;not&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;null&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;or&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;null&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;car&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;enigma&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cdr&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)))))&lt;/span&gt;
+
+&lt;span class="c1"&gt;; if nil is in x&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defun&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;mystery&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;y&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;null&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;y&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="no"&gt;nil&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;eql&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;car&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;y&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;let&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nv"&gt;z&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;mystery&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cdr&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;y&lt;/span&gt;&lt;span class="p"&gt;))))&lt;/span&gt;
+&lt;span class="w"&gt;            &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;and&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;z&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;z&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;))))))&lt;/span&gt;
+
+&lt;span class="c1"&gt;; count number of elements in y which differ x&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;what could occur in place of the &lt;em&gt;x&lt;/em&gt; in each of the following exchanges&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&amp;gt; (car (&lt;strong&gt;car&lt;/strong&gt; (cdr '(a (b c) d))))
+B&lt;/li&gt;
+&lt;li&gt;&amp;gt; (&lt;strong&gt;or&lt;/strong&gt; 13 (/ 1 0))
+13&lt;/li&gt;
+&lt;li&gt;&amp;gt; (&lt;strong&gt;apply&lt;/strong&gt; #'list 1 nil)
+(1)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;using only operators introduced in this chapter, define a function that takes a list as an argument and returns true if one of its elements is a list&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defun&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;if-have-list&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;null&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="no"&gt;nil&lt;/span&gt;
+&lt;span class="w"&gt;     &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;listp&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;car&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="no"&gt;t&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;if-have-list&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cdr&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;)))))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;give iterative and recursive definitions of a function that&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;takes a positive integer and prints that many dots&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defun&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;print-dots-iteratively&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;do&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nv"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nb"&gt;eql&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;#39;done&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;format&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defun&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;print-dots-recursively&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;eql&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="ss"&gt;&amp;#39;done&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;progn&lt;/span&gt;
+&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;format&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;t&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s"&gt;&amp;quot;.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;print-dots-recursively&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)))))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;ol class="arabic simple" start="2"&gt;
+&lt;li&gt;takes a list and returns the number of times the symbol &lt;em&gt;a&lt;/em&gt; occurs in it&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defun&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;a-interative-counter&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;let&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nb"&gt;count&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="w"&gt;       &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;dolist&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;obj&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;eql&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;obj&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;#39;a&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;             &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;setf&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;count&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nb"&gt;count&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;))))&lt;/span&gt;
+&lt;span class="w"&gt;        &lt;/span&gt;&lt;span class="nb"&gt;count&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defun&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;a-recursive-counter&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p class="first"&gt;a friend is trying to write a function that returns the sum of all the non-nil elements in a list. he has written two versions of this function, and neither of them work. explain what's wrong with each, and give a correct version&lt;/p&gt;
+&lt;ol class="loweralpha"&gt;
+&lt;li&gt;&lt;div class="first"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defun&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;summit&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;remove&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;nil&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="c1"&gt;; (setf lst (remove nil lst)) to update lst&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;apply&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;#&amp;#39;&lt;/span&gt;&lt;span class="nb"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;li&gt;&lt;div class="first"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defun&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;summit&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;   &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;let&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;((&lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;car&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;null&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="c1"&gt;; I strongly doubt here goes wrong&lt;/span&gt;
+&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="c1"&gt;; (cdr last-element) is still nil&lt;/span&gt;
+&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="c1"&gt;; so this is an infinite loop&lt;/span&gt;
+&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;summit&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cdr&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="w"&gt;          &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;summit&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cdr&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;lst&lt;/span&gt;&lt;span class="p"&gt;))))))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="lists"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-23"&gt;3. Lists&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="section" id="conses"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-24"&gt;3.1. conses&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;setf&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cons&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;#39;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;nil&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;setf&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;y&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;list&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;#39;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;#39;b&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;#39;c&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c1"&gt;; flat list&lt;/span&gt;
+&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;setf&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;z&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;list&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;#39;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;list&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;#39;b&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;#39;c&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;#39;d&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c1"&gt;; nested list&lt;/span&gt;
+
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defun&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;my-listp&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;or&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;null&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;consp&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+
+&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;defun&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;my-atom&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;not&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;consp&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;x&lt;/span&gt;&lt;span class="p"&gt;)))&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;em&gt;nil&lt;/em&gt; is both an &lt;em&gt;atom&lt;/em&gt; and &lt;em&gt;list&lt;/em&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="equality"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-25"&gt;3.2. equality&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;calling &lt;em&gt;cons&lt;/em&gt; makes lisp allocate a piece of memory for two pointers, so calling &lt;em&gt;cons&lt;/em&gt; twice generates two distinctly different objects.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;&amp;gt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;eql&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cons&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;#39;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;nil&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nb"&gt;cons&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="ss"&gt;&amp;#39;a&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="no"&gt;nil&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+&lt;span class="no"&gt;NIL&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;em&gt;eql&lt;/em&gt; returns true only if &lt;strong&gt;the same object&lt;/strong&gt;, and &lt;em&gt;equal&lt;/em&gt; only needs printed result being same.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content><category term="2023"/><category term="lisp"/></entry><entry><title>定位手册 - 理论，实践与进阶</title><link href="https://dylanz.site/2023/ding-wei-shou-ce-li-lun-shi-jian-yu-jin-jie.html" rel="alternate"/><published>2023-05-21T17:18:00+08:00</published><updated>2023-05-21T17:18:00+08:00</updated><author><name>Big Pineapple</name></author><id>tag:dylanz.site,2023-05-21:/2023/ding-wei-shou-ce-li-lun-shi-jian-yu-jin-jie.html</id><summary type="html"/><content type="html">&lt;div class="contents topic" id="topic-1"&gt;
+&lt;p class="topic-title"&gt;&lt;a class="reference internal" href="#top"&gt;目录&lt;/a&gt;&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#section-2" id="toc-entry-1"&gt;1. 无线定位系统：操作，应用与实践&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction" id="toc-entry-2"&gt;1.1. introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#basic-methods" id="toc-entry-3"&gt;1.2. basic methods&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#toa" id="toc-entry-4"&gt;1.2.1. TOA&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#tdoa" id="toc-entry-5"&gt;1.2.2. TDOA&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#doa" id="toc-entry-6"&gt;1.2.3. DOA&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#rssi" id="toc-entry-7"&gt;1.2.4. RSSI&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#los-versus-nlos" id="toc-entry-8"&gt;1.2.5. LOS.versus.NLOS&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#positioning-mobility-and-tracking" id="toc-entry-9"&gt;1.2.6. positioning, mobility, and tracking&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#network-localization" id="toc-entry-10"&gt;1.2.7. network localization.网络定位&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#section-3" id="toc-entry-11"&gt;1.3. 定位系统概览&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#gps" id="toc-entry-12"&gt;1.3.1. GPS&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#assisted-gps" id="toc-entry-13"&gt;1.3.2. Assisted GPS&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#ins" id="toc-entry-14"&gt;1.3.3. INS&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#integrated-ins-and-gps" id="toc-entry-15"&gt;1.3.4. Integrated INS and GPS&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#rfid" id="toc-entry-16"&gt;1.3.5. RFID&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#wlps" id="toc-entry-17"&gt;1.3.6. WLPS&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#tcas" id="toc-entry-18"&gt;1.3.7. TCAS&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#wlan" id="toc-entry-19"&gt;1.3.8. WLAN&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#vision-positioning-system" id="toc-entry-20"&gt;1.3.9. vision positioning system&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#radar" id="toc-entry-21"&gt;1.3.10. radar&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#comparison" id="toc-entry-22"&gt;1.4. Comparison&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#section-4" id="toc-entry-23"&gt;1.5. 总结与展望&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#section-5" id="toc-entry-24"&gt;2. 源定位：算法与分析&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#introduction-1" id="toc-entry-25"&gt;2.1. Introduction&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#section-6" id="toc-entry-26"&gt;2.2. 源定位的度量模型与原理&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#toa-1" id="toc-entry-27"&gt;2.2.1. TOA&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#tdoa-1" id="toc-entry-28"&gt;2.2.2. TDOA&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="section-2"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-1"&gt;1. 无线定位系统：操作，应用与实践&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-2"&gt;1.1. introduction&lt;/a&gt;&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;Global Positioning System -- on the globe&lt;/li&gt;
+&lt;li&gt;Local Positioning System -- relative&lt;ul&gt;
+&lt;li&gt;Self-positioning System -- with respect to a static point&lt;/li&gt;
+&lt;li&gt;Remote-positioning System -- relative position of other nodes&lt;ul&gt;
+&lt;li&gt;Active remote positioning system -- target cooperates in positioning&lt;/li&gt;
+&lt;li&gt;Passive remote positioning system -- target is passive and noncooperative&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;div class="section" id="basic-methods"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-3"&gt;1.2. basic methods&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="section" id="toa"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-4"&gt;1.2.1. TOA&lt;/a&gt;&lt;/h4&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;所有基站与终端时间同步，小误差导致大失误&lt;/li&gt;
+&lt;li&gt;信号包含时间戳，提高了信号复杂度&lt;/li&gt;
+&lt;li&gt;基站位置已知，静态节点或者配有 gps 的动态节点&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="tdoa"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-5"&gt;1.2.2. TDOA&lt;/a&gt;&lt;/h4&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;所有基站时间同步即可（终端的石英钟往往不如基站的原子钟准确）&lt;/li&gt;
+&lt;li&gt;信号不需要包含时间戳，因为只需要到达时间作差&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="doa"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-6"&gt;1.2.3. DOA&lt;/a&gt;&lt;/h4&gt;
+&lt;/div&gt;
+&lt;div class="section" id="rssi"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-7"&gt;1.2.4. RSSI&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;RSSI, Received Signal Strength&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="los-versus-nlos"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-8"&gt;1.2.5. LOS.versus.NLOS&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;TOA, TDOA, DOA 对 LOS 更加敏感。而 RSSI 受 LOS 影响较小，因为 能量-距离 关系中，
+NLOS 导致的 shadowing(random) effect 可用滤波消减。因此许多 NLOS 识别、消除与
+定位技术应运而生&lt;/p&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;shadowing effect&lt;/dt&gt;
+&lt;dd&gt;&lt;p class="first"&gt;received signal power fluctuates due to objects obstructing the propagation path&lt;/p&gt;
+&lt;p class="last"&gt;由于传播路径上的物体遮挡，传输信号强度发生波动&lt;/p&gt;
+&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;/div&gt;
+&lt;div class="section" id="positioning-mobility-and-tracking"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-9"&gt;1.2.6. positioning, mobility, and tracking&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;parameter estimation techniques.&lt;/p&gt;
+&lt;p&gt;例如，在 LOS/NLOS 混合环境中，往往用到卡尔曼、贝叶斯或者粒子滤波。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="network-localization"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-10"&gt;1.2.7. network localization.网络定位&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;必要的基础设施：卫星、基站、WLAN AP&lt;/p&gt;
+&lt;p&gt;少量已知的 &lt;em&gt;anchor&lt;/em&gt; 或者 &lt;em&gt;reference&lt;/em&gt; 节点，以及剩下的 &lt;em&gt;unlocalized&lt;/em&gt; 未知节点。
+未知节点不能与已知节点通信，会互相通信估算位置。&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;collaborative position location&lt;/li&gt;
+&lt;li&gt;cooperative localization&lt;/li&gt;
+&lt;li&gt;network localization&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="section-3"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-11"&gt;1.3. 定位系统概览&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="section" id="gps"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-12"&gt;1.3.1. GPS&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;27 = 24 + 3 (in case)&lt;/p&gt;
+&lt;p&gt;complete 2 rotations each 24 hours.&lt;/p&gt;
+&lt;p&gt;任何时间，任何地点，至少四颗，清晰可见！&lt;/p&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;&lt;strong&gt;距离测量&lt;/strong&gt;&lt;/dt&gt;
+&lt;dd&gt;&lt;p class="first"&gt;考虑到终端机与卫星 &lt;strong&gt;完美同步&lt;/strong&gt; (精确到纳秒级)，二者同时发出 long unique pattern
+( pseudo random code )，根据二者信号的延迟判断距离。&lt;/p&gt;
+&lt;p&gt;受制于成本问题，厂家往往只会在终端机里面用石英钟，无法纳秒级精确，所以额外一步。&lt;/p&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;&lt;em&gt;syncrhonization&lt;/em&gt;&lt;/dt&gt;
+&lt;dd&gt;&lt;p class="first"&gt;第四颗卫星用来测量终端机误差。&lt;/p&gt;
+&lt;p class="last"&gt;The difference between the distance of the estimated receiver position from
+the fourth satellite and the pseudorange of the fourth satellite (the radius
+of the fourth satellite or the distance to the fourth satellite as measured
+by the GPS receiver) is used to calculate the error.&lt;/p&gt;
+&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p&gt;另外，卫星的原子钟也周期性矫正，确保 &lt;em&gt;relativistic effect&lt;/em&gt; 被消除，
+以及与陆地时钟同步。&lt;/p&gt;
+&lt;p&gt;relativistic effect 基于可由相对论解释的两个现象：&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;弱重力场的时钟 tick faster&lt;/li&gt;
+&lt;li&gt;移动的时钟 tick slower&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p class="last"&gt;因此，因为弱重力场，卫星时钟相对地面时钟转地更快，又因高速运动转地更慢。
+即使理论上两种效应 cancel out，最终的 net effect 是相比于地面时钟 tick faster&lt;/p&gt;
+&lt;/dd&gt;
+&lt;dt&gt;&lt;strong&gt;卫星位置&lt;/strong&gt;&lt;/dt&gt;
+&lt;dd&gt;&lt;p class="first"&gt;终端机可存储 almanac，据此获得任何时间每个卫星的位置。&lt;/p&gt;
+&lt;p class="last"&gt;日月重力的牵引效果被美国国防部持续观测，并将调整信息作为信号的一部分发到终端机&lt;/p&gt;
+&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;/div&gt;
+&lt;div class="section" id="assisted-gps"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-13"&gt;1.3.2. Assisted GPS&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;todo&lt;/p&gt;
+&lt;p&gt;GPS 的问题：Time To First Fix, TTFF 或 cold start 花费时间太久&lt;/p&gt;
+&lt;p&gt;首次开机后需要很长时间获取信号、交互数据并定位&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="ins"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-14"&gt;1.3.3. INS&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;todo&lt;/p&gt;
+&lt;p&gt;误差在积分过程中的传播被称为 &lt;em&gt;integration drift&lt;/em&gt; ，&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="integrated-ins-and-gps"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-15"&gt;1.3.4. Integrated INS and GPS&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;INS 可填补两个 GPS 计算定位的空隙，也可用于 obscuration caused by maneuvering&lt;/p&gt;
+&lt;p&gt;GPS 可矫正 INS 的传播误差&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="rfid"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-16"&gt;1.3.5. RFID&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;RFID 是一个识别附着在物体上标签的无线系统，其包含一个 reader 和 RFID 标签。&lt;/p&gt;
+&lt;p&gt;根据标签种类可分为两类&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;passive tags. 不含电源，适合短距离。配有被特定频率的信号激活的天线阵列。&lt;/li&gt;
+&lt;li&gt;active RFID system. 收发系统，tag = transponder + power source.
+RFID reader 发送电磁波，tag in its vicinity 接收.
+tag modulate 电磁波，增加识别信息并发回。reader 将变频电磁波转为数字信号，&lt;/li&gt;
+&lt;/ul&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;&lt;strong&gt;RFID as a Positioning System&lt;/strong&gt;&lt;/dt&gt;
+&lt;dd&gt;&lt;p class="first"&gt;Received Signal Strength Indicator&lt;/p&gt;
+&lt;p&gt;location identification based on dynamic active RFID calibration&lt;/p&gt;
+&lt;blockquote class="last"&gt;
+fixed tags serve as reference points&lt;/blockquote&gt;
+&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;/div&gt;
+&lt;div class="section" id="wlps"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-17"&gt;1.3.6. WLPS&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;hybrid TOA and DOA&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;monitoring mobile unit (or Dynamic Base Station, DBS)&lt;/li&gt;
+&lt;li&gt;target mobile unit ( or Active Target, or Transceiver, TRX)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;DOA 用的是 DBS 上的天线阵列&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="tcas"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-18"&gt;1.3.7. TCAS&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;检测并跟踪飞行器，附近有半空碰撞风险时警告飞行员。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="wlan"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-19"&gt;1.3.8. WLAN&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;trilateration using RSSI technique&lt;/p&gt;
+&lt;p&gt;Network Interface Card, NIC&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="vision-positioning-system"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-20"&gt;1.3.9. vision positioning system&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;todo&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="radar"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-21"&gt;1.3.10. radar&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;RAdio Detection And Ranging, RADAR&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="comparison"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-22"&gt;1.4. Comparison&lt;/a&gt;&lt;/h3&gt;
+&lt;table border="1" class="docutils"&gt;
+&lt;colgroup&gt;
+&lt;col width="25%" /&gt;
+&lt;col width="25%" /&gt;
+&lt;col width="25%" /&gt;
+&lt;col width="25%" /&gt;
+&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td&gt;Accuracy&lt;/td&gt;
+&lt;td&gt;LOS/NLOS&lt;/td&gt;
+&lt;td&gt;No. of BS&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;TOA&lt;/td&gt;
+&lt;td&gt;Medium&lt;/td&gt;
+&lt;td&gt;LOS&lt;/td&gt;
+&lt;td&gt;&amp;gt;=3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;TDOA&lt;/td&gt;
+&lt;td&gt;Medium&lt;/td&gt;
+&lt;td&gt;LOS&lt;/td&gt;
+&lt;td&gt;&amp;gt;=3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;DOA&lt;/td&gt;
+&lt;td&gt;Low&lt;/td&gt;
+&lt;td&gt;LOS&lt;/td&gt;
+&lt;td&gt;&amp;gt;=2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;RSSI&lt;/td&gt;
+&lt;td&gt;H to M&lt;/td&gt;
+&lt;td&gt;Both&lt;/td&gt;
+&lt;td&gt;&amp;gt;=3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class="section" id="section-4"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-23"&gt;1.5. 总结与展望&lt;/a&gt;&lt;/h3&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="section-5"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-24"&gt;2. 源定位：算法与分析&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;Assuming that the disturbances in the measurements are zero-mean Gaussian
+distributed, the Cramér–Rao lower bound (CRLB), which gives a lower bound
+on the variance attainable by any unbiased location estimator using the same
+data, will also be provided.&lt;/p&gt;
+&lt;p&gt;假定测量中的干扰是零均值高斯分布，还将提供 Cramer-Rao 下限 (CRLB)，
+其给出了使用相同数据的任何无偏位置估计器可达到的方差的下限。&lt;/p&gt;
+&lt;p&gt;看完这章的学习成果：&lt;/p&gt;
+&lt;p&gt;1). 用到 TOA, TDOA, RSS 和 DOA 测量的定位算法的发展&lt;/p&gt;
+&lt;p&gt;2). 位置估计的性能测量&lt;/p&gt;
+&lt;div class="section" id="introduction-1"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-25"&gt;2.1. Introduction&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The position of a target of interest can be determined by utilizing its emitted signal
+measured at an array of spatially separated receivers with a priori known locations.&lt;/p&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;&lt;strong&gt;assume there are no outliers&lt;/strong&gt;&lt;/dt&gt;
+&lt;dd&gt;shadowing and multipath propagation errors are sufficiently small&lt;/dd&gt;
+&lt;dt&gt;&lt;strong&gt;assume LOS transmission&lt;/strong&gt;&lt;/dt&gt;
+&lt;dd&gt;NLOS 会造成距离信息中较大的正偏差&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;/div&gt;
+&lt;div class="section" id="section-6"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-26"&gt;2.2. 源定位的度量模型与原理&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="math"&gt;
+\begin{equation*}
+\textbf{r} = \textbf{f}(\textbf{x}) + \textbf{n}
+\end{equation*}
+&lt;/div&gt;
+&lt;p&gt;where &lt;span class="math"&gt;\(\textbf{r}\)&lt;/span&gt; 是测量值向量，&lt;span class="math"&gt;\(\textbf{x}\)&lt;/span&gt; 是待定位的坐标，
+&lt;span class="math"&gt;\(\textbf{f}\)&lt;/span&gt; 是已知的非线性函数，&lt;span class="math"&gt;\(\textbf{n}\)&lt;/span&gt; 是 0 均值的噪声向量。&lt;/p&gt;
+&lt;div class="section" id="toa-1"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-27"&gt;2.2.1. TOA&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;三个或更多基站时，把有噪的 TOA 转化为方程组，再根据已知基站 &lt;strong&gt;最优化&lt;/strong&gt; 定位更好&lt;/p&gt;
+&lt;p&gt;令 &lt;span class="math"&gt;\(\textbf{x} = [x \space{} y]^T\)&lt;/span&gt; 为未知终端，
+&lt;span class="math"&gt;\(\textbf{x}_l = [x_l \space{} x_l]^T\)&lt;/span&gt; 为已知基站，则终端与第l个基站之间的距离
+&lt;span class="math"&gt;\(d_l\)&lt;/span&gt; 就是&lt;/p&gt;
+&lt;div class="math"&gt;
+\begin{equation*}
+d_l = \| \textbf{x} - \textbf{x}_l \|_2 = \sqrt{(x-x_l)^2+(y-y_l)^2}
+\end{equation*}
+&lt;/div&gt;
+&lt;p&gt;设 &lt;span class="math"&gt;\(t_l\)&lt;/span&gt; 为信号从基站 &lt;em&gt;l&lt;/em&gt; 到达终端机的传播时间，则显然&lt;/p&gt;
+&lt;div class="math"&gt;
+\begin{equation*}
+t_l = \frac{d_l}{c}
+\end{equation*}
+&lt;/div&gt;
+&lt;p&gt;现实生活中，TOA 不可避免地存在误差，所以由 &lt;span class="math"&gt;\(t_l\)&lt;/span&gt; 和 &lt;em&gt;c&lt;/em&gt;
+相乘表示的距离与实际测量值的关系可以表示为&lt;/p&gt;
+&lt;div class="math"&gt;
+\begin{equation*}
+r_{TOA,l} = d_l + n_{TOA,l} = \sqrt{(x-x_l)^2+(y-y_l)^2} + n_{TOA,l}
+\end{equation*}
+&lt;/div&gt;
+&lt;p&gt;上式可表达为向量形式&lt;/p&gt;
+&lt;div class="math"&gt;
+\begin{equation*}
+\textbf{r}_{TOA} = \textbf{f}_{TOA}(\textbf{x}) + \textbf{n}_{TOA}
+\end{equation*}
+&lt;/div&gt;
+&lt;p&gt;为了便于算法的开发分析以及 CRLB 的计算，
+&lt;span class="math"&gt;\({n_{TOA,l}}\)&lt;/span&gt; 是零均值非相关的高斯过程。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="tdoa-1"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-28"&gt;2.2.2. TDOA&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;TDOA 是信号到达一对传感器的时间之差，而且 TDOA 不需要接收机的时钟和他们一起同步。将 TDOA 与传播速度 c 相乘得到接收机与两个基站的范围之差。每个 TDOA 定义了一个接收机位于其上的双曲线，而目标位置就在至少两条双曲线的交点上。&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="2023"/><category term="positioning"/></entry><entry><title>记录一次 Gentoo 的修缮过程</title><link href="https://dylanz.site/2023/ji-lu-yi-ci-gentoo-de-xiu-shan-guo-cheng.html" rel="alternate"/><published>2023-04-29T13:29:00+08:00</published><updated>2023-04-29T13:29:00+08:00</updated><author><name>Big Pineapple</name></author><id>tag:dylanz.site,2023-04-29:/2023/ji-lu-yi-ci-gentoo-de-xiu-shan-guo-cheng.html</id><summary type="html">
+&lt;div class="section" id="abstract"&gt;
+&lt;h2&gt;0. abstract&lt;/h2&gt;
+&lt;p&gt;最近在 /etc/fstab 里面指定 /var/lib/docker 时出现了失 …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="contents topic" id="topic-1"&gt;
+&lt;p class="topic-title"&gt;&lt;a class="reference internal" href="#top"&gt;目录&lt;/a&gt;&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#abstract" id="toc-entry-1"&gt;0. abstract&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#livecd" id="toc-entry-2"&gt;1. livecd&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#mount" id="toc-entry-3"&gt;1.1. mount&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#stage3" id="toc-entry-4"&gt;1.2. stage3&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#base" id="toc-entry-5"&gt;1.3. base&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#btrfs-for-safety" id="toc-entry-6"&gt;2. Btrfs for safety&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#section-1" id="toc-entry-7"&gt;2.1. 清理碎片&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#section-2" id="toc-entry-8"&gt;2.2. 子卷快照&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="abstract"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-1"&gt;0. abstract&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;最近在 /etc/fstab 里面指定 /var/lib/docker 时出现了失误，致使我的 root 分区被污染，重新修复 seems implausible，于是痛定思痛重装 Gentoo，同时记录一下。&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="livecd"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-2"&gt;1. livecd&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="section" id="mount"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-3"&gt;1.1. mount&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;即使 Gentoo 多年，由于我总是在 grub 保有 recovery entry，所以进 livecd 抢救的次数也屈指可数，这使我总是忘记这段关键的命令&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;mkdir&lt;span class="w"&gt; &lt;/span&gt;/mnt/gentoo
+sudo&lt;span class="w"&gt; &lt;/span&gt;mount&lt;span class="w"&gt; &lt;/span&gt;-vo&lt;span class="w"&gt; &lt;/span&gt;compress-force&lt;span class="o"&gt;=&lt;/span&gt;zstd,subvolid&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;256&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;/dev/nvme0n1p3&lt;span class="w"&gt; &lt;/span&gt;/mnt/gentoo
+sudo&lt;span class="w"&gt; &lt;/span&gt;mount&lt;span class="w"&gt; &lt;/span&gt;-vo&lt;span class="w"&gt; &lt;/span&gt;compress-force&lt;span class="o"&gt;=&lt;/span&gt;zstd,subvolid&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;257&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;/dev/nvme0n1p3&lt;span class="w"&gt; &lt;/span&gt;/mnt/gentoo/home
+sudo&lt;span class="w"&gt; &lt;/span&gt;mount&lt;span class="w"&gt; &lt;/span&gt;/dev/nvme0n1p1&lt;span class="w"&gt; &lt;/span&gt;/mnt/gentoo/boot
+sudo&lt;span class="w"&gt; &lt;/span&gt;swapon&lt;span class="w"&gt; &lt;/span&gt;/dev/nvme0n1p2
+sudo&lt;span class="w"&gt; &lt;/span&gt;mount&lt;span class="w"&gt; &lt;/span&gt;--types&lt;span class="w"&gt; &lt;/span&gt;proc&lt;span class="w"&gt; &lt;/span&gt;/proc&lt;span class="w"&gt; &lt;/span&gt;/mnt/gentoo/proc
+&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;i&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;in&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;sys&lt;span class="w"&gt; &lt;/span&gt;dev&lt;span class="w"&gt; &lt;/span&gt;run&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;do&lt;/span&gt;
+&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;mount&lt;span class="w"&gt; &lt;/span&gt;--rbind&lt;span class="w"&gt; &lt;/span&gt;/&lt;span class="nv"&gt;$i&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;/mnt/gentoo/&lt;span class="nv"&gt;$i&lt;/span&gt;
+&lt;span class="k"&gt;for&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;mount&lt;span class="w"&gt; &lt;/span&gt;--make-rslave&lt;span class="w"&gt; &lt;/span&gt;/mnt/gentoo/&lt;span class="nv"&gt;$i&lt;/span&gt;
+&lt;span class="k"&gt;done&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="stage3"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-4"&gt;1.2. stage3&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;下载 stage3 之前最重要的事，which I often forget，就是校准时间&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;date&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;042914362023&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;# 将时间设定为 04月29日，14：36，2023年&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;另一个就是保留权限解压 tar 包&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;tar&lt;span class="w"&gt; &lt;/span&gt;xfpv&lt;span class="w"&gt; &lt;/span&gt;stage3-*.tar.xz&lt;span class="w"&gt; &lt;/span&gt;--xattrs-include&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;*.*&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;--numeric-owner
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="base"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-5"&gt;1.3. base&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;拷贝 dns 信息&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;cp&lt;span class="w"&gt; &lt;/span&gt;--dereference&lt;span class="w"&gt; &lt;/span&gt;/etc/resolv.conf&lt;span class="w"&gt; &lt;/span&gt;/mnt/gentoo/etc/
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;以及gentoo 仓库的信息&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;mkdir&lt;span class="w"&gt; &lt;/span&gt;/mnt/gentoo/etc/portage/repos.conf
+cp&lt;span class="w"&gt; &lt;/span&gt;/mnt/gentoo/usr/share/portage/config/repos.conf&lt;span class="w"&gt; &lt;/span&gt;/mnt/gentoo/etc/portage/repos.conf/gentoo.conf
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;或许在 /etc/portage/repos.conf/gentoo.conf 里面可以加上 &lt;strong&gt;sync-openpgp-key-refresh = no&lt;/strong&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="btrfs-for-safety"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-6"&gt;2. Btrfs for safety&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;前面其实都是些废话，最重要的就是好好利用 &lt;strong&gt;Copy on Write, CoW&lt;/strong&gt; 和 &lt;strong&gt;snapshot&lt;/strong&gt; 特性，empowered by Btrfs&lt;/p&gt;
+&lt;div class="section" id="section-1"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-7"&gt;2.1. 清理碎片&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;谨记，Btrfs 命令支持 &lt;em&gt;最短去重前缀&lt;/em&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# btrfs filesystem defragment -v /&lt;/span&gt;
+&lt;span class="c1"&gt;# btrfs fi de -v /  # 以上命令可以写成这样&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="section-2"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-8"&gt;2.2. 子卷快照&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Btrfs 的子卷并不是块设备，而是独立可挂载的 POSIX filetree&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# btrfs subvolume snapshot &amp;lt;subvolume&amp;gt; { &amp;lt;subdir&amp;gt;/&amp;lt;name&amp;gt; | &amp;lt;subdir&amp;gt; }&lt;/span&gt;
+&lt;span class="c1"&gt;# btrfs sub snap -r ... # -r 意味着该快照只读&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;首先在 / 下创建专用于备份的文件夹，我称其为 &lt;em&gt;snapshoot&lt;/em&gt; 哈哈哈&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# btrfs subvolume create /snapshoot&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;我将 home 文件夹设为了子卷，所以需要快照两次，因为 btrfs 的快照 &lt;strong&gt;不是递归的&lt;/strong&gt; ，
+子卷存在的地方会被映射为同名的空文件夹&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# btrfs subvolume snapshot -r /     /snapshoot/$(date +&amp;quot;%Y-%m-%d&amp;quot;)-readonly-root&lt;/span&gt;
+&lt;span class="c1"&gt;# btrfs subvolume snapshot -r /home /snapshoot/$(date +&amp;quot;%Y-%m-%d&amp;quot;)-readonly-home&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content><category term="2023"/><category term="gentoo"/></entry><entry><title>reStructuredText primer</title><link href="https://dylanz.site/2023/restructuredtext-primer.html" rel="alternate"/><published>2023-04-10T17:46:00+08:00</published><updated>2023-04-10T17:46:00+08:00</updated><author><name>Big Pineapple</name></author><id>tag:dylanz.site,2023-04-10:/2023/restructuredtext-primer.html</id><summary type="html"/><content type="html">&lt;div class="contents topic" id="topic-1"&gt;
+&lt;p class="topic-title"&gt;&lt;a class="reference internal" href="#top"&gt;目录&lt;/a&gt;&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#abstract" id="toc-entry-1"&gt;0. abstract&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#basics" id="toc-entry-2"&gt;1. basics&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#headings" id="toc-entry-3"&gt;1.1. headings&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#inline-markup" id="toc-entry-4"&gt;1.2. inline markup&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#lists" id="toc-entry-5"&gt;1.3. lists&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#bullet-list" id="toc-entry-6"&gt;1.3.1. bullet list&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#number-list" id="toc-entry-7"&gt;1.3.2. number list&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#definition-list" id="toc-entry-8"&gt;1.3.3. definition list&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#fields-lists" id="toc-entry-9"&gt;1.3.4. fields lists&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#line-blocks" id="toc-entry-10"&gt;1.4. line blocks&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#tables" id="toc-entry-11"&gt;1.5. tables&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#grid-table" id="toc-entry-12"&gt;1.5.1. grid table&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#simple-table" id="toc-entry-13"&gt;1.5.2. simple table&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#hyper-link" id="toc-entry-14"&gt;1.6. hyper link&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#code-blocks" id="toc-entry-15"&gt;1.7. code blocks&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#images" id="toc-entry-16"&gt;1.8. images&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#citation" id="toc-entry-17"&gt;1.9. citation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#table-of-contents" id="toc-entry-18"&gt;1.10. table of contents&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#advanced" id="toc-entry-19"&gt;2. advanced&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#math" id="toc-entry-20"&gt;2.1. math&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#emacs-rst-mode" id="toc-entry-21"&gt;2.2. emacs rst-mode&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#section-adornment" id="toc-entry-22"&gt;2.2.1 section adornment&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#move-around-sections" id="toc-entry-23"&gt;2.2.2 move around sections&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#plain-lines-to-lists" id="toc-entry-24"&gt;2.2.3 plain lines to lists&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class="reference internal" href="#table-of-contents-1" id="toc-entry-25"&gt;2.2.4 table of contents&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="abstract"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-1"&gt;0. abstract&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;reStructuredText, or reST, is designed to be a simple yet unobtrusive markup
+language.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="basics"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-2"&gt;1. basics&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="section" id="headings"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-3"&gt;1.1. headings&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="gh"&gt;Title&lt;/span&gt;
+&lt;span class="gh"&gt;=====&lt;/span&gt;
+
+&lt;span class="gh"&gt;Section&lt;/span&gt;
+&lt;span class="gh"&gt;-------&lt;/span&gt;
+
+&lt;span class="gh"&gt;Subsection&lt;/span&gt;
+&lt;span class="gh"&gt;~~~~~~~~~~&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="inline-markup"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-4"&gt;1.2. inline markup&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;em&gt;italic&lt;/em&gt; *text* for emphasis&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;boldface&lt;/strong&gt; **text** for strong emphasis&lt;/p&gt;
+&lt;p&gt;&lt;tt class="docutils literal"&gt;backquote&lt;/tt&gt; ``text`` for code samples&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="lists"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-5"&gt;1.3. lists&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="section" id="bullet-list"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-6"&gt;1.3.1. bullet list&lt;/a&gt;&lt;/h4&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;available signs: + - *&lt;ul&gt;
+&lt;li&gt;nested lists must be seperated&lt;/li&gt;
+&lt;li&gt;by an empty line&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;and here the parent list continues&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="m"&gt;-&lt;/span&gt; available signs: + - *
+
+  &lt;span class="m"&gt;-&lt;/span&gt; nested lists must be seperated
+  &lt;span class="m"&gt;-&lt;/span&gt; by an empty line
+
+&lt;span class="m"&gt;-&lt;/span&gt; and here the parent list continues
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="number-list"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-7"&gt;1.3.2. number list&lt;/a&gt;&lt;/h4&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;auto numbering is feasible&lt;/li&gt;
+&lt;li&gt;using prefix sign '#'&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="m"&gt;#.&lt;/span&gt; auto numbering is feasible
+&lt;span class="m"&gt;#.&lt;/span&gt; using prefix sign &amp;#39;#&amp;#39;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="definition-list"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-8"&gt;1.3.3. definition list&lt;/a&gt;&lt;/h4&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;term(up to a line)&lt;/dt&gt;
+&lt;dd&gt;Definition must be indented
+and multiple paragraphs are possible&lt;/dd&gt;
+&lt;dt&gt;detergent&lt;/dt&gt;
+&lt;dd&gt;a chemical liquid or powder for cleaning&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;term
+    Definition must be indented
+    and multiple paragraphs are possible
+
+detergent
+    a chemical liquid or powder for cleaning
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="fields-lists"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-9"&gt;1.3.4. fields lists&lt;/a&gt;&lt;/h3&gt;
+&lt;table class="docutils field-list" frame="void" rules="none"&gt;
+&lt;col class="field-name" /&gt;
+&lt;col class="field-body" /&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr class="field"&gt;&lt;th class="field-name"&gt;fieldname:&lt;/th&gt;&lt;td class="field-body"&gt;Field Content&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nc"&gt;:fieldname:&lt;/span&gt; Field Content
+
+def my_function(my_arg, my_other_arg):
+    &amp;quot;&amp;quot;&amp;quot;A function just for me.
+
+    &lt;span class="nc"&gt;:param my_arg:&lt;/span&gt; The first of my arguments.
+    &lt;span class="nc"&gt;:param my_other_arg:&lt;/span&gt; The second of my arguments.
+
+    &lt;span class="nc"&gt;:returns:&lt;/span&gt; A message (just for me, of course).
+    &amp;quot;&amp;quot;&amp;quot;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="line-blocks"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-10"&gt;1.4. line blocks&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;prefix every line with | to preserve line breaks&lt;/p&gt;
+&lt;div class="line-block"&gt;
+&lt;div class="line"&gt;These lines are&lt;/div&gt;
+&lt;div class="line"&gt;broken exactly like in&lt;/div&gt;
+&lt;div class="line"&gt;the source file&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt; These lines are
+&lt;span class="o"&gt;|&lt;/span&gt; broken exactly like in
+&lt;span class="o"&gt;|&lt;/span&gt; the source file
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="tables"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-11"&gt;1.5. tables&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="section" id="grid-table"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-12"&gt;1.5.1. grid table&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;For grid tables, grid cells must be painted manually.&lt;/p&gt;
+&lt;table border="1" class="docutils"&gt;
+&lt;colgroup&gt;
+&lt;col width="43%" /&gt;
+&lt;col width="21%" /&gt;
+&lt;col width="18%" /&gt;
+&lt;col width="18%" /&gt;
+&lt;/colgroup&gt;
+&lt;thead valign="bottom"&gt;
+&lt;tr&gt;&lt;th class="head"&gt;Header row, column 1
+(header rows optional)&lt;/th&gt;
+&lt;th class="head"&gt;Header 2&lt;/th&gt;
+&lt;th class="head"&gt;Header 3&lt;/th&gt;
+&lt;th class="head"&gt;Header 4&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td&gt;body row 1, column 1&lt;/td&gt;
+&lt;td&gt;column 2&lt;/td&gt;
+&lt;td&gt;column 3&lt;/td&gt;
+&lt;td&gt;column 4&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;body row 2&lt;/td&gt;
+&lt;td&gt;...&lt;/td&gt;
+&lt;td&gt;...&lt;/td&gt;
+&lt;td&gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;+------------------------+------------+----------+----------+
+&lt;span class="o"&gt;|&lt;/span&gt; Header row, column 1   | Header 2   | Header 3 | Header 4 |
+&lt;span class="o"&gt;|&lt;/span&gt; (header rows optional) |            |          |          |
++========================+============+==========+==========+
+&lt;span class="o"&gt;|&lt;/span&gt; body row 1, column 1   | column 2   | column 3 | column 4 |
++------------------------+------------+----------+----------+
+&lt;span class="o"&gt;|&lt;/span&gt; body row 2             | ...        | ...      |          |
++------------------------+------------+----------+----------+
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="simple-table"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-13"&gt;1.5.2. simple table&lt;/a&gt;&lt;/h4&gt;
+&lt;table border="1" class="docutils"&gt;
+&lt;colgroup&gt;
+&lt;col width="23%" /&gt;
+&lt;col width="23%" /&gt;
+&lt;col width="54%" /&gt;
+&lt;/colgroup&gt;
+&lt;thead valign="bottom"&gt;
+&lt;tr&gt;&lt;th class="head"&gt;A&lt;/th&gt;
+&lt;th class="head"&gt;B&lt;/th&gt;
+&lt;th class="head"&gt;A and B&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td&gt;T&lt;/td&gt;
+&lt;td&gt;F&lt;/td&gt;
+&lt;td&gt;F&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;F&lt;/td&gt;
+&lt;td&gt;T&lt;/td&gt;
+&lt;td&gt;F&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;T&lt;/td&gt;
+&lt;td&gt;T&lt;/td&gt;
+&lt;td&gt;T&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;F&lt;/td&gt;
+&lt;td&gt;F&lt;/td&gt;
+&lt;td&gt;F&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;===  ===  =======
+A    B    A and B
+===  ===  =======
+T    F    F
+F    T    F
+T    T    T
+F    F    F
+===  ===  =======
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="hyper-link"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-14"&gt;1.6. hyper link&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://example.com"&gt;Link Text&lt;/a&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="s"&gt;`Link Text &lt;/span&gt;&lt;span class="si"&gt;&amp;lt;https://example.com&amp;gt;&lt;/span&gt;&lt;span class="s"&gt;`_&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://example.com"&gt;Another Link Text&lt;/a&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="s"&gt;`Another Link Text`_&lt;/span&gt;
+
+&lt;span class="p"&gt;..&lt;/span&gt; &lt;span class="nt"&gt;_Another Link Text:&lt;/span&gt; https://example.com
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="code-blocks"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-15"&gt;1.7. code blocks&lt;/a&gt;&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;..&lt;/span&gt; &lt;span class="ow"&gt;code-block&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt; &lt;span class="k"&gt;python&lt;/span&gt;
+
+    &lt;span class="kn"&gt;import&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nn"&gt;sys&lt;/span&gt;
+    &lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sys&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;executable&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="images"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-16"&gt;1.8. images&lt;/a&gt;&lt;/h3&gt;
+&lt;img alt="Alternative Text" src="/files/MNIST-with-LeNet/output1.png" /&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;..&lt;/span&gt; &lt;span class="ow"&gt;image&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt; /path/to/image.png
+       &lt;span class="nc"&gt;:alt:&lt;/span&gt; Alternative Text is useful to those who probably lose image
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="citation"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-17"&gt;1.9. citation&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Lorem ipsum &lt;a class="citation-reference" href="#ref" id="citation-reference-1"&gt;[Ref]&lt;/a&gt; dolor sit amet.&lt;/p&gt;
+&lt;table class="docutils citation" frame="void" id="ref" rules="none"&gt;
+&lt;colgroup&gt;&lt;col class="label" /&gt;&lt;col /&gt;&lt;/colgroup&gt;
+&lt;tbody valign="top"&gt;
+&lt;tr&gt;&lt;td class="label"&gt;&lt;a class="fn-backref" href="#citation-reference-1"&gt;[Ref]&lt;/a&gt;&lt;/td&gt;&lt;td&gt;Book or article reference, URL or whatever.&lt;/td&gt;&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div class="section" id="table-of-contents"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-18"&gt;1.10. table of contents&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;The following code automatically expands to table of contents.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;..&lt;/span&gt; &lt;span class="ow"&gt;contents&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="advanced"&gt;
+&lt;h2&gt;&lt;a class="toc-backref" href="#toc-entry-19"&gt;2. advanced&lt;/a&gt;&lt;/h2&gt;
+&lt;div class="section" id="math"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-20"&gt;2.1. math&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;According to Leonhard Euler, we have Euler's formula which states that
+for any real number x:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;div class="math"&gt;
+\begin{equation*}
+e^ix = cos x + i sin x
+\end{equation*}
+&lt;/div&gt;
+&lt;/blockquote&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;..&lt;/span&gt; &lt;span class="ow"&gt;math&lt;/span&gt;&lt;span class="p"&gt;::&lt;/span&gt;
+
+    e^ix = cos x + i sin x
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Mean Squared Error Loss, or MSE Loss:&lt;/p&gt;
+&lt;div class="math"&gt;
+\begin{equation*}
+J_{MSE} = \frac{1}{N}\sum_{i=1}^N(y_i - \hat{y}_i)^2
+\end{equation*}
+&lt;/div&gt;
+&lt;p&gt;Here inlined a famous formula: &lt;span class="math"&gt;\(a^2 + b^2 = c^2\)&lt;/span&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="na"&gt;:math:&lt;/span&gt;&lt;span class="nv"&gt;`a^2 + b^2 = c^2`&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;For another instance, sigmoid function is defined as &lt;span class="math"&gt;\(f(x) = \frac{1}{1+e^{-x}}\)&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="emacs-rst-mode"&gt;
+&lt;h3&gt;&lt;a class="toc-backref" href="#toc-entry-21"&gt;2.2. emacs rst-mode&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Since emacs v24.3 reST support is integrated.&lt;/p&gt;
+&lt;div class="section" id="section-adornment"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-22"&gt;2.2.1 section adornment&lt;/a&gt;&lt;/h4&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;&lt;em&gt;C-c C-a C-a&lt;/em&gt;&lt;/dt&gt;
+&lt;dd&gt;rst-adjust&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;My Section Title
+=== C-c C-a C-a
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="section" id="move-around-sections"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-23"&gt;2.2.2 move around sections&lt;/a&gt;&lt;/h4&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;&lt;em&gt;C-M-a&lt;/em&gt;&lt;/dt&gt;
+&lt;dd&gt;rst-backward-section&lt;/dd&gt;
+&lt;dt&gt;&lt;em&gt;C-M-e&lt;/em&gt;&lt;/dt&gt;
+&lt;dd&gt;rst-forward-section&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;/div&gt;
+&lt;div class="section" id="plain-lines-to-lists"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-24"&gt;2.2.3 plain lines to lists&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;C-c C-l&lt;/strong&gt;&lt;/p&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;&lt;em&gt;C-c C-l C-e&lt;/em&gt;&lt;/dt&gt;
+&lt;dd&gt;rst-enumerate-region&lt;/dd&gt;
+&lt;dt&gt;&lt;em&gt;C-c C-l C-b&lt;/em&gt;&lt;/dt&gt;
+&lt;dd&gt;rst-bullet-list-region&lt;/dd&gt;
+&lt;dt&gt;C-c C-l TAB&lt;/dt&gt;
+&lt;dd&gt;rst-insert-list&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;/div&gt;
+&lt;div class="section" id="table-of-contents-1"&gt;
+&lt;h4&gt;&lt;a class="toc-backref" href="#toc-entry-25"&gt;2.2.4 table of contents&lt;/a&gt;&lt;/h4&gt;
+&lt;p&gt;Present table of contents in a temporary buffer. &lt;strong&gt;C-c C-t&lt;/strong&gt;&lt;/p&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;C-c C-t C-t&lt;/dt&gt;
+&lt;dd&gt;rst-toc&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p&gt;insert table-of-contents&lt;/p&gt;
+&lt;dl class="docutils"&gt;
+&lt;dt&gt;C-c C-t C-i&lt;/dt&gt;
+&lt;dd&gt;rst-toc-insert&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;script type='text/javascript'&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="2023"/><category term="rst"/></entry></feed>
