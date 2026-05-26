@@ -1,6 +1,6 @@
 <!doctype html><title>
-Deploy TranslateGemma Locally
-    </title><meta charset=utf-8><meta content="width=device-width" initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><link href=/theme/css/pygments.css rel=stylesheet><link href=/files/favicon.ico rel=icon type=image/x-icon><body><h1>Deploy TranslateGemma Locally</h1> 2026-05-06 22:05 <hr><div class=article-content><div class=toc><ul><li><a href=#-1-update>-1. Update</a><li><a href=#-09-update>-0.9. Update</a><li><a href=#0-llamacpp>0. llama.cpp</a><li><a href=#1-llama-translatorservice>1. llama-translator.service</a><ul><li><a href=#11-translategemma>1.1. translategemma</a><li><a href=#12-hy-mt15>1.2. hy-mt1.5</a><li><a href=#13-hy-mt2>1.3. hy-mt2</a></ul><li><a href=#2-jinja-template>2. jinja template</a><ul><li><a href=#21-translategemma-4b>2.1. translategemma-4b</a><li><a href=#22-hy-mt15-7b>2.2. hy-mt1.5-7b</a><li><a href=#23-hy-mt2-18b>2.3. hy-mt2-1.8b</a></ul><li><a href=#3-for-immersivetrans>3. for ImmersiveTrans</a><li><a href=#deprecated-ver-lmstudio>(deprecated ver). lmstudio</a></ul></div><h2 id=-1-update>-1. Update</h2><p>2026 年 5 月 18 日：换成了 <a href=https://huggingface.co/tencent/HY-MT1.5-7B>HY-MT1.5-7B</a><h2 id=-09-update>-0.9. Update</h2><p>2026 年 5 月 25 日：换成了 <a href=https://huggingface.co/tencent/Hy-MT2-1.8B>Hy-MT2-1.8B</a><p>并发速度有所上升，另外文件 <code>en_zh_translate.jinja</code> 也略有改变<h2 id=0-llamacpp>0. llama.cpp</h2><p>gentoo 若要启用 <code>--cache-type-k q8_0</code> 特性，请增加 AMDGPU_TARGETS<div class=highlight><pre><span></span><code><span class=gh>#</span> 6750gre 12g 是 gfx1031，但是某些特性依赖 gfx1030
+deploy llama translator locally
+    </title><meta charset=utf-8><meta content="width=device-width" initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><link href=/theme/css/pygments.css rel=stylesheet><link href=/files/favicon.ico rel=icon type=image/x-icon><body><h1>deploy llama translator locally</h1> 2026-05-06 22:05 <hr><div class=article-content><div class=toc><ul><li><a href=#-1-update>-1. Update</a><li><a href=#-09-update>-0.9. Update</a><li><a href=#0-llamacpp>0. llama.cpp</a><li><a href=#1-llama-translatorservice>1. llama-translator.service</a><ul><li><a href=#11-translategemma>1.1. translategemma</a><li><a href=#12-hy-mt15>1.2. hy-mt1.5</a><li><a href=#13-hy-mt2>1.3. hy-mt2</a></ul><li><a href=#2-jinja-template>2. jinja template</a><ul><li><a href=#21-translategemma-4b>2.1. translategemma-4b</a><li><a href=#22-hy-mt15-7b>2.2. hy-mt1.5-7b</a><li><a href=#23-hy-mt2-18b>2.3. hy-mt2-1.8b</a></ul><li><a href=#3-for-immersivetrans>3. for ImmersiveTrans</a><li><a href=#deprecated-ver-lmstudio>(deprecated ver). lmstudio</a></ul></div><h2 id=-1-update>-1. Update</h2><p>2026 年 5 月 18 日：换成了 <a href=https://huggingface.co/tencent/HY-MT1.5-7B>HY-MT1.5-7B</a><h2 id=-09-update>-0.9. Update</h2><p>2026 年 5 月 25 日：换成了 <a href=https://huggingface.co/tencent/Hy-MT2-1.8B>Hy-MT2-1.8B</a><p>并发速度有所上升，另外文件 <code>en_zh_translate.jinja</code> 也略有改变<h2 id=0-llamacpp>0. llama.cpp</h2><p>gentoo 若要启用 <code>--cache-type-k q8_0</code> 特性，请增加 AMDGPU_TARGETS<div class=highlight><pre><span></span><code><span class=gh>#</span> 6750gre 12g 是 gfx1031，但是某些特性依赖 gfx1030
 AMDGPU_TARGETS="gfx1031 gfx1030"
 </code></pre></div><h2 id=1-llama-translatorservice>1. llama-translator.service</h2><h3 id=11-translategemma>1.1. translategemma</h3><details><summary>这是旧的 translategemma-4b 的有关内容</summary> edit `~/.config/systemd/user/llama-translator.service` <div class=highlight><pre><span></span><code><span class=k>[Unit]</span>
 <span class=na>Description</span><span class=o>=</span><span class=s>llama.cpp translation service</span>
@@ -110,13 +110,15 @@ AMDGPU_TARGETS="gfx1031 gfx1030"
 <span class=w>  </span><span class=s>--port 1234 </span>\
 <span class=w>  </span><span class=s>--sleep-idle-seconds 300 </span>\
 <span class=w>  </span><span class=s>--kv-unified </span>\
-<span class=w>  </span><span class=s>--parallel 8 </span>\
-<span class=w>  </span><span class=s>--ctx-size 4096 </span>\
-<span class=w>  </span><span class=s>--no-cache-prompt </span>\
-<span class=w>  </span><span class=s>--temperature 0.1 </span>\
+<span class=w>  </span><span class=s>--flash-attn on </span>\
+<span class=w>  </span><span class=s>--parallel 12 </span>\
+<span class=w>  </span><span class=s>--ctx-size 32768 </span>\
+<span class=w>  </span><span class=s>--cache-reuse 1024 </span>\
+<span class=w>  </span><span class=s>--temperature 0 </span>\
 <span class=w>  </span><span class=s>--jinja </span>\
+<span class=w>  </span><span class=s>--mlock </span>\
 <span class=w>  </span><span class=s>--chat-template-file en_zh_translate.jinja </span>\
-<span class=w>  </span><span class=s>--verbose</span>
+<span class=w>  </span><span class=s>--metrics</span>
 
 <span class=c1># --metrics</span>
 <span class=c1># 自动重启</span>
@@ -168,9 +170,9 @@ AMDGPU_TARGETS="gfx1031 gfx1030"
 </code></pre></div></details><h2 id=3-for-immersivetrans>3. for ImmersiveTrans</h2><p>沉浸式翻译有三个 prompt<ul><li>system prompt<li>multi-paragraph prompt<li>single-paragraph prompt</ul><p>既然我们已经在 llama-server 的 jinja 指定了 system prompt，<strong>此处留空</strong>。<p>对于 multi-paragraph prompt：<ul><li>1.可以手动制定 %% 为分隔符</ul><div class=highlight><pre><span></span><code><span class=x>Translate these paragraphs using %% as separator:</span>
 <span class=cp>{{</span><span class=nv>text</span><span class=cp>}}</span>
 </code></pre></div><ul><li>2.也可直接传入原段落，问题不大</ul><div class=highlight><pre><span></span><code><span class=cp>{{</span><span class=nv>text</span><span class=cp>}}</span>
-</code></pre></div><p>对于 single-paragraph prompt 同样只保留 <code>{{text}}</code> 即可。<p><strong>值得注意的是！多/单段提示词必须至少保留 {{text}}，不然就会输出 Lorem</strong><div class=highlight><pre><span></span><code>敏捷的狐狸跳过...
+</code></pre></div><p>对于 single-paragraph prompt 同样只保留 <code>{{text}}</code> 即可。<ul><li>3.<strong>值得注意的是！多/单段提示词必须至少保留 {{text}}，不然就会输出 Lorem</strong></ul><div class=highlight><pre><span></span><code>敏捷的狐狸跳过...
 我能够吞下玻璃...
-</code></pre></div><p>由于 llama-server 制定了 <code>--parallel 8</code>，我们可以设置<p><code>每秒最大请求数2 x 每次请求最大段落数4 = parallel 8</code><h2 id=deprecated-ver-lmstudio>(deprecated ver). lmstudio</h2><details><summary>伟大探索时期的遗留</summary> 提示词来自[这里](https://ollama.com/library/translategemma) concise version <div class=highlight><pre><span></span><code><span class=cp>{{</span> <span class=nv>bos_token</span> <span class=cp>}}</span>
+</code></pre></div><ul><li>4.一些个超参数</ul><p>大量短句只消耗 20-50 tokens，但是预处理 prompt eval 依然要花 30ms。 因而增加 <strong>每次请求最大段落数 32</strong> 并行处理。<p>网页翻译滚动时大量段落，因此限制 <strong>每秒最大请求数 4</strong> ，理论上每秒处理上限 128 段。<p>根据利特尔法则 $ 并发数 (Slots) = 到达率 (Requests/sec) × 处理时间 (Latency) $ 此处每秒处理 4 个请求，平均处理时间根据日志约 5 秒，所需 slot 为 20. 快速翻页时， <code>--parallel 12</code> 处理每秒的 4 次请求依然会产生排队。 但是考虑到阅读会停顿，所以无妨。<p><code>--ctx-size 32768</code> (32K 上下文) 1.8B 模型占用 2GB，6750GRE 12GB 还有 10G，llama-server 所有 Slot 共享 ctx-size。 32768 ÷ 8 slots = 4096 tokens/slot 如果有某个请求包含超长文本，4000 tokens 的 Slot 余裕足以应付，不会触发 context shift<p><code>--cache-reuse 1024</code> 翻译任务高度重复，因为新请求里有很大一部分（Prompt 头部指令）和之前的请求一模一样。<h2 id=deprecated-ver-lmstudio>(deprecated ver). lmstudio</h2><details><summary>伟大探索时期的遗留</summary> 提示词来自[这里](https://ollama.com/library/translategemma) concise version <div class=highlight><pre><span></span><code><span class=cp>{{</span> <span class=nv>bos_token</span> <span class=cp>}}</span>
 <span class=x>&lt;start_of_turn>user</span>
 <span class=x>You are an English to Chinese translator.</span>
 <span class=x>Translate accurately and naturally.</span>
