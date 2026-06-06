@@ -1,0 +1,152 @@
+<!doctype html><title>
+host forgejo and debug mdns
+    </title><meta charset=utf-8><meta content="width=device-width" initial-scale=1 name=viewport><link href=/theme/css/main.css rel=stylesheet><link href=/theme/css/pygments.css rel=stylesheet><link href=/files/favicon.ico rel=icon type=image/x-icon><body><h1>host forgejo and debug mdns</h1> 2026-06-06 18:51 <hr><div class=article-content><div class=toc><ul><li><a href=#0-intro>0. intro</a><li><a href=#1-forgejo>1. forgejo</a><li><a href=#1-some-tests>1. some tests</a><ul><li><a href=#11-alarm>1.1. alarm</a><li><a href=#12-gentoo-pc>1.2. Gentoo PC</a></ul><li><a href=#2-ping-curl>2. 为何 Ping 能通，Curl 报错？</a><li><a href=#3-answer-systemd-resolved>3. answer： systemd-resolved</a></ul></div><hr><h1 id=0-intro>0. intro</h1><p>使用 roc-rk3328-cc renegade 安装 archlinux arm (alarm) 并托管了 forgejo 和 syncthing，便于 lan 内多设备同步项目文件<p>syncthing 很简单，只需要注意一点 <strong>LAN 内取消全局发现</strong>，以减少乱七八糟的中继。<p>同步路径设为 <code>$HOME/dev</code>，使用 syncthing 同步 <strong>dev下不包括 .git 的文件</strong><p>另外由于 syncthing 不同步 <code>.stignore</code>， 所以让其指向可以同步的 <code>.stignore-shared</code>。<div class=highlight><pre><span></span><code>dylan@genteelpc<span class=w> </span>~/dev<span class=w> </span>$<span class=w> </span>cat<span class=w> </span>.stignore<span class=w> </span>
+<span class=c1>#include .stignore-shared</span>
+</code></pre></div><p><code>.stignore-shared</code> 里面放了一般不要的东西。<div class=highlight><pre><span></span><code>dylan@genteelpc<span class=w> </span>~/dev<span class=w> </span>$<span class=w> </span>cat<span class=w> </span>.stignore-shared<span class=w> </span>
+//<span class=w> </span>忽略常见的依赖库和构建产物
+**/node_modules/
+**/build/
+**/dist/
+**/bin/
+**/obj/
+
+//<span class=w> </span>忽略<span class=w> </span>Python<span class=w> </span>虚拟环境
+**/.venv/
+**/venv/
+**/ENV/
+
+//<span class=w> </span>核心：彻底<span class=w> </span>disable<span class=w> </span>Git
+**/.git
+
+//<span class=w> </span>忽略<span class=w> </span>IDE<span class=w> </span>生成的临时配置（建议加上，否则<span class=w> </span>PC<span class=w> </span>和<span class=w> </span>Laptop<span class=w> </span>的窗口布局会冲突）
+**/.vscode/
+**/.idea/
+**/*.swp
+**/*.swo
+
+//<span class=w> </span>忽略<span class=w> </span>OS<span class=w> </span>产生的垃圾文件
+**/.DS_Store
+**/Thumbs.db%<span class=w>      </span>
+</code></pre></div><h1 id=1-forgejo>1. forgejo</h1><p>然后氛围了一个脚本，便于在 dev 下新建项目并将上游指向 <code>alarm.local</code>，<p>私以为这是很不错的折中之法，避免了污染家目录下的 <code>~/.gitconfig</code>。<div class=highlight><pre><span></span><code>dylan@genteelpc<span class=w> </span>~/dev<span class=w> </span>$<span class=w> </span>cat<span class=w> </span>make-new-project-under-dev.sh<span class=w> </span>
+<span class=c1>#!/bin/bash</span>
+
+<span class=c1># ================= 配置区 =================</span>
+<span class=c1># 1. Forgejo 的访问地址 (mDNS)</span>
+<span class=nv>HOST</span><span class=o>=</span><span class=s2>"alarm.local:3000"</span>
+<span class=c1># 2. 你的 Forgejo 用户名</span>
+<span class=nv>USER</span><span class=o>=</span><span class=s2>"..."</span>
+<span class=c1># 3. 在网页端生成的 Token (设置 -> 应用 -> 生成令牌)</span>
+<span class=nv>TOKEN</span><span class=o>=</span><span class=s2>"..."</span>
+<span class=c1># 4. 你的本地开发根目录</span>
+<span class=nv>DEV_DIR</span><span class=o>=</span><span class=s2>"</span><span class=nv>$HOME</span><span class=s2>/dev"</span>
+<span class=c1># ==========================================</span>
+
+<span class=nv>PROJ_NAME</span><span class=o>=</span><span class=nv>$1</span>
+
+<span class=c1># 检查是否输入了项目名</span>
+<span class=k>if</span><span class=w> </span><span class=o>[</span><span class=w> </span>-z<span class=w> </span><span class=s2>"</span><span class=nv>$PROJ_NAME</span><span class=s2>"</span><span class=w> </span><span class=o>]</span><span class=p>;</span><span class=w> </span><span class=k>then</span>
+<span class=w>    </span><span class=nb>echo</span><span class=w> </span><span class=s2>"错误: 请输入项目名称"</span>
+<span class=w>    </span><span class=nb>echo</span><span class=w> </span><span class=s2>"用法: ./make-brand-new-proj.sh [项目名]"</span>
+<span class=w>    </span><span class=nb>exit</span><span class=w> </span><span class=m>1</span>
+<span class=k>fi</span>
+
+<span class=nv>TARGET_PATH</span><span class=o>=</span><span class=s2>"</span><span class=nv>$DEV_DIR</span><span class=s2>/</span><span class=nv>$PROJ_NAME</span><span class=s2>"</span>
+
+<span class=c1># 1. 创建并进入目录</span>
+<span class=k>if</span><span class=w> </span><span class=o>[</span><span class=w> </span>!<span class=w> </span>-d<span class=w> </span><span class=s2>"</span><span class=nv>$TARGET_PATH</span><span class=s2>"</span><span class=w> </span><span class=o>]</span><span class=p>;</span><span class=w> </span><span class=k>then</span>
+<span class=w>    </span>mkdir<span class=w> </span>-p<span class=w> </span><span class=s2>"</span><span class=nv>$TARGET_PATH</span><span class=s2>"</span>
+<span class=w>    </span><span class=nb>echo</span><span class=w> </span><span class=s2>"✅ 已创建本地目录: </span><span class=nv>$TARGET_PATH</span><span class=s2>"</span>
+<span class=k>fi</span>
+<span class=nb>cd</span><span class=w> </span><span class=s2>"</span><span class=nv>$TARGET_PATH</span><span class=s2>"</span>
+
+<span class=c1># 2. 调用 Forgejo API 自动创建远程仓库 (如果不存在)</span>
+<span class=c1># 这一步实现了“真·一键”，无需去网页手动创建项目</span>
+<span class=nb>echo</span><span class=w> </span><span class=s2>"🚀 正在 Forgejo 上创建远程仓库..."</span>
+curl<span class=w> </span>-s<span class=w> </span>-X<span class=w> </span><span class=s1>'POST'</span><span class=w> </span><span class=se>\</span>
+<span class=w>  </span><span class=s2>"http://</span><span class=nv>$HOST</span><span class=s2>/api/v1/user/repos"</span><span class=w> </span><span class=se>\</span>
+<span class=w>  </span>-H<span class=w> </span><span class=s2>"accept: application/json"</span><span class=w> </span><span class=se>\</span>
+<span class=w>  </span>-H<span class=w> </span><span class=s2>"Authorization: token </span><span class=nv>$TOKEN</span><span class=s2>"</span><span class=w> </span><span class=se>\</span>
+<span class=w>  </span>-H<span class=w> </span><span class=s2>"Content-Type: application/json"</span><span class=w> </span><span class=se>\</span>
+<span class=w>  </span>-d<span class=w> </span><span class=s2>"{ \"name\": \"</span><span class=nv>$PROJ_NAME</span><span class=s2>\", \"private\": true, \"auto_init\": false }"</span><span class=w> </span>><span class=w> </span>/dev/null
+
+<span class=c1># 3. 初始化本地 Git (如果 .git 不存在)</span>
+<span class=k>if</span><span class=w> </span><span class=o>[</span><span class=w> </span>!<span class=w> </span>-d<span class=w> </span><span class=s2>".git"</span><span class=w> </span><span class=o>]</span><span class=p>;</span><span class=w> </span><span class=k>then</span>
+<span class=w>    </span>git<span class=w> </span>init
+<span class=w>    </span><span class=c1># 使用 Token 嵌入式 URL，实现免密 Push</span>
+<span class=w>    </span><span class=nv>REMOTE_URL</span><span class=o>=</span><span class=s2>"http://</span><span class=nv>$TOKEN</span><span class=s2>@</span><span class=nv>$HOST</span><span class=s2>/</span><span class=nv>$USER</span><span class=s2>/</span><span class=nv>$PROJ_NAME</span><span class=s2>.git"</span>
+<span class=w>    </span>git<span class=w> </span>remote<span class=w> </span>add<span class=w> </span>origin<span class=w> </span><span class=s2>"</span><span class=nv>$REMOTE_URL</span><span class=s2>"</span>
+<span class=w>    </span><span class=nb>echo</span><span class=w> </span><span class=s2>"✅ Git 初始化完成，已关联远程地址 (Token 模式)"</span>
+<span class=k>else</span>
+<span class=w>    </span><span class=nb>echo</span><span class=w> </span><span class=s2>"ℹ  本地 Git 仓库已存在，跳过初始化。"</span>
+<span class=k>fi</span>
+
+<span class=c1># 4. 自动创建第一个提交 (可选，防止初次 push 失败)</span>
+<span class=k>if</span><span class=w> </span><span class=o>[</span><span class=w> </span>!<span class=w> </span>-f<span class=w> </span><span class=s2>"README.md"</span><span class=w> </span><span class=o>]</span><span class=p>;</span><span class=w> </span><span class=k>then</span>
+<span class=w>    </span><span class=nb>echo</span><span class=w> </span><span class=s2>"# </span><span class=nv>$PROJ_NAME</span><span class=s2>"</span><span class=w> </span>><span class=w> </span>README.md
+<span class=w>    </span>git<span class=w> </span>add<span class=w> </span>README.md
+<span class=w>    </span>git<span class=w> </span>commit<span class=w> </span>-m<span class=w> </span><span class=s2>"Initial commit from script"</span>
+<span class=w>    </span><span class=c1># 第一次推送并建立追踪关系</span>
+<span class=w>    </span>git<span class=w> </span>push<span class=w> </span>-u<span class=w> </span>origin<span class=w> </span><span class=k>$(</span>git<span class=w> </span>symbolic-ref<span class=w> </span>--short<span class=w> </span>HEAD<span class=k>)</span>
+<span class=w>    </span><span class=nb>echo</span><span class=w> </span><span class=s2>"✅ 已完成首次提交并推送到 Forgejo"</span>
+<span class=k>fi</span>
+
+<span class=nb>echo</span><span class=w> </span><span class=s2>"------------------------------------------"</span>
+<span class=nb>echo</span><span class=w> </span><span class=s2>"项目 '</span><span class=nv>$PROJ_NAME</span><span class=s2>' 准备就绪！"</span>
+<span class=c1># echo "本地路径: $TARGET_PATH"</span>
+<span class=nb>echo</span><span class=w> </span><span class=s2>"远程地址: http://</span><span class=nv>$HOST</span><span class=s2>/</span><span class=nv>$USER</span><span class=s2>/</span><span class=nv>$PROJ_NAME</span><span class=s2>"</span>
+<span class=nb>echo</span><span class=w> </span><span class=s2>"------------------------------------------"</span>
+</code></pre></div><p>Thanks to 多播DNS （multicast DNS, mDNS），可以通过 <code>alarm.local</code> 访问 alarm，<p>which 允许设备在 lan 内通过 <code>.local</code> 互相发现，而无需中心化的 DNS server。<p><code>ping alarm.local</code> 成功，web 访问 <code>http://alarm.local:3000</code> 成功。<p>但是 curl 报错 <code>Could not resolve host: alarm.local</code>，于是乎开始 debug<h1 id=1-some-tests>1. some tests</h1><h2 id=11-alarm>1.1. alarm</h2><p><code>cat /etc/avahi/avahi-daemon.conf</code><p>检查 <code>use-ipv4=yes</code> 和 <code>use-ipv6=yes</code><p><code>avahi-resolve -n alarm.local -4</code>: 在服务端自测是否能解析出自己的 IPv4 地址。<div class=highlight><pre><span></span><code>[alarm@alarm ~]$ avahi-resolve -n alarm.local -4
+alarm.local     192.168.2.24
+</code></pre></div><h2 id=12-gentoo-pc>1.2. Gentoo PC</h2><ul><li><code>ping -4 alarm.local</code>: 测试 IPv4。</ul><p>报错 <code>Address family for hostname not supported</code>，说明 mDNS 的 IPv4 广播解析失败<ul><li><p><code>getent ahosts alarm.local</code>：看到 ip 说明 nss 通了</p><li><p><code>resolvectl query alarm.local</code>：查看 <code>systemd-resolved</code> 是否能捕捉到多播信号</p></ul><div class=highlight><pre><span></span><code>dylan@genteelpc ~ $ resolvectl query -4 alarm.local
+alarm.local: 192.168.2.24                      -- link: enp8s0
+
+-- Information acquired via protocol mDNS/IPv4 in 971us.
+-- Data is authenticated: no; Data was acquired via local or encrypted transport: no
+-- Data from: cache
+
+
+dylan@genteelpc ~ $ resolvectl query -6 alarm.local
+alarm.local: 240e:359:26d6:4f10:4b3:6eff:fed6:5d6d -- link: enp8s0
+
+-- Information acquired via protocol mDNS/IPv6 in 932us.
+-- Data is authenticated: no; Data was acquired via local or encrypted transport: no
+-- Data from: cache
+</code></pre></div><ul><li><strong>DNS</strong>：<code>curl -v -4 http://alarm.local:3000</code></ul><p><code>* Could not resolve host</code>：DNS解析失败，可用 <code>nslookup</code> 验证<p><code>* Trying 192.168.2.24...</code>：解析成功，但是连接失败。<p>expected output<div class=highlight><pre><span></span><code>dylan@genteelpc ~ $ curl -v -I -4 http://alarm.local:3000
+* Host alarm.local:3000 was resolved.
+* IPv6: (none)
+* IPv4: 192.168.2.24
+*   Trying 192.168.2.24:3000...
+* Established connection to alarm.local (192.168.2.24 port 3000) from 192.168.2.4 port 46924 
+* using HTTP/1.x
+> HEAD / HTTP/1.1
+> Host: alarm.local:3000
+> User-Agent: curl/8.19.0
+> Accept: */*
+> 
+* Request completely sent off
+&lt; HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+&lt; Date: Sat, 06 Jun 2026 12:31:17 GMT
+Date: Sat, 06 Jun 2026 12:31:17 GMT
+&lt; 
+
+* Connection #0 to host alarm.local:3000 left intact
+</code></pre></div><hr><h1 id=2-ping-curl>2. 为何 Ping 能通，Curl 报错？</h1><ul><li><strong>Ping (ICMP)</strong>：通常直接调用 syscall <code>getaddrinfo</code> （或自己的某种回退机制？）。</ul><p>发现 DNS 解析失败时，会自动触发 <code>nss-mdns</code> 多播搜索。<ul><li><strong>Curl (HTTP/TCP)</strong>：依赖 <code>/etc/resolv.conf</code> 中定义的 DNS 服务器。</ul><p>普通文件 <code>/etc/resolv.conf</code> 指向路由器，<code>curl</code> 询问路由器，后者返回 <code>NXDOMAIN</code>.<p>然后直接报错退出，不再尝试 NSS 的 mDNS。<div class=highlight><pre><span></span><code>dylan@genteelpc ~ $ cat /etc/resolv.conf.bak 
+# Generated by NetworkManager
+nameserver 192.168.2.1
+nameserver fe80::3a68:beff:fee1:69d0%enp8s0
+</code></pre></div><ul><li><p><strong>缓存清理</strong>：<code>sudo resolvectl flush-caches</code></p><li><p><strong>多播路由</strong>：<code>ip route add 224.0.0.0/4 dev &lt;网卡></code></p></ul><p>确保 IPv4 多播流量有明确的出口。<hr><h1 id=3-answer-systemd-resolved>3. answer： systemd-resolved</h1><p>Gentoo with systemd 中，<code>systemd-resolved</code> 处理 DNS、mDNS 等任务。<div class=highlight><pre><span></span><code>sudo<span class=w> </span>ln<span class=w> </span>-sf<span class=w> </span>/run/systemd/resolve/stub-resolv.conf<span class=w> </span>/etc/resolv.conf
+</code></pre></div><p>DNS 指向 <code>127.0.0.53</code>，让所有请求先经过 <code>resolved</code> 由其判断 （.local 多播，其余上游）<div class=highlight><pre><span></span><code><span class=c1># systemd-networkd</span>
+dylan@genteelpc<span class=w> </span>~<span class=w> </span>$<span class=w> </span>cat<span class=w> </span>/etc/systemd/network/20-wired.network<span class=w> </span>
+<span class=o>[</span>Match<span class=o>]</span>
+<span class=nv>Name</span><span class=o>=</span>enp8s0
+
+<span class=o>[</span>Network<span class=o>]</span>
+<span class=nv>DHCP</span><span class=o>=</span>yes
+<span class=nv>MulticastDNS</span><span class=o>=</span>yes
+
+<span class=c1># NetworkManager</span>
+dylan@genteelpc<span class=w> </span>~<span class=w> </span>$<span class=w> </span>cat<span class=w> </span>/etc/NetworkManager/NetworkManager.conf
+<span class=o>[</span>main<span class=o>]</span>
+<span class=nv>dns</span><span class=o>=</span>systemd-resolved%
+</code></pre></div></div>

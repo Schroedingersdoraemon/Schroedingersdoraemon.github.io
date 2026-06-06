@@ -1,5 +1,264 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Random Gibberish - 2026</title><link href="https://dylanz.site/" rel="alternate"/><link href="https://dylanz.site/feeds/2026.atom.xml" rel="self"/><id>https://dylanz.site/</id><updated>2026-05-14T00:31:00+08:00</updated><entry><title>network programming: echo server</title><link href="https://dylanz.site/2026/network-programming-echo-server.html" rel="alternate"/><published>2026-05-14T00:31:00+08:00</published><updated>2026-05-14T00:31:00+08:00</updated><author><name>Big Pineapple</name></author><id>tag:dylanz.site,2026-05-14:/2026/network-programming-echo-server.html</id><summary type="html">&lt;div class="toc"&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Random Gibberish - 2026</title><link href="https://dylanz.site/" rel="alternate"/><link href="https://dylanz.site/feeds/2026.atom.xml" rel="self"/><id>https://dylanz.site/</id><updated>2026-06-06T18:51:00+08:00</updated><entry><title>host forgejo and debug mdns</title><link href="https://dylanz.site/2026/host-forgejo-and-debug-mdns.html" rel="alternate"/><published>2026-06-06T18:51:00+08:00</published><updated>2026-06-06T18:51:00+08:00</updated><author><name>Big Pineapple</name></author><id>tag:dylanz.site,2026-06-06:/2026/host-forgejo-and-debug-mdns.html</id><summary type="html">&lt;div class="toc"&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="#0-intro"&gt;0. intro&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#1-forgejo"&gt;1. forgejo&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#1-some-tests"&gt;1. some tests&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href="#11-alarm"&gt;1.1. alarm&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#12-gentoo-pc"&gt;1.2. Gentoo PC&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="#2-ping-curl"&gt;2. 为何 Ping 能通，Curl 报错？&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#3-answer-systemd-resolved"&gt;3. answer： systemd-resolved&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;hr&gt;
+&lt;h1 id="0-intro"&gt;0. intro&lt;/h1&gt;
+&lt;p&gt;使用 roc-rk3328-cc renegade 安装 archlinux arm (alarm) 
+并托管了 forgejo 和 syncthing，便于 lan 内多设 …&lt;/p&gt;</summary><content type="html">&lt;div class="toc"&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="#0-intro"&gt;0. intro&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#1-forgejo"&gt;1. forgejo&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#1-some-tests"&gt;1. some tests&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href="#11-alarm"&gt;1.1. alarm&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#12-gentoo-pc"&gt;1.2. Gentoo PC&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a href="#2-ping-curl"&gt;2. 为何 Ping 能通，Curl 报错？&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#3-answer-systemd-resolved"&gt;3. answer： systemd-resolved&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;hr&gt;
+&lt;h1 id="0-intro"&gt;0. intro&lt;/h1&gt;
+&lt;p&gt;使用 roc-rk3328-cc renegade 安装 archlinux arm (alarm) 
+并托管了 forgejo 和 syncthing，便于 lan 内多设备同步项目文件&lt;/p&gt;
+&lt;p&gt;syncthing 很简单，只需要注意一点 &lt;strong&gt;LAN 内取消全局发现&lt;/strong&gt;，以减少乱七八糟的中继。&lt;/p&gt;
+&lt;p&gt;同步路径设为 &lt;code&gt;$HOME/dev&lt;/code&gt;，使用 syncthing 同步 &lt;strong&gt;dev下不包括 .git 的文件&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;另外由于 syncthing 不同步 &lt;code&gt;.stignore&lt;/code&gt;，
+所以让其指向可以同步的 &lt;code&gt;.stignore-shared&lt;/code&gt;。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;dylan@genteelpc&lt;span class="w"&gt; &lt;/span&gt;~/dev&lt;span class="w"&gt; &lt;/span&gt;$&lt;span class="w"&gt; &lt;/span&gt;cat&lt;span class="w"&gt; &lt;/span&gt;.stignore&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="c1"&gt;#include .stignore-shared&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;code&gt;.stignore-shared&lt;/code&gt; 里面放了一般不要的东西。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;dylan@genteelpc&lt;span class="w"&gt; &lt;/span&gt;~/dev&lt;span class="w"&gt; &lt;/span&gt;$&lt;span class="w"&gt; &lt;/span&gt;cat&lt;span class="w"&gt; &lt;/span&gt;.stignore-shared&lt;span class="w"&gt; &lt;/span&gt;
+//&lt;span class="w"&gt; &lt;/span&gt;忽略常见的依赖库和构建产物
+**/node_modules/
+**/build/
+**/dist/
+**/bin/
+**/obj/
+
+//&lt;span class="w"&gt; &lt;/span&gt;忽略&lt;span class="w"&gt; &lt;/span&gt;Python&lt;span class="w"&gt; &lt;/span&gt;虚拟环境
+**/.venv/
+**/venv/
+**/ENV/
+
+//&lt;span class="w"&gt; &lt;/span&gt;核心：彻底&lt;span class="w"&gt; &lt;/span&gt;disable&lt;span class="w"&gt; &lt;/span&gt;Git
+**/.git
+
+//&lt;span class="w"&gt; &lt;/span&gt;忽略&lt;span class="w"&gt; &lt;/span&gt;IDE&lt;span class="w"&gt; &lt;/span&gt;生成的临时配置（建议加上，否则&lt;span class="w"&gt; &lt;/span&gt;PC&lt;span class="w"&gt; &lt;/span&gt;和&lt;span class="w"&gt; &lt;/span&gt;Laptop&lt;span class="w"&gt; &lt;/span&gt;的窗口布局会冲突）
+**/.vscode/
+**/.idea/
+**/*.swp
+**/*.swo
+
+//&lt;span class="w"&gt; &lt;/span&gt;忽略&lt;span class="w"&gt; &lt;/span&gt;OS&lt;span class="w"&gt; &lt;/span&gt;产生的垃圾文件
+**/.DS_Store
+**/Thumbs.db%&lt;span class="w"&gt;      &lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h1 id="1-forgejo"&gt;1. forgejo&lt;/h1&gt;
+&lt;p&gt;然后氛围了一个脚本，便于在 dev 下新建项目并将上游指向 &lt;code&gt;alarm.local&lt;/code&gt;，&lt;/p&gt;
+&lt;p&gt;私以为这是很不错的折中之法，避免了污染家目录下的 &lt;code&gt;~/.gitconfig&lt;/code&gt;。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;dylan@genteelpc&lt;span class="w"&gt; &lt;/span&gt;~/dev&lt;span class="w"&gt; &lt;/span&gt;$&lt;span class="w"&gt; &lt;/span&gt;cat&lt;span class="w"&gt; &lt;/span&gt;make-new-project-under-dev.sh&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="c1"&gt;#!/bin/bash&lt;/span&gt;
+
+&lt;span class="c1"&gt;# ================= 配置区 =================&lt;/span&gt;
+&lt;span class="c1"&gt;# 1. Forgejo 的访问地址 (mDNS)&lt;/span&gt;
+&lt;span class="nv"&gt;HOST&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;alarm.local:3000&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;# 2. 你的 Forgejo 用户名&lt;/span&gt;
+&lt;span class="nv"&gt;USER&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;...&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;# 3. 在网页端生成的 Token (设置 -&amp;gt; 应用 -&amp;gt; 生成令牌)&lt;/span&gt;
+&lt;span class="nv"&gt;TOKEN&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;...&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;# 4. 你的本地开发根目录&lt;/span&gt;
+&lt;span class="nv"&gt;DEV_DIR&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$HOME&lt;/span&gt;&lt;span class="s2"&gt;/dev&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;# ==========================================&lt;/span&gt;
+
+&lt;span class="nv"&gt;PROJ_NAME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="nv"&gt;$1&lt;/span&gt;
+
+&lt;span class="c1"&gt;# 检查是否输入了项目名&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;-z&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$PROJ_NAME&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;错误: 请输入项目名称&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;用法: ./make-brand-new-proj.sh [项目名]&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;exit&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="nv"&gt;TARGET_PATH&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$DEV_DIR&lt;/span&gt;&lt;span class="s2"&gt;/&lt;/span&gt;&lt;span class="nv"&gt;$PROJ_NAME&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+
+&lt;span class="c1"&gt;# 1. 创建并进入目录&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;!&lt;span class="w"&gt; &lt;/span&gt;-d&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$TARGET_PATH&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;mkdir&lt;span class="w"&gt; &lt;/span&gt;-p&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$TARGET_PATH&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;✅ 已创建本地目录: &lt;/span&gt;&lt;span class="nv"&gt;$TARGET_PATH&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+&lt;span class="nb"&gt;cd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$TARGET_PATH&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+
+&lt;span class="c1"&gt;# 2. 调用 Forgejo API 自动创建远程仓库 (如果不存在)&lt;/span&gt;
+&lt;span class="c1"&gt;# 这一步实现了“真·一键”，无需去网页手动创建项目&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;🚀 正在 Forgejo 上创建远程仓库...&amp;quot;&lt;/span&gt;
+curl&lt;span class="w"&gt; &lt;/span&gt;-s&lt;span class="w"&gt; &lt;/span&gt;-X&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;POST&amp;#39;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;http://&lt;/span&gt;&lt;span class="nv"&gt;$HOST&lt;/span&gt;&lt;span class="s2"&gt;/api/v1/user/repos&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;-H&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;accept: application/json&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;-H&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Authorization: token &lt;/span&gt;&lt;span class="nv"&gt;$TOKEN&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;-H&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Content-Type: application/json&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="se"&gt;\&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;-d&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;{ \&amp;quot;name\&amp;quot;: \&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$PROJ_NAME&lt;/span&gt;&lt;span class="s2"&gt;\&amp;quot;, \&amp;quot;private\&amp;quot;: true, \&amp;quot;auto_init\&amp;quot;: false }&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;/dev/null
+
+&lt;span class="c1"&gt;# 3. 初始化本地 Git (如果 .git 不存在)&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;!&lt;span class="w"&gt; &lt;/span&gt;-d&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;.git&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;git&lt;span class="w"&gt; &lt;/span&gt;init
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c1"&gt;# 使用 Token 嵌入式 URL，实现免密 Push&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nv"&gt;REMOTE_URL&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;http://&lt;/span&gt;&lt;span class="nv"&gt;$TOKEN&lt;/span&gt;&lt;span class="s2"&gt;@&lt;/span&gt;&lt;span class="nv"&gt;$HOST&lt;/span&gt;&lt;span class="s2"&gt;/&lt;/span&gt;&lt;span class="nv"&gt;$USER&lt;/span&gt;&lt;span class="s2"&gt;/&lt;/span&gt;&lt;span class="nv"&gt;$PROJ_NAME&lt;/span&gt;&lt;span class="s2"&gt;.git&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;git&lt;span class="w"&gt; &lt;/span&gt;remote&lt;span class="w"&gt; &lt;/span&gt;add&lt;span class="w"&gt; &lt;/span&gt;origin&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="nv"&gt;$REMOTE_URL&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;✅ Git 初始化完成，已关联远程地址 (Token 模式)&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;else&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;ℹ  本地 Git 仓库已存在，跳过初始化。&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="c1"&gt;# 4. 自动创建第一个提交 (可选，防止初次 push 失败)&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;[&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;!&lt;span class="w"&gt; &lt;/span&gt;-f&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;README.md&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;then&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;# &lt;/span&gt;&lt;span class="nv"&gt;$PROJ_NAME&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&amp;gt;&lt;span class="w"&gt; &lt;/span&gt;README.md
+&lt;span class="w"&gt;    &lt;/span&gt;git&lt;span class="w"&gt; &lt;/span&gt;add&lt;span class="w"&gt; &lt;/span&gt;README.md
+&lt;span class="w"&gt;    &lt;/span&gt;git&lt;span class="w"&gt; &lt;/span&gt;commit&lt;span class="w"&gt; &lt;/span&gt;-m&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Initial commit from script&amp;quot;&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="c1"&gt;# 第一次推送并建立追踪关系&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;git&lt;span class="w"&gt; &lt;/span&gt;push&lt;span class="w"&gt; &lt;/span&gt;-u&lt;span class="w"&gt; &lt;/span&gt;origin&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;git&lt;span class="w"&gt; &lt;/span&gt;symbolic-ref&lt;span class="w"&gt; &lt;/span&gt;--short&lt;span class="w"&gt; &lt;/span&gt;HEAD&lt;span class="k"&gt;)&lt;/span&gt;
+&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;✅ 已完成首次提交并推送到 Forgejo&amp;quot;&lt;/span&gt;
+&lt;span class="k"&gt;fi&lt;/span&gt;
+
+&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;------------------------------------------&amp;quot;&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;项目 &amp;#39;&lt;/span&gt;&lt;span class="nv"&gt;$PROJ_NAME&lt;/span&gt;&lt;span class="s2"&gt;&amp;#39; 准备就绪！&amp;quot;&lt;/span&gt;
+&lt;span class="c1"&gt;# echo &amp;quot;本地路径: $TARGET_PATH&amp;quot;&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;远程地址: http://&lt;/span&gt;&lt;span class="nv"&gt;$HOST&lt;/span&gt;&lt;span class="s2"&gt;/&lt;/span&gt;&lt;span class="nv"&gt;$USER&lt;/span&gt;&lt;span class="s2"&gt;/&lt;/span&gt;&lt;span class="nv"&gt;$PROJ_NAME&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;&lt;/span&gt;
+&lt;span class="nb"&gt;echo&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;------------------------------------------&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;Thanks to 多播DNS （multicast DNS, mDNS），可以通过 &lt;code&gt;alarm.local&lt;/code&gt; 访问 alarm，&lt;/p&gt;
+&lt;p&gt;which 允许设备在 lan 内通过 &lt;code&gt;.local&lt;/code&gt; 互相发现，而无需中心化的 DNS server。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ping alarm.local&lt;/code&gt; 成功，web 访问 &lt;code&gt;http://alarm.local:3000&lt;/code&gt; 成功。&lt;/p&gt;
+&lt;p&gt;但是 curl 报错 &lt;code&gt;Could not resolve host: alarm.local&lt;/code&gt;，于是乎开始 debug&lt;/p&gt;
+&lt;h1 id="1-some-tests"&gt;1. some tests&lt;/h1&gt;
+&lt;h2 id="11-alarm"&gt;1.1. alarm&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;cat /etc/avahi/avahi-daemon.conf&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;检查 &lt;code&gt;use-ipv4=yes&lt;/code&gt; 和 &lt;code&gt;use-ipv6=yes&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;avahi-resolve -n alarm.local -4&lt;/code&gt;: 在服务端自测是否能解析出自己的 IPv4 地址。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;[alarm@alarm ~]$ avahi-resolve -n alarm.local -4
+alarm.local     192.168.2.24
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;h2 id="12-gentoo-pc"&gt;1.2. Gentoo PC&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;ping -4 alarm.local&lt;/code&gt;: 测试 IPv4。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;报错 &lt;code&gt;Address family for hostname not supported&lt;/code&gt;，说明 mDNS 的 IPv4 广播解析失败&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;getent ahosts alarm.local&lt;/code&gt;：看到 ip 说明 nss 通了&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;code&gt;resolvectl query alarm.local&lt;/code&gt;：查看 &lt;code&gt;systemd-resolved&lt;/code&gt; 是否能捕捉到多播信号&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;dylan@genteelpc ~ $ resolvectl query -4 alarm.local
+alarm.local: 192.168.2.24                      -- link: enp8s0
+
+-- Information acquired via protocol mDNS/IPv4 in 971us.
+-- Data is authenticated: no; Data was acquired via local or encrypted transport: no
+-- Data from: cache
+
+
+dylan@genteelpc ~ $ resolvectl query -6 alarm.local
+alarm.local: 240e:359:26d6:4f10:4b3:6eff:fed6:5d6d -- link: enp8s0
+
+-- Information acquired via protocol mDNS/IPv6 in 932us.
+-- Data is authenticated: no; Data was acquired via local or encrypted transport: no
+-- Data from: cache
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;DNS&lt;/strong&gt;：&lt;code&gt;curl -v -4 http://alarm.local:3000&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;* Could not resolve host&lt;/code&gt;：DNS解析失败，可用 &lt;code&gt;nslookup&lt;/code&gt; 验证&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;* Trying 192.168.2.24...&lt;/code&gt;：解析成功，但是连接失败。&lt;/p&gt;
+&lt;p&gt;expected output&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;dylan@genteelpc ~ $ curl -v -I -4 http://alarm.local:3000
+* Host alarm.local:3000 was resolved.
+* IPv6: (none)
+* IPv4: 192.168.2.24
+*   Trying 192.168.2.24:3000...
+* Established connection to alarm.local (192.168.2.24 port 3000) from 192.168.2.4 port 46924 
+* using HTTP/1.x
+&amp;gt; HEAD / HTTP/1.1
+&amp;gt; Host: alarm.local:3000
+&amp;gt; User-Agent: curl/8.19.0
+&amp;gt; Accept: */*
+&amp;gt; 
+* Request completely sent off
+&amp;lt; HTTP/1.1 200 OK
+HTTP/1.1 200 OK
+&amp;lt; Date: Sat, 06 Jun 2026 12:31:17 GMT
+Date: Sat, 06 Jun 2026 12:31:17 GMT
+&amp;lt; 
+
+* Connection #0 to host alarm.local:3000 left intact
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;hr&gt;
+&lt;h1 id="2-ping-curl"&gt;2. 为何 Ping 能通，Curl 报错？&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Ping (ICMP)&lt;/strong&gt;：通常直接调用 syscall &lt;code&gt;getaddrinfo&lt;/code&gt; （或自己的某种回退机制？）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;发现 DNS 解析失败时，会自动触发 &lt;code&gt;nss-mdns&lt;/code&gt; 多播搜索。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Curl (HTTP/TCP)&lt;/strong&gt;：依赖 &lt;code&gt;/etc/resolv.conf&lt;/code&gt; 中定义的 DNS 服务器。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;普通文件 &lt;code&gt;/etc/resolv.conf&lt;/code&gt; 指向路由器，&lt;code&gt;curl&lt;/code&gt; 询问路由器，后者返回 &lt;code&gt;NXDOMAIN&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;然后直接报错退出，不再尝试 NSS 的 mDNS。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;dylan@genteelpc ~ $ cat /etc/resolv.conf.bak 
+# Generated by NetworkManager
+nameserver 192.168.2.1
+nameserver fe80::3a68:beff:fee1:69d0%enp8s0
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;缓存清理&lt;/strong&gt;：&lt;code&gt;sudo resolvectl flush-caches&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;多播路由&lt;/strong&gt;：&lt;code&gt;ip route add 224.0.0.0/4 dev &amp;lt;网卡&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;确保 IPv4 多播流量有明确的出口。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id="3-answer-systemd-resolved"&gt;3. answer： systemd-resolved&lt;/h1&gt;
+&lt;p&gt;Gentoo with systemd 中，&lt;code&gt;systemd-resolved&lt;/code&gt; 处理 DNS、mDNS 等任务。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;sudo&lt;span class="w"&gt; &lt;/span&gt;ln&lt;span class="w"&gt; &lt;/span&gt;-sf&lt;span class="w"&gt; &lt;/span&gt;/run/systemd/resolve/stub-resolv.conf&lt;span class="w"&gt; &lt;/span&gt;/etc/resolv.conf
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;DNS 指向 &lt;code&gt;127.0.0.53&lt;/code&gt;，让所有请求先经过 &lt;code&gt;resolved&lt;/code&gt; 由其判断
+（.local 多播，其余上游）&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c1"&gt;# systemd-networkd&lt;/span&gt;
+dylan@genteelpc&lt;span class="w"&gt; &lt;/span&gt;~&lt;span class="w"&gt; &lt;/span&gt;$&lt;span class="w"&gt; &lt;/span&gt;cat&lt;span class="w"&gt; &lt;/span&gt;/etc/systemd/network/20-wired.network&lt;span class="w"&gt; &lt;/span&gt;
+&lt;span class="o"&gt;[&lt;/span&gt;Match&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="nv"&gt;Name&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;enp8s0
+
+&lt;span class="o"&gt;[&lt;/span&gt;Network&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="nv"&gt;DHCP&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;yes
+&lt;span class="nv"&gt;MulticastDNS&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;yes
+
+&lt;span class="c1"&gt;# NetworkManager&lt;/span&gt;
+dylan@genteelpc&lt;span class="w"&gt; &lt;/span&gt;~&lt;span class="w"&gt; &lt;/span&gt;$&lt;span class="w"&gt; &lt;/span&gt;cat&lt;span class="w"&gt; &lt;/span&gt;/etc/NetworkManager/NetworkManager.conf
+&lt;span class="o"&gt;[&lt;/span&gt;main&lt;span class="o"&gt;]&lt;/span&gt;
+&lt;span class="nv"&gt;dns&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;systemd-resolved%
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="2026"/><category term="network"/><category term="mdns"/></entry><entry><title>network programming: echo server</title><link href="https://dylanz.site/2026/network-programming-echo-server.html" rel="alternate"/><published>2026-05-14T00:31:00+08:00</published><updated>2026-05-14T00:31:00+08:00</updated><author><name>Big Pineapple</name></author><id>tag:dylanz.site,2026-05-14:/2026/network-programming-echo-server.html</id><summary type="html">&lt;div class="toc"&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="#0-intro"&gt;0. intro&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="#1-echo-client-server"&gt;1. 单线程 echo client-server&lt;/a&gt;&lt;ul&gt;
@@ -910,9 +1169,9 @@ edit `~/.config/systemd/user/llama-translator-hy.service`
 &lt;/details&gt;
 
 &lt;h3 id="23-hy-mt2-18b"&gt;2.3. hy-mt2-1.8b&lt;/h3&gt;
-&lt;details open&gt;
+&lt;details&gt;
 
-&lt;summary&gt;这是 hy-mt2-1.8b 的有关内容&lt;/summary&gt;
+&lt;summary&gt;这是旧的 hy-mt2-1.8b 有关内容&lt;/summary&gt;
 
 
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="cp"&gt;{%&lt;/span&gt;- &lt;span class="k"&gt;set&lt;/span&gt; &lt;span class="nv"&gt;user_text&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;messages&lt;/span&gt;&lt;span class="o"&gt;[-&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;][&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;content&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt; -&lt;span class="cp"&gt;%}&lt;/span&gt;
@@ -921,6 +1180,32 @@ edit `~/.config/systemd/user/llama-translator-hy.service`
 &lt;span class="x"&gt;Translate the following text into Chinese. Output only the translation, no explanation.&lt;/span&gt;
 &lt;span class="x"&gt;&amp;lt;｜hy_place▁holder▁no▁3｜&amp;gt;&lt;/span&gt;
 &lt;span class="cp"&gt;{{&lt;/span&gt; &lt;span class="nv"&gt;user_text&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="nf"&gt;trim&lt;/span&gt; &lt;span class="cp"&gt;}}&lt;/span&gt;
+&lt;span class="x"&gt;&amp;lt;｜hy_Assistant｜&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+
+&lt;/details&gt;
+
+&lt;details open&gt;
+
+&lt;summary&gt;这是 gemini 给的 hy-mt2-1.8b 的有关内容&lt;/summary&gt;
+
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="cp"&gt;{%&lt;/span&gt;- &lt;span class="k"&gt;set&lt;/span&gt; &lt;span class="nv"&gt;user_text&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;messages&lt;/span&gt;&lt;span class="o"&gt;[-&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="o"&gt;][&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;content&amp;#39;&lt;/span&gt;&lt;span class="o"&gt;]&lt;/span&gt; -&lt;span class="cp"&gt;%}&lt;/span&gt;
+
+&lt;span class="x"&gt;&amp;lt;｜hy_begin▁of▁sentence｜&amp;gt;&lt;/span&gt;
+&lt;span class="x"&gt;Keep all &amp;quot;%%&amp;quot;.&lt;/span&gt;
+&lt;span class="x"&gt;Match the input structure.&lt;/span&gt;
+&lt;span class="x"&gt;No explanation.&lt;/span&gt;
+&lt;span class="x"&gt;Translate the following text into Chinese.&lt;/span&gt;
+&lt;span class="x"&gt;&amp;lt;｜hy_place▁holder▁no▁3｜&amp;gt;&lt;/span&gt;
+
+&lt;span class="x"&gt;&amp;lt;｜hy_User｜&amp;gt;&lt;/span&gt;
+&lt;span class="x"&gt;Text:&lt;/span&gt;
+&lt;span class="cp"&gt;{{&lt;/span&gt; &lt;span class="nv"&gt;user_text&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="nf"&gt;trim&lt;/span&gt; &lt;span class="cp"&gt;}}&lt;/span&gt;
+
+&lt;span class="x"&gt;Translation:&lt;/span&gt;
 &lt;span class="x"&gt;&amp;lt;｜hy_Assistant｜&amp;gt;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
@@ -1107,22 +1392,31 @@ Prompt
 &lt;li&gt;&lt;a href="#0-boot"&gt;0. boot&lt;/a&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a href="#00-compile-uboot"&gt;0.0. compile uboot&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="#01-optional-retrieve-armbian-boot"&gt;0.1. (optional) retrieve armbian boot&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#02-libretech-flash-tool"&gt;0.2. libretech-flash-tool&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;a href="#1-flash-your-card"&gt;1. flash your card&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#1-flash-your-card"&gt;1. flash your card&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href="#11-if-compiled-uboot-or-grab-it"&gt;1.1. if compiled uboot or grab it&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#12-if-libretech-flash-tool"&gt;1.2. if libretech-flash-tool&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
 &lt;li&gt;&lt;a href="#2-kernel"&gt;2. kernel&lt;/a&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a href="#21-compile-image-and-dtbs"&gt;2.1. compile Image and dtbs&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="#22-optional-use-binary"&gt;2.2. (optional) use binary&lt;/a&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a href="#221-gentoo"&gt;2.2.1. gentoo&lt;/a&gt;&lt;ul&gt;
-&lt;li&gt;&lt;a href="#2221-alarm"&gt;2.2.2.1. 获取 alarm 内核产物&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href="#2222-gentoo-stage3"&gt;2.2.2.2. gentoo stage3 …&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="toc"&gt;
+&lt;li&gt;&lt;a href="#2221-alarm"&gt;2.2 …&lt;/a&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="toc"&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="#0-boot"&gt;0. boot&lt;/a&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a href="#00-compile-uboot"&gt;0.0. compile uboot&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="#01-optional-retrieve-armbian-boot"&gt;0.1. (optional) retrieve armbian boot&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#02-libretech-flash-tool"&gt;0.2. libretech-flash-tool&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/li&gt;
-&lt;li&gt;&lt;a href="#1-flash-your-card"&gt;1. flash your card&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#1-flash-your-card"&gt;1. flash your card&lt;/a&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a href="#11-if-compiled-uboot-or-grab-it"&gt;1.1. if compiled uboot or grab it&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#12-if-libretech-flash-tool"&gt;1.2. if libretech-flash-tool&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
 &lt;li&gt;&lt;a href="#2-kernel"&gt;2. kernel&lt;/a&gt;&lt;ul&gt;
 &lt;li&gt;&lt;a href="#21-compile-image-and-dtbs"&gt;2.1. compile Image and dtbs&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="#22-optional-use-binary"&gt;2.2. (optional) use binary&lt;/a&gt;&lt;ul&gt;
@@ -1140,11 +1434,19 @@ Prompt
 &lt;li&gt;&lt;a href="#4-start"&gt;4. start&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/div&gt;
+&lt;hr&gt;
+&lt;p&gt;The prescribed way is:&lt;/p&gt;
+&lt;p&gt;~&lt;a href="#02-libretech-flash-tool"&gt;0.2. libretech-flash-tool&lt;/a&gt;~&lt;/p&gt;
+&lt;p&gt;update: libretech-flash-tool is not recommended.&lt;/p&gt;
+&lt;p&gt;&lt;a href="#12-if-libretech-flash-tool"&gt;1.2. flash your card&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="#222-alarm"&gt;2.2.2. archlinux arm (alarm)&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="#3-extlinux"&gt;3. extlinux&lt;/a&gt;&lt;/p&gt;
 &lt;h1 id="0-boot"&gt;0. boot&lt;/h1&gt;
-&lt;p&gt;boot 有两种方法&lt;/p&gt;
+&lt;p&gt;boot 有三种方法&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href="#00-compile-uboot"&gt;从头编译uboot&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href="#01-optional-retrieve-armbian-boot"&gt;拿来主义：巧得二进制&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#02-libretech-flash-tool"&gt;更好用的工具&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h2 id="00-compile-uboot"&gt;0.0. compile uboot&lt;/h2&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;git&lt;span class="w"&gt; &lt;/span&gt;clone&lt;span class="w"&gt; &lt;/span&gt;--depth&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;https://github.com/u-boot/u-boot
@@ -1365,7 +1667,29 @@ Trixie Debian 13&lt;br&gt;
 &lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="p"&gt;|&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;doas&lt;span class="w"&gt; &lt;/span&gt;dd&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;of&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;rk3328_boot.bin&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;bs&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;512&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nv"&gt;count&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="m"&gt;32768&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
+&lt;h2 id="02-libretech-flash-tool"&gt;0.2. libretech-flash-tool&lt;/h2&gt;
+&lt;p&gt;2026 年 06 月 1 日&lt;a href="https://hub.libre.computer/t/libre-computer-flash-tool/321"&gt;网上冲浪&lt;/a&gt;时，发现自由电脑项目提供了一个工具 &lt;a href="https://github.com/libre-computer-project/libretech-flash-tool"&gt;libretech-flash-tool&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;如此方便令人感叹&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;git&lt;span class="w"&gt; &lt;/span&gt;clone&lt;span class="w"&gt; &lt;/span&gt;https://github.com/libre-computer-project/libretech-flash-tool.git
+&lt;span class="nb"&gt;cd&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;libretech-flash-tool
+
+./lft.sh&lt;span class="w"&gt; &lt;/span&gt;board-list
+...
+roc-rk3328-cc
+
+./lft.sh&lt;span class="w"&gt; &lt;/span&gt;dev-list
+sdb&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c1"&gt;# 不一定是 sdb&lt;/span&gt;
+
+sudo&lt;span class="w"&gt; &lt;/span&gt;./lft.sh&lt;span class="w"&gt; &lt;/span&gt;bl-flash&lt;span class="w"&gt; &lt;/span&gt;aml-s905x-cc&lt;span class="w"&gt; &lt;/span&gt;sdb&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="c1"&gt;# 一定要确定是 tf 卡&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;h1 id="1-flash-your-card"&gt;1. flash your card&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="#11-if-compiled-uboot-or-grab-it"&gt;if compile uboot yourself (0.0)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#11-if-compiled-uboot-or-grab-it"&gt;if retrieve armbian boot (0.1)&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="#12-if-libretech-flash-tool"&gt;if libretech-flash-tool (0.2)&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="11-if-compiled-uboot-or-grab-it"&gt;1.1. if compiled uboot or grab it&lt;/h2&gt;
 &lt;p&gt;初始化 tf 卡，数据无价，谨慎操作！&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;doas&lt;span class="w"&gt; &lt;/span&gt;fdisk&lt;span class="w"&gt; &lt;/span&gt;/dev/sdb
 g&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;# new GPT disklabel&lt;/span&gt;
@@ -1401,6 +1725,20 @@ q&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;# quit&lt;/span&gt;
 &lt;p&gt;doas e2fsck -f /dev/sdb1&lt;br&gt;
 doas resize2fs /dev/sdb1&lt;/p&gt;
 &lt;/blockquote&gt;
+&lt;h2 id="12-if-libretech-flash-tool"&gt;1.2. if libretech-flash-tool&lt;/h2&gt;
+&lt;p&gt;直接格式化分区即可&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;doas&lt;span class="w"&gt; &lt;/span&gt;fdisk&lt;span class="w"&gt; &lt;/span&gt;/dev/sdb
+n&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;# 创建新分区&lt;/span&gt;
+&lt;span class="m"&gt;1&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;# 默认是1&lt;/span&gt;
+回车&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;# 默认开始 2048&lt;/span&gt;
+回车&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;# 默认扩展到最后&lt;/span&gt;
+w&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;# write&lt;/span&gt;
+q&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="c1"&gt;# quit&lt;/span&gt;
+
+&lt;span class="c1"&gt;# 然后格式化分区&lt;/span&gt;
+doas&lt;span class="w"&gt; &lt;/span&gt;mkfs.ext4&lt;span class="w"&gt; &lt;/span&gt;/dev/sdb1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;h1 id="2-kernel"&gt;2. kernel&lt;/h1&gt;
 &lt;p&gt;类似的，kernel 也有两种方法&lt;/p&gt;
 &lt;ul&gt;

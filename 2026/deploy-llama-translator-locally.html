@@ -160,12 +160,27 @@ AMDGPU_TARGETS="gfx1031 gfx1030"
 <span class=x>Translate the following segment into zh, without additional explanation.</span>
 
 <span class=cp>{{</span> <span class=nv>last_user.content</span> <span class=o>|</span> <span class=nf>trim</span> <span class=cp>}}</span><span class=x>&lt;|extra_0|></span>
-</code></pre></div></details><h3 id=23-hy-mt2-18b>2.3. hy-mt2-1.8b</h3><details open><summary>这是 hy-mt2-1.8b 的有关内容</summary> <div class=highlight><pre><span></span><code><span class=cp>{%</span>- <span class=k>set</span> <span class=nv>user_text</span> <span class=o>=</span> <span class=nv>messages</span><span class=o>[-</span><span class=m>1</span><span class=o>][</span><span class=s1>'content'</span><span class=o>]</span> -<span class=cp>%}</span>
+</code></pre></div></details><h3 id=23-hy-mt2-18b>2.3. hy-mt2-1.8b</h3><details><summary>这是旧的 hy-mt2-1.8b 有关内容</summary> <div class=highlight><pre><span></span><code><span class=cp>{%</span>- <span class=k>set</span> <span class=nv>user_text</span> <span class=o>=</span> <span class=nv>messages</span><span class=o>[-</span><span class=m>1</span><span class=o>][</span><span class=s1>'content'</span><span class=o>]</span> -<span class=cp>%}</span>
 
 <span class=x>&lt;｜hy_begin▁of▁sentence｜></span>
 <span class=x>Translate the following text into Chinese. Output only the translation, no explanation.</span>
 <span class=x>&lt;｜hy_place▁holder▁no▁3｜></span>
 <span class=cp>{{</span> <span class=nv>user_text</span> <span class=o>|</span> <span class=nf>trim</span> <span class=cp>}}</span>
+<span class=x>&lt;｜hy_Assistant｜></span>
+</code></pre></div></details><details open><summary>这是 gemini 给的 hy-mt2-1.8b 的有关内容</summary> <div class=highlight><pre><span></span><code><span class=cp>{%</span>- <span class=k>set</span> <span class=nv>user_text</span> <span class=o>=</span> <span class=nv>messages</span><span class=o>[-</span><span class=m>1</span><span class=o>][</span><span class=s1>'content'</span><span class=o>]</span> -<span class=cp>%}</span>
+
+<span class=x>&lt;｜hy_begin▁of▁sentence｜></span>
+<span class=x>Keep all "%%".</span>
+<span class=x>Match the input structure.</span>
+<span class=x>No explanation.</span>
+<span class=x>Translate the following text into Chinese.</span>
+<span class=x>&lt;｜hy_place▁holder▁no▁3｜></span>
+
+<span class=x>&lt;｜hy_User｜></span>
+<span class=x>Text:</span>
+<span class=cp>{{</span> <span class=nv>user_text</span> <span class=o>|</span> <span class=nf>trim</span> <span class=cp>}}</span>
+
+<span class=x>Translation:</span>
 <span class=x>&lt;｜hy_Assistant｜></span>
 </code></pre></div></details><h2 id=3-for-immersivetrans>3. for ImmersiveTrans</h2><p>沉浸式翻译有三个 prompt<ul><li>system prompt</ul><p>既然我们已经在 llama-server 的 jinja 指定了 system prompt，<strong>此处留空</strong>。<ul><li>multi-paragraph prompt</ul><p>默认的是手动制定 %% 为分隔符<div class=highlight><pre><span></span><code><span class=x>Translate these paragraphs using %% as separator:</span>
 <span class=cp>{{</span><span class=nv>text</span><span class=cp>}}</span>
