@@ -179,36 +179,65 @@ dylan@genteelpc<span class=w> </span>~<span class=w> </span>$<span class=w> </sp
 dylan@genteelpc<span class=w> </span>~<span class=w> </span>$<span class=w> </span>cat<span class=w> </span>/etc/nsswitch.conf<span class=w> </span><span class=p>|</span><span class=w> </span>grep<span class=w> </span>hosts
 <span class=c1># Valid databases are: aliases, ethers, group, gshadow, hosts,</span>
 hosts:<span class=w>      </span>mymachines<span class=w> </span>resolve<span class=w> </span><span class=o>[</span>!UNAVAIL<span class=o>=</span><span class=k>return</span><span class=o>]</span><span class=w> </span>mdns_minimal<span class=w> </span>files<span class=w> </span>myhostname<span class=w> </span>dns
-</code></pre></div><h1 id=4-nginx-reverse-proxy>4. nginx reverse proxy</h1><p>对于 LAN 内访问，使用 nginx 反向代理<div class=highlight><pre><span></span><code><span class=c1># alarm complains about it</span>
+</code></pre></div><h1 id=4-nginx-reverse-proxy>4. nginx reverse proxy</h1><p>对于 LAN 内访问，使用 nginx 反向代理<p>先设置一下异常处理,所有服务挂了都跳转到此页面<div class=highlight><pre><span></span><code><span class=c1># [alarm@alarm html]$ cat /etc/nginx/error-page.conf </span>
+<span class=k>error_page</span><span class=w> </span><span class=mi>404</span><span class=w> </span><span class=mi>500</span><span class=w> </span><span class=mi>502</span><span class=w> </span><span class=mi>503</span><span class=w> </span><span class=mi>504</span><span class=w> </span><span class=s>/404.html</span><span class=p>;</span>
+
+<span class=k>location</span><span class=w> </span><span class=p>=</span><span class=w> </span><span class=s>/404.html</span><span class=w> </span><span class=p>{</span>
+<span class=w>    </span><span class=kn>root</span><span class=w> </span><span class=s>/usr/share/nginx/html</span><span class=p>;</span>
+<span class=w>    </span><span class=kn>internal</span><span class=p>;</span>
+<span class=p>}</span>
+</code></pre></div><p>然后可以抽象一部分出来，三五个服务感觉换到 caddy 也不是很划算，颇有些目睹二十年屎山 之发展现状.<div class=highlight><pre><span></span><code><span class=c1># [alarm@alarm html]$ cat /etc/nginx/proxy-common.conf </span>
+<span class=k>proxy_set_header</span><span class=w> </span><span class=s>Host</span><span class=w> </span><span class=nv>$host</span><span class=p>;</span>
+<span class=k>proxy_set_header</span><span class=w> </span><span class=s>X-Real-IP</span><span class=w> </span><span class=nv>$remote_addr</span><span class=p>;</span>
+<span class=k>proxy_set_header</span><span class=w> </span><span class=s>X-Forwarded-For</span><span class=w> </span><span class=nv>$proxy_add_x_forwarded_for</span><span class=p>;</span>
+
+<span class=k>proxy_intercept_errors</span><span class=w> </span><span class=no>on</span><span class=p>;</span>
+<span class=k>proxy_buffering</span><span class=w> </span><span class=no>off</span><span class=p>;</span>
+</code></pre></div><p>Then comes the <code>/etc/nginx/nginx.conf</code><div class=highlight><pre><span></span><code><span class=c1># alarm complains about it</span>
 <span class=k>server_names_hash_bucket_size</span><span class=w> </span><span class=mi>128</span><span class=p>;</span>
 <span class=k>types_hash_max_size</span><span class=w> </span><span class=mi>4096</span><span class=p>;</span>
 
+<span class=c1># git</span>
 <span class=k>server</span><span class=w> </span><span class=p>{</span>
-<span class=w>    </span><span class=kn>listen</span><span class=w> </span><span class=mi>80</span><span class=p>;</span>
-<span class=w>    </span><span class=kn>listen</span><span class=w> </span><span class=s>[::]:80</span><span class=p>;</span>
 <span class=w>    </span><span class=kn>server_name</span><span class=w> </span><span class=s>git.alarm.local</span><span class=p>;</span>
+<span class=w>    </span><span class=kn>include</span><span class=w> </span><span class=s>error-page.conf</span><span class=p>;</span>
 
 <span class=w>    </span><span class=kn>location</span><span class=w> </span><span class=s>/</span><span class=w> </span><span class=p>{</span>
 <span class=w>        </span><span class=kn>proxy_pass</span><span class=w> </span><span class=s>http://127.0.0.1:3000</span><span class=p>;</span>
-
-<span class=w>        </span><span class=c1># 也可以将以下内容放入 /etc/nginx/proxy_params</span>
-<span class=w>        </span><span class=c1># 随后在此 include proxy_params;</span>
-<span class=w>        </span><span class=kn>proxy_set_header</span><span class=w> </span><span class=s>Host</span><span class=w> </span><span class=nv>$host</span><span class=p>;</span>
-<span class=w>        </span><span class=kn>proxy_set_header</span><span class=w> </span><span class=s>X-Real-IP</span><span class=w> </span><span class=nv>$remote_addr</span><span class=p>;</span>
-<span class=w>        </span><span class=kn>proxy_set_header</span><span class=w> </span><span class=s>X-Forwarded-For</span><span class=w> </span><span class=nv>$proxy_add_x_forwarded_for</span><span class=p>;</span>
+<span class=w>        </span><span class=kn>include</span><span class=w> </span><span class=s>proxy-common.conf</span><span class=p>;</span>
 <span class=w>    </span><span class=p>}</span>
 <span class=p>}</span>
 
+<span class=c1># tools</span>
 <span class=k>server</span><span class=w> </span><span class=p>{</span>
-<span class=w>    </span><span class=kn>listen</span><span class=w> </span><span class=mi>80</span><span class=p>;</span>
-<span class=w>    </span><span class=kn>listen</span><span class=w> </span><span class=s>[::]:80</span><span class=p>;</span>
 <span class=w>    </span><span class=kn>server_name</span><span class=w> </span><span class=s>tools.alarm.local</span><span class=p>;</span>
+<span class=w>    </span><span class=kn>include</span><span class=w> </span><span class=s>error-page.conf</span><span class=p>;</span>
 
 <span class=w>    </span><span class=kn>location</span><span class=w> </span><span class=s>/</span><span class=w> </span><span class=p>{</span>
 <span class=w>        </span><span class=kn>proxy_pass</span><span class=w> </span><span class=s>http://127.0.0.1:8093</span><span class=p>;</span>
-<span class=w>        </span><span class=kn>proxy_set_header</span><span class=w> </span><span class=s>Host</span><span class=w> </span><span class=nv>$host</span><span class=p>;</span>
-<span class=w>        </span><span class=kn>proxy_set_header</span><span class=w> </span><span class=s>X-Real-IP</span><span class=w> </span><span class=nv>$remote_addr</span><span class=p>;</span>
-<span class=w>        </span><span class=kn>proxy_set_header</span><span class=w> </span><span class=s>X-Forwarded-For</span><span class=w> </span><span class=nv>$proxy_add_x_forwarded_for</span><span class=p>;</span>
+<span class=w>        </span><span class=kn>include</span><span class=w> </span><span class=s>proxy-common.conf</span><span class=p>;</span>
+<span class=w>    </span><span class=p>}</span>
+<span class=p>}</span>
+
+<span class=c1># LLM</span>
+<span class=k>server</span><span class=w> </span><span class=p>{</span>
+<span class=w>    </span><span class=kn>server_name</span><span class=w> </span><span class=s>llm.alarm.local</span><span class=p>;</span>
+<span class=w>    </span><span class=kn>include</span><span class=w> </span><span class=s>error-page.conf</span><span class=p>;</span>
+
+<span class=w>    </span><span class=kn>location</span><span class=w> </span><span class=s>/</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=kn>proxy_pass</span><span class=w> </span><span class=s>http://192.168.2.4:12345</span><span class=p>;</span>
+<span class=w>        </span><span class=kn>include</span><span class=w> </span><span class=s>proxy-common.conf</span><span class=p>;</span>
+<span class=w>    </span><span class=p>}</span>
+<span class=p>}</span>
+
+<span class=c1># dashdot</span>
+<span class=k>server</span><span class=w> </span><span class=p>{</span>
+<span class=w>    </span><span class=kn>server_name</span><span class=w> </span><span class=s>dash.alarm.local</span><span class=p>;</span>
+<span class=w>    </span><span class=kn>include</span><span class=w> </span><span class=s>error-page.conf</span><span class=p>;</span>
+
+<span class=w>    </span><span class=kn>location</span><span class=w> </span><span class=s>/</span><span class=w> </span><span class=p>{</span>
+<span class=w>        </span><span class=kn>proxy_pass</span><span class=w> </span><span class=s>http://127.0.0.1:3001</span><span class=p>;</span>
+<span class=w>        </span><span class=kn>include</span><span class=w> </span><span class=s>proxy-common.conf</span><span class=p>;</span>
 <span class=w>    </span><span class=p>}</span>
 <span class=p>}</span>
 
@@ -274,6 +303,8 @@ Report<span class=w> </span>bugs<span class=w> </span>to<span class=w> </span>&l
 <span class=w>  </span><span class=s>IP=$(hostname -i); </span>\
 <span class=w>  </span><span class=s>/usr/bin/avahi-publish -R -a git.alarm.local $IP & </span>\
 <span class=w>  </span><span class=s>/usr/bin/avahi-publish -R -a tools.alarm.local $IP & </span>\
+<span class=w>  </span><span class=s>/usr/bin/avahi-publish -R -a dash.alarm.local $IP & </span>\
+<span class=w>  </span><span class=s>/usr/bin/avahi-publish -R -a llm.alarm.local $IP & </span>\
 <span class=w>  </span><span class=s>wait'</span>
 <span class=na>Restart</span><span class=o>=</span><span class=s>always</span>
 
