@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Random Gibberish - 2023</title><link href="https://dylanz.site/" rel="alternate"/><link href="https://dylanz.site/feeds/2023.atom.xml" rel="self"/><id>https://dylanz.site/</id><updated>2023-06-14T20:35:00+08:00</updated><entry><title>ANSI.Common.Lisp</title><link href="https://dylanz.site/2023/ansicommonlisp.html" rel="alternate"/><published>2023-06-14T20:35:00+08:00</published><updated>2023-06-14T20:35:00+08:00</updated><author><name>Big Pineapple</name></author><id>tag:dylanz.site,2023-06-14:/2023/ansicommonlisp.html</id><summary type="html"/><content type="html">&lt;div class="contents topic" id="topic-1"&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Random Gibberish - 2023</title><link href="https://blog.dylanz.site/" rel="alternate"/><link href="https://blog.dylanz.site/feeds/2023.atom.xml" rel="self"/><id>https://blog.dylanz.site/</id><updated>2023-06-14T20:35:00+08:00</updated><entry><title>ANSI.Common.Lisp</title><link href="https://blog.dylanz.site/2023/ansicommonlisp.html" rel="alternate"/><published>2023-06-14T20:35:00+08:00</published><updated>2023-06-14T20:35:00+08:00</updated><author><name>Big Pineapple</name></author><id>tag:blog.dylanz.site,2023-06-14:/2023/ansicommonlisp.html</id><summary type="html"/><content type="html">&lt;div class="contents topic" id="topic-1"&gt;
 &lt;p class="topic-title"&gt;&lt;a class="reference internal" href="#top"&gt;目录&lt;/a&gt;&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#introduction" id="toc-entry-1"&gt;1. Introduction&lt;/a&gt;&lt;ul&gt;
@@ -452,7 +452,7 @@ B&lt;/li&gt;
 &lt;p&gt;&lt;em&gt;eql&lt;/em&gt; returns true only if &lt;strong&gt;the same object&lt;/strong&gt;, and &lt;em&gt;equal&lt;/em&gt; only needs printed result being same.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-</content><category term="2023"/><category term="lisp"/></entry><entry><title>定位手册 - 理论，实践与进阶</title><link href="https://dylanz.site/2023/ding-wei-shou-ce-li-lun-shi-jian-yu-jin-jie.html" rel="alternate"/><published>2023-05-21T17:18:00+08:00</published><updated>2023-05-21T17:18:00+08:00</updated><author><name>Big Pineapple</name></author><id>tag:dylanz.site,2023-05-21:/2023/ding-wei-shou-ce-li-lun-shi-jian-yu-jin-jie.html</id><summary type="html"/><content type="html">&lt;div class="contents topic" id="topic-1"&gt;
+</content><category term="2023"/><category term="lisp"/></entry><entry><title>定位手册 - 理论，实践与进阶</title><link href="https://blog.dylanz.site/2023/ding-wei-shou-ce-li-lun-shi-jian-yu-jin-jie.html" rel="alternate"/><published>2023-05-21T17:18:00+08:00</published><updated>2023-05-21T17:18:00+08:00</updated><author><name>Big Pineapple</name></author><id>tag:blog.dylanz.site,2023-05-21:/2023/ding-wei-shou-ce-li-lun-shi-jian-yu-jin-jie.html</id><summary type="html"/><content type="html">&lt;div class="contents topic" id="topic-1"&gt;
 &lt;p class="topic-title"&gt;&lt;a class="reference internal" href="#top"&gt;目录&lt;/a&gt;&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#section-2" id="toc-entry-1"&gt;1. 无线定位系统：操作，应用与实践&lt;/a&gt;&lt;ul&gt;
@@ -839,7 +839,7 @@ r_{TOA,l} = d_l + n_{TOA,l} = \sqrt{(x-x_l)^2+(y-y_l)^2} + n_{TOA,l}
     (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
     (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
 }
-&lt;/script&gt;</content><category term="2023"/><category term="positioning"/></entry><entry><title>记录一次 Gentoo 的修缮过程</title><link href="https://dylanz.site/2023/ji-lu-yi-ci-gentoo-de-xiu-shan-guo-cheng.html" rel="alternate"/><published>2023-04-29T13:29:00+08:00</published><updated>2023-04-29T13:29:00+08:00</updated><author><name>Big Pineapple</name></author><id>tag:dylanz.site,2023-04-29:/2023/ji-lu-yi-ci-gentoo-de-xiu-shan-guo-cheng.html</id><summary type="html">
+&lt;/script&gt;</content><category term="2023"/><category term="positioning"/></entry><entry><title>记录一次 Gentoo 的修缮过程</title><link href="https://blog.dylanz.site/2023/ji-lu-yi-ci-gentoo-de-xiu-shan-guo-cheng.html" rel="alternate"/><published>2023-04-29T13:29:00+08:00</published><updated>2023-04-29T13:29:00+08:00</updated><author><name>Big Pineapple</name></author><id>tag:blog.dylanz.site,2023-04-29:/2023/ji-lu-yi-ci-gentoo-de-xiu-shan-guo-cheng.html</id><summary type="html">
 &lt;div class="section" id="abstract"&gt;
 &lt;h2&gt;0. abstract&lt;/h2&gt;
 &lt;p&gt;最近在 /etc/fstab 里面指定 /var/lib/docker 时出现了失 …&lt;/p&gt;&lt;/div&gt;</summary><content type="html">&lt;div class="contents topic" id="topic-1"&gt;
@@ -927,7 +927,7 @@ cp&lt;span class="w"&gt; &lt;/span&gt;/mnt/gentoo/usr/share/portage/config/repos
 &lt;/pre&gt;&lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
-</content><category term="2023"/><category term="gentoo"/></entry><entry><title>reStructuredText primer</title><link href="https://dylanz.site/2023/restructuredtext-primer.html" rel="alternate"/><published>2023-04-10T17:46:00+08:00</published><updated>2023-04-10T17:46:00+08:00</updated><author><name>Big Pineapple</name></author><id>tag:dylanz.site,2023-04-10:/2023/restructuredtext-primer.html</id><summary type="html"/><content type="html">&lt;div class="contents topic" id="topic-1"&gt;
+</content><category term="2023"/><category term="gentoo"/></entry><entry><title>reStructuredText primer</title><link href="https://blog.dylanz.site/2023/restructuredtext-primer.html" rel="alternate"/><published>2023-04-10T17:46:00+08:00</published><updated>2023-04-10T17:46:00+08:00</updated><author><name>Big Pineapple</name></author><id>tag:blog.dylanz.site,2023-04-10:/2023/restructuredtext-primer.html</id><summary type="html"/><content type="html">&lt;div class="contents topic" id="topic-1"&gt;
 &lt;p class="topic-title"&gt;&lt;a class="reference internal" href="#top"&gt;目录&lt;/a&gt;&lt;/p&gt;
 &lt;ul class="simple"&gt;
 &lt;li&gt;&lt;a class="reference internal" href="#abstract" id="toc-entry-1"&gt;0. abstract&lt;/a&gt;&lt;/li&gt;

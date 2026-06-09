@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>Random Gibberish - 2024</title><link href="https://dylanz.site/" rel="alternate"/><link href="https://dylanz.site/feeds/2024.atom.xml" rel="self"/><id>https://dylanz.site/</id><updated>2024-12-14T00:16:00+08:00</updated><entry><title>Dark Souls 2 Custom Server</title><link href="https://dylanz.site/2024/dark-souls-2-custom-server.html" rel="alternate"/><published>2024-12-14T00:16:00+08:00</published><updated>2024-12-14T00:16:00+08:00</updated><author><name>Big Pineapple</name></author><id>tag:dylanz.site,2024-12-14:/2024/dark-souls-2-custom-server.html</id><summary type="html">
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Random Gibberish - 2024</title><link href="https://blog.dylanz.site/" rel="alternate"/><link href="https://blog.dylanz.site/feeds/2024.atom.xml" rel="self"/><id>https://blog.dylanz.site/</id><updated>2024-12-14T00:16:00+08:00</updated><entry><title>Dark Souls 2 Custom Server</title><link href="https://blog.dylanz.site/2024/dark-souls-2-custom-server.html" rel="alternate"/><published>2024-12-14T00:16:00+08:00</published><updated>2024-12-14T00:16:00+08:00</updated><author><name>Big Pineapple</name></author><id>tag:blog.dylanz.site,2024-12-14:/2024/dark-souls-2-custom-server.html</id><summary type="html">
 &lt;div class="section" id="intro"&gt;
 &lt;h2&gt;0. intro&lt;/h2&gt;
 &lt;p&gt;bearer of the curse...&lt;/p&gt;
@@ -132,7 +132,7 @@ screen -dm -S ds2.server $HOME/ds2.server/Server/Server
 &lt;/pre&gt;&lt;/div&gt;
 &lt;p&gt;可使用 Loader 下方的齿轮图标，打勾复制存档 &lt;strong&gt;数据无价，请注意备份！&lt;/strong&gt;&lt;/p&gt;
 &lt;/div&gt;
-</content><category term="2024"/><category term="game"/></entry><entry><title>Word Power Made Easy</title><link href="https://dylanz.site/2024/word-power-made-easy.html" rel="alternate"/><published>2024-06-25T00:10:00+08:00</published><updated>2024-06-25T00:10:00+08:00</updated><author><name>Big Pineapple</name></author><id>tag:dylanz.site,2024-06-25:/2024/word-power-made-easy.html</id><summary type="html">
+</content><category term="2024"/><category term="game"/></entry><entry><title>Word Power Made Easy</title><link href="https://blog.dylanz.site/2024/word-power-made-easy.html" rel="alternate"/><published>2024-06-25T00:10:00+08:00</published><updated>2024-06-25T00:10:00+08:00</updated><author><name>Big Pineapple</name></author><id>tag:blog.dylanz.site,2024-06-25:/2024/word-power-made-easy.html</id><summary type="html">
 &lt;div class="section" id="personality-types"&gt;
 &lt;h2&gt;1. Personality Types&lt;/h2&gt;
 &lt;dl class="docutils"&gt;
